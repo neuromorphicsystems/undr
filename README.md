@@ -4,9 +4,9 @@
 
 # Unified Neuromorphic Datasets Repository
 
-- [Python package](python-package)
-- [Dataset format specification](dataset-format-specification)
-- [Dataset mirrors](dataset-mirrors)
+- [Python package](#python-package)
+- [Dataset format specification](#dataset-format-specification)
+- [Dataset mirrors](#dataset-mirrors)
 
 ## Python package
 
@@ -29,6 +29,7 @@ pip3 install twine
 
 3. Upload the source code to PyPI:
 ```
+rm -rf dist
 python3 setup.py sdist
 python3 -m twine upload dist/*
 ```
