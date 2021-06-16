@@ -1,10 +1,12 @@
 <p align="center">
-    <img src="undr.png" width="256">
+    <img src="https://raw.githubusercontent.com/neuromorphicsystems/undr/main/undr.png" width="256">
 </p>
 
 # Unified Neuromorphic Datasets Repository
 
-Get your data down UNDR.
+- [Python package](python-package)
+- [Dataset format specification](dataset-format-specification)
+- [Dataset mirrors](dataset-mirrors)
 
 ## Python package
 
@@ -15,7 +17,6 @@ pip3 install undr
 ## Dataset format specification
 
 ## Dataset mirrors
-
 
 ## Publish
 
