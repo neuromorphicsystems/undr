@@ -5,7 +5,7 @@ with open('README.md') as file:
 
 setuptools.setup(
     name='undr',
-    version='0.0.2',
+    version='0.0.4',
     url='https://github.com/neuromorphicsystems/undr',
     author='Alexandre Marcireau',
     author_email='alexandre.marcireau@gmail.com',
@@ -22,5 +22,4 @@ setuptools.setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
     ],
-    package_dir={'': 'undr'},
-    packages=setuptools.find_packages(where='src'))
+    packages=['undr'])
