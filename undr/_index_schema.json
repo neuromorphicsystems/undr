@@ -1,0 +1,72 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/neuromorphicsystems/undr/undr/_index_schema.json",
+    "title": "index",
+    "description": "A directory index to store metadata",
+    "type": "object",
+    "properties": {
+        "directories": {
+            "description": "Subdirectories in the same directory as the index",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "entries": {
+            "description": "List of files (typically of different types) recorded at the same time",
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "suffix": {
+                            "description": "File suffix to add to the object key to form the filename",
+                            "type": "string"
+                        },
+                        "type": {
+                            "description": "File type in the list of supported types",
+                            "type": "string",
+                            "enum": ["aps", "dvs", "imu", "plain"]
+                        },
+                        "original_name": {
+                            "description": "The recording name in the original dataset",
+                            "type": "string"
+                        },
+                        "sensor": {
+                            "description": "The sensor used to acquire the data",
+                            "type": "string",
+                            "enum": ["atis", "davis240c", "dvs"]
+                        },
+                        "scene": {
+                            "description": "The type of scene that produced the data",
+                            "type": "string",
+                            "enum": ["real", "screen", "synthetic"]
+                        },
+                        "width": {
+                            "description": "The sensor width in pixels",
+                            "type": "number"
+                        },
+                        "height": {
+                            "description": "The sensor height in pixels",
+                            "type": "number"
+                        },
+                        "date": {
+                            "description": "The recording acquisition date",
+                            "type": "date-time"
+                        }
+                    },
+                    "required": ["suffix", "type"]
+                }
+            }
+        },
+        "ignore": {
+            "description": "Other files and directories bundled with the dataset",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "required": ["directories", "entries", "ignore"]
+}

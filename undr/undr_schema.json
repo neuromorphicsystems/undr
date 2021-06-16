@@ -1,0 +1,37 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/neuromorphicsystems/undr/undr/undr_schema.json",
+    "title": "undr configuration",
+    "description": "A configuration file for the UNDR package",
+    "type": "object",
+    "properties": {
+        "directory": {
+            "description": "Path to the download directory, relative to the parent of the configuration file",
+            "type": "string"
+        },
+        "datasets": {
+            "description": "List of remote dataset servers",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "The dataset name, used as directory name",
+                        "type": "string"
+                    },
+                    "url": {
+                        "description": "The remote server URL",
+                        "type": "uri"
+                    },
+                    "mode": {
+                        "description": "The download strategy",
+                        "type": "string",
+                        "enum": ["compressed", "decompressed", "remote"]
+                    }
+                },
+                "required": ["name", "url", "mode"]
+            }
+        }
+    },
+    "required": ["directory", "datasets"]
+}
