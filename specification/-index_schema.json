@@ -1,0 +1,94 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/neuromorphicsystems/undr/main/specification/-index_schema.json",
+    "title": "index",
+    "description": "A directory index to store metadata",
+    "definitions": {
+        "path_object": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "pattern": "^(?:[A-Za-z0-9_]+|[A-Za-z0-9_\\.]+\\.(?!download$|lz|decompress$)[^\\.]*)$"
+                },
+                "doi": {
+                    "type": "string",
+                    "pattern": "^10[.].+$"
+                }
+            },
+            "required": ["name"]
+        }
+    },
+    "type": "object",
+    "properties": {
+        "directories": {
+            "description": "Subdirectories in the same directory as the index",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/path_object"
+            }
+        },
+        "doi": {
+            "type": "string",
+            "pattern": "^10[.].+$"
+        },
+        "files": {
+            "description": "Dataset files with a supported format",
+            "type": "array",
+            "items": {
+                "allOf": [
+                    {
+                        "$ref": "#/definitions/path_object"
+                    },
+                    {
+                        "properties": {
+                            "type": {
+                                "description": "File type in the list of supported types",
+                                "type": "string",
+                                "enum": ["aps", "dvs", "imu", "plain"]
+                            },
+                            "original_name": {
+                                "description": "The recording name in the original dataset",
+                                "type": "string"
+                            },
+                            "sensor": {
+                                "description": "The sensor used to acquire the data",
+                                "type": "string",
+                                "enum": ["atis", "davis240c", "dvs"]
+                            },
+                            "scene": {
+                                "description": "The type of scene that produced the data",
+                                "type": "string",
+                                "enum": ["real", "screen", "synthetic"]
+                            },
+                            "width": {
+                                "description": "The sensor width in pixels",
+                                "type": "integer",
+                                "minimum": 0
+                            },
+                            "height": {
+                                "description": "The sensor height in pixels",
+                                "type": "integer",
+                                "minimum": 0
+                            },
+                            "date": {
+                                "description": "The recording acquisition date",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        },
+                        "required": ["type"]
+                    }
+                ]
+            }
+        },
+        "other_files": {
+            "description": "Other files bundled with the dataset",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/path_object"
+            }
+        }
+    },
+    "required": ["directories", "files", "other_files"]
+}

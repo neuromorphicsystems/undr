@@ -3,23 +3,11 @@
     "$id": "https://raw.githubusercontent.com/neuromorphicsystems/undr/main/undr/undr_schema.json",
     "title": "undr configuration",
     "description": "A configuration file for the UNDR package",
-    "definitions": {
-        "path": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "pattern": "^[^/\\\?]+$"
-                }
-            },
-            "required": ["name"]
-        }
-    },
     "type": "object",
     "properties": {
         "directory": {
             "description": "Path to the download directory, relative to the parent of the configuration file",
-            "$ref": "#/definitions/path"
+            "type": "string"
         },
         "datasets": {
             "description": "List of remote dataset servers",
@@ -29,7 +17,12 @@
                 "properties": {
                     "name": {
                         "description": "The dataset name, used as directory name",
-                        "$ref": "#/definitions/path"
+                        "type": "string",
+                        "pattern": "^(?:[A-Za-z0-9_]+|[A-Za-z0-9_\\.]+\\.(?!download$|lz$|decompress$)[^\\.]*)$"
+                    },
+                    "doi": {
+                        "type": "string",
+                        "pattern": "^10[.].+$"
                     },
                     "url": {
                         "description": "The remote server URL",
@@ -40,6 +33,16 @@
                         "description": "The download strategy",
                         "type": "string",
                         "enum": ["compressed", "decompressed", "remote"]
+                    },
+                    "server_type": {
+                        "description": "Server type for file list parsing",
+                        "type": "string",
+                        "enum": ["apache", "nginx"]
+                    },
+                    "timeout": {
+                        "description": "Socket timeout for server requests",
+                        "type": "number",
+                        "minimum": 0
                     }
                 },
                 "required": ["name", "url", "mode"]

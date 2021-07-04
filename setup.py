@@ -6,7 +6,7 @@ dirname = pathlib.Path(__file__).resolve().parent
 shutil.rmtree(dirname / 'undr', ignore_errors=True)
 shutil.copytree(dirname / 'source', dirname / 'undr')
 shutil.copyfile(dirname / 'specification' / 'undr_schema.json', dirname / 'undr' / 'undr_schema.json')
-shutil.copyfile(dirname / 'specification' / '_index_schema.json', dirname / 'undr' / '_index_schema.json')
+shutil.copyfile(dirname / 'specification' / '-index_schema.json', dirname / 'undr' / '-index_schema.json')
 
 with open('README.md') as file:
     long_description = file.read()
@@ -24,6 +24,7 @@ setuptools.setup(
         'jsonschema-rs>=0.9',
         'lzip>=1.0',
         'numpy>=1.20',
+        'requests>=2.25',
         'toml>=0.10',
     ],
     classifiers=[
