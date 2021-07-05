@@ -5,19 +5,24 @@
 # Unified Neuromorphic Datasets Repository
 
 - [Getting started](#getting-started)
+  - [Install the undr module](#install-the-undr-module)
+  - [Generate a default configuration file](#generate-a-default-configuration-file)
+  - [Download the datasets](#download-the-datasets)
+  - [Process the data](#process-the-data)
+  - [Generate a BibTex file](#generate-a-bibtex-file)
 - [Python module](#python-module)
 - [Dataset format specification](#dataset-format-specification)
 - [Dataset mirrors](#dataset-mirrors)
 
 ## Getting Started
 
-### 1. Install the `undr` command-line program.
+### Install the undr module
 
 ```sh
 pip3 install undr
 ```
 
-### 2. Generate a default configuration file.
+### Generate a default configuration file
 
 ```sh
 python3 -m undr init
@@ -36,15 +41,23 @@ Datasets are listed as `[[datasets]]` entries with three mandatory properties: `
 
 `undr` also supports hybrid configurations where only part of a dataset is downloaded or decompressed. See [NOT DOCUMENTED YET] for details.
 
-### 3. Provision the datasets (download their file indexes) and possibly download and decompress their files (depending on the `'mode'`).
-  ```sh
-  python3 -m undr install
-  ```
+### Download the datasets
 
-### 4. Generate a BibTex file to cite the datasets you downloaded.
-  ```sh
-  python3 -m undr bibtex --output datasets.bib
-  ```
+```sh
+python3 -m undr install
+```
+
+This command downloads the datasets file indexes. If the `mode` is `'compressed'` or `'decompress'`, it also downloads the dataset files (and possibly decompresses them).
+
+This command can be interrupted at any time with CTRL + C. Re-running it will resume download where it left off.
+
+### Generate a BibTex file
+
+```sh
+python3 -m undr bibtex --output datasets.bib
+```
+
+The UNDR project does not claim authorship of the datasets. Please use this file to cite the origiinal articles.
 
 ## Python module
 
