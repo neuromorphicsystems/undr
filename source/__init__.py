@@ -5,6 +5,7 @@ import itertools
 import json
 import jsonschema_rs
 import lzip
+import operator
 import os
 import pathlib
 import toml
@@ -68,18 +69,6 @@ class Path:
     server: remote.Server
     parent: typing.Optional["IndexedDirectory"] = dataclasses.field(repr=False)
     metadata: dict[str, typing.Any] = dataclasses.field(repr=False)
-
-    def doi(self) -> typing.Optional[str]:
-        if self.own_doi is None:
-            if self.parent is None:
-                return None
-            return self.parent.doi()
-        return self.own_doi
-
-    def bibtex(self, pretty: bool = False) -> str:
-        doi = self.doi()
-        assert doi is not None
-        return bibtex.from_doi(doi=doi, pretty=pretty)
 
 
 @dataclasses.dataclass
@@ -162,7 +151,7 @@ class IndexedDirectory(Path):
         self.directories = {
             directory["name"]: IndexedDirectory(
                 path=self.path / directory["name"],
-                doi=directory["doi"] if "doi" in directory else None,
+                own_doi=directory["doi"] if "doi" in directory else None,
                 server=self.server.clone_with_url(self.server.join_url(directory["name"], trailing_slash=True)),
                 parent=self,
                 metadata={key: value for key, value in directory.items() if key != "name" and key != "doi"},
@@ -266,22 +255,26 @@ class IndexedDirectory(Path):
             for directory in self.directories:
                 directory.set_timeout(timeout)
 
-    def dois(self) -> set[str]:
-        dois = set()
+    def doi_to_paths(self) -> dict[str, list[Path]]:
+        doi_to_paths = {}
         if self.own_doi is not None:
-            dois.add(self.own_doi)
-        for file in itertools.chain(self.files.values(), self.other_files.values):
+            if self.own_doi in doi_to_paths:
+                doi_to_paths[self.own_doi].append(self)
+            else:
+                doi_to_paths[self.own_doi] = [self]
+        for file in itertools.chain(self.files.values(), self.other_files.values()):
             if file.own_doi is not None:
-                dois.add(file.own_doi)
-        for directory in self.directories:
-            dois |= directory.dois()
-        return dois
-
-    def bibtex(self, pretty: bool = False) -> str:
-        result = ""
-        for doi in sorted(list(self.dois())):
-            result += bibtex.from_doi(doi=doi, pretty=pretty)
-        return result
+                if file.own_doi in doi_to_paths:
+                    doi_to_paths[file.own_doi].append(file)
+                else:
+                    doi_to_paths[file.own_doi] = [file]
+        for directory in self.directories.values():
+            for doi, paths in directory.doi_to_paths().items():
+                if doi in doi_to_paths:
+                    doi_to_paths[doi].extend(paths)
+                else:
+                    doi_to_paths[doi] = paths
+        return doi_to_paths
 
 
 @dataclasses.dataclass
@@ -325,35 +318,47 @@ class Configuration:
         if provision:
             self.provision()
 
-    def provision(self, force: bool) -> None:
+    def provision(self, force: bool, quiet: bool) -> None:
         self.directory.mkdir(parents=True, exist_ok=True)
-        print(format_info("provision"))
+        if not quiet:
+            print(format_info("provision"))
         for index, (name, dataset) in enumerate(self.datasets.items()):
-            dataset.provision(prefix=f"{format_count(index, len(self.datasets))} {name}")
-        print()
-        print(format_info("download"))
+            dataset.provision(prefix=None if quiet else f"{format_count(index, len(self.datasets))} {name}")
+        if not quiet:
+            print()
+            print(format_info("download"))
         download_count = sum(1 for dataset in self.datasets.values() if dataset.mode != "remote")
         for index, (name, dataset) in enumerate(self.datasets.items()):
             if dataset.mode != "remote":
-                dataset.download(force=force, prefix=f"{format_count(index, download_count)} {name}")
+                dataset.download(force=force, prefix=None if quiet else f"{format_count(index, download_count)} {name}")
                 dataset.clear_cache()
                 gc.collect()
-        print()
-        print(format_info("decompress"))
+        if not quiet:
+            print()
+            print(format_info("decompress"))
         decompress_count = sum(1 for dataset in self.datasets.values() if dataset.mode == "decompressed")
         for name, dataset in self.datasets.items():
             if dataset.mode == "decompressed":
-                dataset.decompress(force=force, prefix=f"{format_count(index, decompress_count)} {name}")
+                dataset.decompress(
+                    force=force, prefix=None if quiet else f"{format_count(index, decompress_count)} {name}"
+                )
                 gc.collect()
 
-    def dois(self) -> set[str]:
-        dois = set()
-        for dataset in self.datasets:
-            dois |= dataset.dois()
-        return dois
+    def doi_to_paths(self) -> dict[str, list[Path]]:
+        doi_to_paths = {}
+        for dataset in self.datasets.values():
+            for doi, paths in dataset.doi_to_paths().items():
+                if doi in doi_to_paths:
+                    doi_to_paths[doi].extend(paths)
+                else:
+                    doi_to_paths[doi] = paths
+        return doi_to_paths
 
-    def bibtex(self, pretty: bool = False) -> str:
+    def bibtex(self, pretty: bool, timeout: float) -> str:
         result = ""
-        for doi in sorted(list(self.dois())):
-            result += bibtex.from_doi(doi=doi, pretty=pretty)
+        for doi, paths in self.doi_to_paths().items():
+            if len(result) > 0:
+                result += "\n"
+            result += "% {}\n".format(", ".join(path.path.relative_to(self.directory).as_posix() for path in paths))
+            result += bibtex.from_doi(doi=doi, pretty=pretty, timeout=timeout)
         return result

@@ -54,7 +54,7 @@
                             "sensor": {
                                 "description": "The sensor used to acquire the data",
                                 "type": "string",
-                                "enum": ["atis", "davis240c", "dvs"]
+                                "enum": ["atis", "davis240c", "dvs128"]
                             },
                             "scene": {
                                 "description": "The type of scene that produced the data",

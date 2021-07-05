@@ -1,0 +1,9 @@
+directory = 'datasets'
+
+datasets = [
+    {name = 'dvs09', url = 'https://rds.westernsydney.edu.au/Institutes/MARCS/ICNS/UNDR/dvs09/', mode = 'remote', server_type = 'apache'},
+    {name = 'dvsflow16', url = 'https://rds.westernsydney.edu.au/Institutes/MARCS/ICNS/UNDR/dvsflow16/', mode = 'remote', server_type = 'apache'},
+    {name = 'dvsact16', url = 'https://rds.westernsydney.edu.au/Institutes/MARCS/ICNS/UNDR/dvsact16/', mode = 'remote', server_type = 'apache'},
+    {name = 'ncaltech101', url = 'https://rds.westernsydney.edu.au/Institutes/MARCS/ICNS/UNDR/ncaltech101/', mode = 'remote', server_type = 'apache'},
+    {name = 'nmnist', url = 'https://rds.westernsydney.edu.au/Institutes/MARCS/ICNS/UNDR/nmnist/', mode = 'remote', server_type = 'apache'},
+]
