@@ -18,7 +18,7 @@
                     "name": {
                         "description": "The dataset name, used as directory name",
                         "type": "string",
-                        "pattern": "^(?:[A-Za-z0-9_]+|[A-Za-z0-9_\\.]+\\.(?!download$|lz$|decompress$)[^\\.]*)$"
+                        "pattern": "^(?:[A-Za-z0-9_\\-]+|[A-Za-z0-9_\\-\\.]+\\.(?!download$|lz$|decompress$)[^\\.]*)$"
                     },
                     "doi": {
                         "type": "string",
@@ -32,7 +32,7 @@
                     "mode": {
                         "description": "The download strategy",
                         "type": "string",
-                        "enum": ["compressed", "decompressed", "remote"]
+                        "enum": ["local", "local-decompressed", "remote"]
                     },
                     "server_type": {
                         "description": "Server type for file list parsing",

@@ -6,11 +6,10 @@ import html.parser
 import os
 import pathlib
 import re
-import sys
 import threading
-import time
 import typing
 from . import certificates
+from . import progress
 from . import utilities
 
 certificates_bundle = certificates.bundle()
@@ -66,25 +65,20 @@ class Task(Resource):
     downloaded_size: int = 0
 
 
-@dataclasses.dataclass
-class WorkloadStatus:
-    force: bool
-    todo_file_count: int = 0
-    doing_file_count: int = 0
-    done_file_count: int = 0
-    to_download_size: int = 0
-    downloaded_size: int = 0
-
-
-@dataclasses.dataclass
-class Workload(WorkloadStatus):
-    tasks: collections.deque[Task] = dataclasses.field(default=None, init=False, repr=False)
-    done_tasks: collections.deque[Task] = dataclasses.field(default=None, init=False, repr=False)
-
-    def __post_init__(self):
+class Workload:
+    def __init__(self):
+        self.status = progress.Status()
+        self.status_lock = threading.Lock()
         self.tasks = collections.deque()
         self.done_tasks = collections.deque()
-        self.lock = threading.Lock()
+        self.progress_queue: typing.Optional[collections.deque] = None
+
+    def update_status(self, **kwargs):
+        status_update = progress.StatusUpdate(**kwargs)
+        with self.status_lock:
+            self.status.apply_update(status_update=status_update)
+        if self.progress_queue is not None:
+            self.progress_queue.append(status_update)
 
     def add_todo_task(self, resource: Resource, size: int) -> None:
         self.tasks.append(
@@ -96,9 +90,10 @@ class Workload(WorkloadStatus):
                 downloaded_size=0,
             )
         )
-        with self.lock:
-            self.todo_file_count += 1
-            self.to_download_size += size
+        self.update_status(
+            todo_file_count_delta=1,
+            todo_size_delta=size,
+        )
 
     def add_doing_task(self, resource: Resource, to_download_size: int, downloaded_size: int) -> None:
         self.tasks.append(
@@ -110,10 +105,11 @@ class Workload(WorkloadStatus):
                 downloaded_size=downloaded_size,
             )
         )
-        with self.lock:
-            self.doing_file_count += 1
-            self.to_download_size += to_download_size
-            self.downloaded_size += downloaded_size
+        self.update_status(
+            todo_file_count_delta=1,
+            todo_size_delta=to_download_size,
+            done_size_delta=downloaded_size,
+        )
 
     def add_done_task(self, resource: Resource, size: int) -> None:
         self.done_tasks.append(
@@ -125,9 +121,7 @@ class Workload(WorkloadStatus):
                 downloaded_size=size,
             )
         )
-        with self.lock:
-            self.done_file_count += 1
-            self.downloaded_size += size
+        self.update_status(done_file_count_delta=1, done_size_delta=size)
 
     def resize_task(self, task: Task, actual_to_download_size: int, actual_downloaded_size: int) -> None:
         if task.to_download_size == actual_to_download_size:
@@ -141,16 +135,12 @@ class Workload(WorkloadStatus):
             downloaded_delta = actual_downloaded_size - task.downloaded_size
             task.downloaded_size = actual_downloaded_size
         if to_download_delta != 0 or downloaded_delta != 0:
-            with self.lock:
-                self.to_download_size += to_download_delta
-                self.downloaded_size += downloaded_delta
+            self.update_status(todo_size_delta=to_download_delta, done_size_delta=downloaded_delta)
 
     def report_downloaded(self, task: Task, size: int) -> None:
         task.to_download_size = max(0, task.to_download_size - size)
         task.downloaded_size += size
-        with self.lock:
-            self.to_download_size = max(0, self.to_download_size - size)
-            self.downloaded_size += size
+        self.update_status(todo_size_delta=-size, done_size_delta=size)
 
     def report_done(self, task: Task) -> None:
         if task.to_download_size == 0:
@@ -158,105 +148,13 @@ class Workload(WorkloadStatus):
         else:
             delta = -task.to_download_size
         task.to_download_size += delta
-        state = copy.copy(task.state)
         task.state = Task.State.DONE
         self.done_tasks.append(task)
-        with self.lock:
-            self.to_download_size += delta
-            if state == Task.State.TODO:
-                self.todo_file_count = max(self.todo_file_count - 1, 0)
-            elif state == Task.State.DOING:
-                self.doing_file_count = max(self.doing_file_count - 1, 0)
-            else:
-                raise Exception(f"unexpected task state {task.state}")
-            self.done_file_count += 1
-
-    def status(self) -> WorkloadStatus:
-        with self.lock:
-            return WorkloadStatus(
-                force=self.force,
-                todo_file_count=self.todo_file_count,
-                doing_file_count=self.doing_file_count,
-                done_file_count=self.done_file_count,
-                to_download_size=self.to_download_size,
-                downloaded_size=self.downloaded_size,
-            )
-
-
-class Printer:
-    def __init__(self, prefix: str, workload: Workload, file_object: typing.IO = None):
-        self.prefix = prefix
-        self.workload = workload
-        self.file_object = sys.stdout if file_object is None else file_object
-        self.complete = threading.Condition()
-        self.previous_message_length = 0
-        self.speed_samples = collections.deque()
-        self.begin_t = time.monotonic()
-        self.begin_downloaded_size = self.workload.status().downloaded_size
-        self.previous_downloaded_size = 0
-        self.previous_t = self.begin_t
-
-        def target() -> None:
-            while True:
-                with self.complete:
-                    if self.complete.wait(0.1):
-                        break
-                self.__write(last_call=False)
-            self.__write(last_call=True)
-
-        self.worker = threading.Thread(target=target)
-        self.worker.daemon = True
-        self.worker.start()
-
-    def __write(self, last_call) -> None:
-        status = self.workload.status()
-        downloaded_size = status.downloaded_size - self.begin_downloaded_size
-        if last_call:
-            speed = downloaded_size / (time.monotonic() - self.begin_t)
-        else:
-            now = time.monotonic()
-            if len(self.speed_samples) >= 30:
-                self.speed_samples.popleft()
-            self.speed_samples.append((downloaded_size - self.previous_downloaded_size) / (now - self.previous_t))
-            self.previous_downloaded_size = downloaded_size
-            self.previous_t = now
-            speed = sum(self.speed_samples) / len(self.speed_samples)
-
-        total_size = status.to_download_size + status.downloaded_size
-        total_count = status.todo_file_count + status.doing_file_count + status.done_file_count
-        if total_count == 0:
-            message = f"{self.prefix}"
-        else:
-            message = "{} - {} / {} file{}, {:.2f} % ({} / {})".format(
-                self.prefix,
-                status.done_file_count,
-                total_count,
-                "" if total_count == 1 else "s",
-                0 if total_size == 0 else status.downloaded_size / total_size * 100,
-                utilities.size_to_string(status.downloaded_size),
-                utilities.size_to_string(total_size),
-                f", {utilities.speed_to_string(speed)}" if speed > 0 else "",
-            )
-        self.file_object.write(
-            "\r{}\r{}{}".format(
-                " " * self.previous_message_length,
-                message,
-                "\n" if last_call else "",
-            )
+        self.update_status(
+            todo_size_delta=delta,
+            todo_file_count_delta=-1,
+            done_file_count_delta=1,
         )
-        self.file_object.flush()
-        self.previous_message_length = len(message)
-
-    def close(self) -> None:
-        with self.complete:
-            self.complete.notify()
-        self.worker.join()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *_):
-        self.close()
 
 
 class Server:
@@ -307,14 +205,14 @@ class Server:
             int(response.headers["Content-Length"]),
         )
 
-    def choose_resource_failed(self, resources: collections.abc.Sequence[Resource]):
+    def resource_pick_failed(self, resources: collections.abc.Sequence[Resource]):
         raise RuntimeError(
             "error 404 (not found) returned by all the candidates ({})".format(
                 ", ".join(self.path_to_url(resource.remote_path) for resource in resources)
             )
         )
 
-    def choose_resource(
+    def resource_pick_from(
         self, session: requests.Session, resources: collections.abc.Sequence[Resource], force: bool
     ) -> tuple[Resource, int, int]:
         selected_resource = None
@@ -338,45 +236,73 @@ class Server:
             if accept_ranges:
                 return (selected_resource, max(0, total_size - selected_downloaded_size), selected_downloaded_size)
             return (selected_resource, total_size, 0)
-        self.choose_resource_failed(resources=resources)
+        self.resource_pick_failed(resources=resources)
+
+    def resource_pick(
+        self, session: requests.Session, resource: Resource, try_alternatives: bool
+    ) -> tuple[Resource, int, int]:
+        return self.resource_pick_from(
+            session=session,
+            resources=(resource, resource.as_lzip()) if try_alternatives else (resource,),
+            force=True,
+        )
+
+    def resource_size_and_chunks(self, session: requests.Session, resource: Resource) -> typing.Iterator[bytes]:
+        response = session.get(
+            self.path_to_url(resource.remote_path),
+            timeout=self._timeout,
+            stream=True,
+        )
+        response.raise_for_status()
+        actual_to_download_size = int(response.headers["Content-Length"])
+
+        def chunks(chunk_size: int) -> typing.Iterator[bytes]:
+            for chunk in response.iter_content(chunk_size=chunk_size):
+                yield chunk
+
+        return (actual_to_download_size, chunks)
 
     def workload(
         self,
         resources: collections.abc.Iterable[Resource],
         force: bool,
         try_alternatives: bool,
-        workers_count: int = 32,
+        workers_count: int,
     ) -> Workload:
         resources = collections.deque(resources)
-        workload = Workload(force)
+        workload = Workload()
 
         def worker_target():
             with self.session() as local_session:
                 try:
                     while True:
                         resource = resources.popleft()
-                        resource, to_download_size, downloaded_size = self.choose_resource(
+                        resource, to_download_size, downloaded_size = self.resource_pick_from(
                             session=local_session,
                             resources=(resource, resource.as_lzip()) if try_alternatives else (resource,),
                             force=force,
                         )
                         if to_download_size > 0:
                             if downloaded_size > 0:
-                                workload.add_doing_task(resource, downloaded_size, to_download_size)
+                                workload.add_doing_task(
+                                    resource=resource,
+                                    to_download_size=to_download_size,
+                                    downloaded_size=downloaded_size,
+                                )
                             else:
-                                workload.add_todo_task(resource, to_download_size)
+                                workload.add_todo_task(resource=resource, size=to_download_size)
                         elif downloaded_size > 0:
-                            workload.add_done_task(resource, downloaded_size)
+                            workload.add_done_task(resource=resource, size=downloaded_size)
                         else:
-                            workload.add_todo_task(resource, 0)
+                            workload.add_todo_task(resource=resource, size=0)
                 except IndexError:
                     pass
 
-        if workers_count == 1:
+        if min(workers_count, len(resources)) < 2:
             worker_target()
         else:
             workers = []
-            for _ in range(0, min(workers_count, len(workload.tasks))):
+            for _ in range(0, min(workers_count, len(resources))):
                 worker = threading.Thread(target=worker_target)
                 worker.daemon = True
                 worker.start()
@@ -388,7 +314,7 @@ class Server:
     def consume(
         self,
         workload: Workload,
-        workers_count: int = 32,
+        workers_count: int,
     ) -> None:
         def worker_target():
             with self.session() as local_session:
@@ -443,7 +369,7 @@ class Server:
                 except IndexError:
                     pass
 
-        if workers_count == 1:
+        if min(workers_count, len(workload.tasks)) < 2:
             worker_target()
         else:
             workers = []
@@ -458,6 +384,24 @@ class Server:
     def download(self, resource: Resource, force: bool, try_alternatives: bool) -> None:
         workload = self.workload(resources=(resource,), force=force, try_alternatives=try_alternatives, workers_count=1)
         self.consume(workload, workers_count=1)
+
+
+class LocalServer(Server):
+    class LocalSession:
+        def head(self, url: str, allow_redirects: bool, timeout: float):
+            raise FileNotFoundError(url)
+
+        def get(self, url: str, timeout: float, stream: bool, headers: dict[str, str]):
+            raise FileNotFoundError(url)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            pass
+
+    def session(self):
+        return self.__class__.LocalSession()
 
 
 class FileServer(Server):
@@ -498,11 +442,11 @@ class FileServer(Server):
         resources: collections.abc.Iterable[Resource],
         force: bool,
         try_alternatives: bool,
-        workers_count: int = 32,
+        workers_count: int,
     ) -> Workload:
         return super().workload(resources=resources, force=force, try_alternatives=try_alternatives, workers_count=1)
 
-    def choose_resource_failed(self, resources: collections.abc.Sequence[Resource]):
+    def resource_pick_failed(self, resources: collections.abc.Sequence[Resource]):
         raise RuntimeError(
             "none of the candidates are listed in their parent directory ({})".format(
                 ", ".join(
