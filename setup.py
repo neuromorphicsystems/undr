@@ -17,7 +17,7 @@ with open("README.md") as file:
 
 setuptools.setup(
     name="undr",
-    version="0.0.7",
+    version="0.0.8",
     url="https://github.com/neuromorphicsystems/undr",
     author="Alexandre Marcireau",
     author_email="alexandre.marcireau@gmail.com",
