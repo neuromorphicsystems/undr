@@ -1,5 +1,6 @@
 *.pyc
 *.egg-info
+*.eggs
 __pycache__
 dist
 undr

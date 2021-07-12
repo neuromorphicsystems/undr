@@ -1,21 +1,23 @@
 import setuptools
-import shutil
-import pathlib
+import sys
 
-dirname = pathlib.Path(__file__).resolve().parent
+if not "-h" in sys.argv and not "--help" in sys.argv and ("sdist" in sys.argv or "develop" in sys.argv):
+    import shutil
+    import pathlib
 
-shutil.rmtree(dirname / "undr", ignore_errors=True)
-shutil.copytree(dirname / "source", dirname / "undr")
-shutil.copyfile(dirname / "specification" / "undr_schema.json", dirname / "undr" / "undr_schema.json")
-shutil.copyfile(dirname / "specification" / "-index_schema.json", dirname / "undr" / "-index_schema.json")
-shutil.copyfile(dirname / "undr_default.toml", dirname / "undr" / "undr_default.toml")
+    dirname = pathlib.Path(__file__).resolve().parent
+    shutil.rmtree(dirname / "undr", ignore_errors=True)
+    shutil.copytree(dirname / "source", dirname / "undr")
+    shutil.copyfile(dirname / "specification" / "undr_schema.json", dirname / "undr" / "undr_schema.json")
+    shutil.copyfile(dirname / "specification" / "-index_schema.json", dirname / "undr" / "-index_schema.json")
+    shutil.copyfile(dirname / "undr_default.toml", dirname / "undr" / "undr_default.toml")
 
 with open("README.md") as file:
     long_description = file.read()
 
 setuptools.setup(
     name="undr",
-    version="0.0.6",
+    version="0.0.7",
     url="https://github.com/neuromorphicsystems/undr",
     author="Alexandre Marcireau",
     author_email="alexandre.marcireau@gmail.com",

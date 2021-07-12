@@ -253,7 +253,7 @@ if __name__ == "__main__":
                         print(f'{format_error(error)} in "{file.path}"')
 
     if args.command == "check-local-directory":
-        print(format_info("check-local-directory"))
+        print(format_info("check local directory"))
         directory = IndexedDirectory(
             path=pathlib.Path(args.path),
             own_doi=None,
