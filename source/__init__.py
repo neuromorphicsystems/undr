@@ -203,6 +203,7 @@ class GenericFile(Path):
                                 )
                             )
         self.progress_queue.append(progress.StatusUpdate(todo_file_count_delta=-1, done_file_count_delta=1))
+        self.progress_queue = None
 
     def chunks(self) -> typing.Iterable[bytes]:
         yield from self._chunks(word_size=1)
@@ -284,9 +285,6 @@ class Task:
     handle_file: typing.Callable[[typing.Any], typing.Any]
 
 
-debug_count = 0  # @DEV
-
-
 @dataclasses.dataclass
 class IndexedDirectory(Path):
     provision: dataclasses.InitVar[bool]
@@ -315,6 +313,7 @@ class IndexedDirectory(Path):
         with open(self.path / "-index.json") as json_index_file:
             json_index = json.load(json_index_file)
         json_index_schema.validate(json_index)
+        """
         all_names = [
             path["name"]
             for path in itertools.chain(json_index["directories"], json_index["files"], json_index["other_files"])
@@ -325,6 +324,7 @@ class IndexedDirectory(Path):
                 if name in unique_names:
                     raise Exception('duplicated name "{}" in "{}"'.format(name, self.path / "-index.json"))
                 unique_names.add(name)
+        """
         if "doi" in json_index:
             self.own_doi = json_index["doi"]
             del json_index["doi"]
@@ -446,7 +446,7 @@ class IndexedDirectory(Path):
         self.server.clear_cache()
         if recursive and self.directories is not None:
             for directory in self.directories.values():
-                directory.clear_server_cache(recursive=recursive)
+                directory.clear_server_cache(recursive=recursive, collect=False)
 
     def set_timeout(self, timeout: float, recursive: bool) -> None:
         self.server.set_timeout(timeout)
@@ -577,6 +577,10 @@ class IndexedDirectory(Path):
             yield (self, consume_results())
             for worker in workers:
                 worker.join()
+        del status
+        del worker_target
+        del printer
+        del tasks
         self.clear_server_cache(recursive=False)
         indent = "" if prefix is None else " " * ((len(prefix) - len(prefix.lstrip(" "))) + 4)
         for index, (name, directory) in enumerate(self.directories.items()):

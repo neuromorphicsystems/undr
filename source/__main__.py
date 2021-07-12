@@ -1,6 +1,5 @@
 import argparse
 import json
-from os import DirEntry
 import numpy
 import pathlib
 import shutil
@@ -118,7 +117,7 @@ def check_local_directory(
     delete_ds_store: bool,
     format_index: bool,
 ) -> None:
-    for path in directory.path.iterdir():
+    for path in sorted(directory.path.iterdir()):
         if path.is_file():
             if path.name == "-index.json":
                 continue

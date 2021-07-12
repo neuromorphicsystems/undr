@@ -309,6 +309,9 @@ class Server:
                 workers.append(worker)
             for worker in workers:
                 worker.join()
+            del workers
+        del resources
+        del worker_target
         return workload
 
     def consume(
@@ -380,6 +383,9 @@ class Server:
                 workers.append(worker)
             for worker in workers:
                 worker.join()
+            del workers
+        del worker_target
+        del workload
 
     def download(self, resource: Resource, force: bool, try_alternatives: bool) -> None:
         workload = self.workload(resources=(resource,), force=force, try_alternatives=try_alternatives, workers_count=1)

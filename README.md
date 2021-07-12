@@ -36,8 +36,8 @@ Datasets are listed as `[[datasets]]` entries with three mandatory properties: `
 
 `mode` changes the download strategy on a per-dataset basis, with three possible values:
 - `'remote'` only downloads the dataset's file index. The `undr` Python package can be used to process the dataset files as if they were on your hard drive by streaming them from the server. This option is particularly useful for large datasets that do not fit on your disk but requires a fast internet connection since files are re-downloaded every time they are processed.
-- `'compressed'` downloads all the dataset files locally but does not decompress them (most datasets are stored as [lzip](https://www.nongnu.org/lzip/) archives). The `undr` Python library transparently decompresses files in memory when you read them, making this option a good trade-off between disk usage and processing speed.
-- `'decompressed'` downloads all the dataset files locally and decompresses them. Decompressed files use a relatively inefficient plain binary file format so this option requires vast amounts of disk space (3 to 5 times as much as the lzip archives). On the other hand, the plain binary format facilitates processing with other languages such as Matlab or C++.
+- `'local'` downloads all the dataset files locally but does not decompress them (most datasets are stored as [lzip](https://www.nongnu.org/lzip/) archives). The `undr` Python library transparently decompresses files in memory when you read them, making this option a good trade-off between disk usage and processing speed.
+- `'local-decompressed'` downloads all the dataset files locally and decompresses them. Decompressed files use a relatively inefficient plain binary file format so this option requires vast amounts of disk space (3 to 5 times as much as the lzip archives). On the other hand, the plain binary format facilitates processing with other languages such as Matlab or C++.
 
 `undr` also supports hybrid configurations where only part of a dataset is downloaded or decompressed. You may also use local directories without a server. See [NOT DOCUMENTED YET] for details.
 
