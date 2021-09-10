@@ -17,7 +17,7 @@ with open("README.md") as file:
 
 setuptools.setup(
     name="undr",
-    version="0.0.8",
+    version="0.0.9",
     url="https://github.com/neuromorphicsystems/undr",
     author="Alexandre Marcireau",
     author_email="alexandre.marcireau@gmail.com",
@@ -25,11 +25,12 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=[
-        "jsonschema-rs>=0.9",
-        "lzip>=1.0",
-        "numpy>=1.20",
-        "requests>=2.25",
-        "toml>=0.10",
+        "jsonschema-rs >= 0.9",
+        "lzip >= 1.0",
+        "numpy >= 1.20",
+        "pyobjc-framework-SecurityInterface >= 7.3; sys_platform == 'darwin'",
+        "requests >= 2.25",
+        "toml >= 0.10",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

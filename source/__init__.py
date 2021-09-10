@@ -1,3 +1,4 @@
+from __future__ import annotations
 import collections
 import dataclasses
 import datetime
@@ -10,51 +11,24 @@ import math
 import numpy
 import os
 import pathlib
+import pkgutil
 import threading
 import toml
 import typing
-import sys
 from . import bibtex
 from . import progress
 from . import raw
 from . import remote
 
+
 dirname = pathlib.Path(__file__).resolve().parent
 
-with open(dirname / "undr_schema.json") as undr_schema_file:
-    undr_schema = jsonschema_rs.JSONSchema(json.load(undr_schema_file))
-
-with open(dirname / "-index_schema.json") as index_schema_file:
-    json_index_schema = jsonschema_rs.JSONSchema(json.load(index_schema_file))
-
-ansi_colors_enabled = os.getenv("ANSI_COLORS_DISABLED") is None
+undr_schema = jsonschema_rs.JSONSchema(json.loads(pkgutil.get_data("undr", "undr_schema.json").decode()))
+json_index_schema = jsonschema_rs.JSONSchema(json.loads(pkgutil.get_data("undr", "-index_schema.json").decode()))
 
 RemainingBytesError = lzip.RemainingBytesError
 
-
-def format_bold(message: str):
-    if ansi_colors_enabled:
-        return f"\033[1m{message}\033[0m"
-    return message
-
-
-def format_dim(message: str):
-    if ansi_colors_enabled:
-        return f"\033[2m{message}\033[0m"
-    return message
-
-
-def format_info(message: str):
-    return f"🦘 {format_bold(message)}"
-
-
-def format_error(message: str):
-    return f"❌ {message}"
-
-
-def format_count(index, total):
-    total_as_string = str(total)
-    return format_dim(f"({index + 1:>{len(total_as_string)}d} / {total_as_string})")
+default_timeout = 60.0
 
 
 def server_factory(type: typing.Optional[str], **kwargs) -> remote.Server:
@@ -74,7 +48,7 @@ class SerializableTomlDecoder(toml.TomlDecoder):
         return self.get_empty_table()
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class Path:
     path: pathlib.Path
     own_doi: typing.Optional[str]
@@ -83,7 +57,7 @@ class Path:
     metadata: dict[str, typing.Any] = dataclasses.field(repr=False)
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class GenericFile(Path):
     remote_path: pathlib.PurePosixPath
     progress_queue: typing.Optional[collections.deque] = dataclasses.field(default=None, repr=False)
@@ -169,7 +143,9 @@ class GenericFile(Path):
         else:
             with self.server.session() as local_session:
                 resource, estimated_size, _ = self.server.resource_pick(
-                    session=local_session, resource=self.as_resource(), try_alternatives=True
+                    session=local_session,
+                    resource=self.as_resource(),
+                    try_alternatives=True,
                 )
                 actual_size, chunks = self.server.resource_size_and_chunks(session=local_session, resource=resource)
                 if self.progress_queue is not None and actual_size != estimated_size:
@@ -203,7 +179,7 @@ class GenericFile(Path):
                                 )
                             )
         self.progress_queue.append(progress.StatusUpdate(todo_file_count_delta=-1, done_file_count_delta=1))
-        self.progress_queue = None
+        object.__setattr__(self, "progress_queue", None)
 
     def chunks(self) -> typing.Iterable[bytes]:
         yield from self._chunks(word_size=1)
@@ -217,12 +193,14 @@ class GenericFile(Path):
         if self.lzip_path().is_file():
             return self.lzip_path().stat().st_size
         with self.server.session() as local_session:
-            return self.server.resource_pick(session=local_session, resource=self.as_resource(), try_alternatives=True)[
-                1
-            ]
+            return self.server.resource_pick(
+                session=local_session,
+                resource=self.as_resource(),
+                try_alternatives=True,
+            )[1]
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class File(GenericFile):
     original_name: typing.Optional[str] = None
     sensor: typing.Optional[str] = None
@@ -234,11 +212,11 @@ class File(GenericFile):
     def __post_init__(self):
         for field in ["original_name", "sensor", "scene", "width", "height", "date"]:
             if field in self.metadata:
-                setattr(self, field, self.metadata[field])
+                object.__setattr__(self, field, self.metadata[field])
                 del self.metadata[field]
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ApsFile(File):
     def packets(self) -> typing.Iterable[numpy.array]:
         dtype = numpy.dtype(raw.aps_dtype(self.width, self.height))
@@ -249,7 +227,7 @@ class ApsFile(File):
         return numpy.frombuffer(self.content_monolithic(), dtype=raw.aps_dtype(self.width, self.height))
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class DvsFile(File):
     def packets(self) -> typing.Iterable[numpy.array]:
         for chunk in self._chunks(word_size=raw.dvs.dtype.itemsize):
@@ -259,7 +237,7 @@ class DvsFile(File):
         return raw.dvs.frombuffer(self.content_monolithic())
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ImuFile(File):
     def packets(self) -> typing.Iterable[numpy.array]:
         for chunk in self._chunks(word_size=raw.imu.dtype.itemsize):
@@ -279,27 +257,20 @@ def file_factory(type: str, **kwargs):
     raise RuntimeError(f"unsupported file type {type}")
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class Task:
     file: File
     handle_file: typing.Callable[[typing.Any], typing.Any]
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class IndexedDirectory(Path):
     provision: dataclasses.InitVar[bool]
     directories: dict[str, "IndexedDirectory"] = dataclasses.field(default=None, init=False, repr=False)
     files: dict[str, File] = dataclasses.field(default=None, init=False, repr=False)
     other_files: dict[str, GenericFile] = dataclasses.field(default=None, init=False, repr=False)
 
-    def __post_init__(self, provision):
-        if provision:
-            self.provision(prefix=None)
-
-    def provision(self, prefix: typing.Optional[str]) -> None:
-        if prefix is not None:
-            sys.stdout.write(prefix)
-            sys.stdout.flush()
+    def provision(self, logger: progress.Logger) -> None:
         self.path.mkdir(exist_ok=True)
         if not (self.path / "-index.json").is_file():
             self.server.download(
@@ -313,7 +284,6 @@ class IndexedDirectory(Path):
         with open(self.path / "-index.json") as json_index_file:
             json_index = json.load(json_index_file)
         json_index_schema.validate(json_index)
-        """
         all_names = [
             path["name"]
             for path in itertools.chain(json_index["directories"], json_index["files"], json_index["other_files"])
@@ -324,60 +294,65 @@ class IndexedDirectory(Path):
                 if name in unique_names:
                     raise Exception('duplicated name "{}" in "{}"'.format(name, self.path / "-index.json"))
                 unique_names.add(name)
-        """
         if "doi" in json_index:
-            self.own_doi = json_index["doi"]
+            object.__setattr__(self, "own_doi", json_index["doi"])
             del json_index["doi"]
-        self.directories = {
-            directory["name"]: IndexedDirectory(
-                path=self.path / directory["name"],
-                own_doi=directory["doi"] if "doi" in directory else None,
-                server=self.server.clone_with_url(self.server.join_url(directory["name"], trailing_slash=True)),
-                parent=self,
-                metadata={key: value for key, value in directory.items() if key != "name" and key != "doi"},
-                provision=False,
-            )
-            for directory in json_index["directories"]
-        }
+        object.__setattr__(
+            self,
+            "directories",
+            {
+                directory["name"]: IndexedDirectory(
+                    path=self.path / directory["name"],
+                    own_doi=directory["doi"] if "doi" in directory else None,
+                    server=self.server.clone_with_url(self.server.join_url(directory["name"], trailing_slash=True)),
+                    parent=self,
+                    metadata={key: value for key, value in directory.items() if key != "name" and key != "doi"},
+                )
+                for directory in json_index["directories"]
+            },
+        )
         del json_index["directories"]
-        indent = "" if prefix is None else " " * ((len(prefix) - len(prefix.lstrip(" "))) + 4)
-        if prefix is not None:
-            sys.stdout.write("\n")
-            sys.stdout.flush()
         for index, (name, directory) in enumerate(self.directories.items()):
-            directory.provision(
-                prefix=None if prefix is None else f"{indent}{format_count(index, len(self.directories))} {name}"
-            )
-        self.files = {
-            file["name"]: file_factory(
-                type=file["type"],
-                path=self.path / file["name"],
-                own_doi=file["doi"] if "doi" in file else None,
-                server=self.server,
-                parent=self,
-                metadata={
-                    key: value for key, value in file.items() if key != "name" and key != "doi" and key != "type"
-                },
-                remote_path=pathlib.PurePosixPath(file["name"]),
-            )
-            for file in json_index["files"]
-        }
+            with logger.group(progress.ProcessDirectory(index, len(self.directories), name, directory)):
+                directory.provision(logger)
+        object.__setattr__(
+            self,
+            "files",
+            {
+                file["name"]: file_factory(
+                    type=file["type"],
+                    path=self.path / file["name"],
+                    own_doi=file["doi"] if "doi" in file else None,
+                    server=self.server,
+                    parent=self,
+                    metadata={
+                        key: value for key, value in file.items() if key != "name" and key != "doi" and key != "type"
+                    },
+                    remote_path=pathlib.PurePosixPath(file["name"]),
+                )
+                for file in json_index["files"]
+            },
+        )
         del json_index["files"]
-        self.other_files = {
-            other["name"]: GenericFile(
-                path=self.path / other["name"],
-                own_doi=other["doi"] if "doi" in other else None,
-                server=self.server,
-                parent=self,
-                metadata={key: value for key, value in other.items() if key != "name" and key != "doi"},
-                remote_path=pathlib.PurePosixPath(other["name"]),
-            )
-            for other in json_index["other_files"]
-        }
+        object.__setattr__(
+            self,
+            "other_files",
+            {
+                other["name"]: GenericFile(
+                    path=self.path / other["name"],
+                    own_doi=other["doi"] if "doi" in other else None,
+                    server=self.server,
+                    parent=self,
+                    metadata={key: value for key, value in other.items() if key != "name" and key != "doi"},
+                    remote_path=pathlib.PurePosixPath(other["name"]),
+                )
+                for other in json_index["other_files"]
+            },
+        )
         del json_index["other_files"]
-        self.metadata = {**self.metadata, **json_index}
+        object.__setattr__(self, "metadata", {**self.metadata, **json_index})
 
-    def download(self, force: bool, prefix: typing.Optional[str], workers_count: int) -> None:
+    def download(self, force: bool, logger: progress.Logger, workers_count: int) -> None:
         assert workers_count > 0
         workload = self.server.workload(
             resources=itertools.chain(
@@ -388,23 +363,18 @@ class IndexedDirectory(Path):
             try_alternatives=True,
             workers_count=workers_count,
         )
-        if prefix is None:
-            printer = None
-        else:
-            printer = progress.Printer(prefix=prefix, status=workload.status)
-            workload.progress_queue = printer.queue
-        self.server.consume(workload=workload, workers_count=workers_count)
-        if printer is not None:
-            printer.close()
-        indent = "" if prefix is None else " " * ((len(prefix) - len(prefix.lstrip(" "))) + 4)
+        workload.progress_queue = logger.queue
+        with logger.poll(workload.status):
+            self.server.consume(workload=workload, workers_count=workers_count)
         for index, (name, directory) in enumerate(self.directories.items()):
-            directory.download(
-                force=force,
-                prefix=None if prefix is None else f"{indent}{format_count(index, len(self.directories))} {name}",
-                workers_count=workers_count,
-            )
+            with logger.group(progress.ProcessDirectory(index, len(self.directories), name, directory)):
+                directory.download(
+                    force=force,
+                    logger=logger,
+                    workers_count=workers_count,
+                )
 
-    def decompress(self, force: bool, prefix: typing.Optional[str]) -> None:
+    def decompress(self, force: bool, logger: progress.Logger) -> None:
         status = progress.Status()
         workload = []
         for index, file in enumerate(itertools.chain(self.files.values(), self.other_files.values())):
@@ -423,30 +393,19 @@ class IndexedDirectory(Path):
                         done_size_delta=file.path.stat().st_size,
                     )
                 )
-        if prefix is None:
-            printer = None
-        else:
-            printer = progress.Printer(prefix=prefix, status=status)
-        for file in workload:
-            if printer is not None:
-                file.progress_queue = printer.queue
-            file.decompress(force=force)
-            if printer is not None:
-                file.progress_queue = None
-        if printer is not None:
-            printer.close()
-        indent = "" if prefix is None else " " * ((len(prefix) - len(prefix.lstrip(" "))) + 4)
+        with logger.poll(status):
+            for file in workload:
+                object.__setattr__(file, "progress_queue", logger.queue)
+                file.decompress(force=force)
         for index, (name, directory) in enumerate(self.directories.items()):
-            directory.decompress(
-                force=force,
-                prefix=None if prefix is None else f"{indent}{format_count(index, len(self.directories))} {name}",
-            )
+            with logger.group(progress.ProcessDirectory(index, len(self.directories), name, directory)):
+                directory.decompress(force=force, logger=logger)
 
     def clear_server_cache(self, recursive: bool) -> None:
         self.server.clear_cache()
         if recursive and self.directories is not None:
             for directory in self.directories.values():
-                directory.clear_server_cache(recursive=recursive, collect=False)
+                directory.clear_server_cache(recursive=True)
 
     def set_timeout(self, timeout: float, recursive: bool) -> None:
         self.server.set_timeout(timeout)
@@ -477,12 +436,13 @@ class IndexedDirectory(Path):
 
     def recursive_map(
         self,
-        prefix: typing.Optional[str],
+        logger: progress.Logger,
         workers_count: int,
         handle_aps_file: typing.Optional[typing.Callable[[ApsFile], typing.Any]] = None,
         handle_dvs_file: typing.Optional[typing.Callable[[DvsFile], typing.Any]] = None,
         handle_imu_file: typing.Optional[typing.Callable[[ImuFile], typing.Any]] = None,
         handle_other_file: typing.Optional[typing.Callable[[GenericFile], typing.Any]] = None,
+        checkpoint_store: typing.Optional[progress.CheckpointStore] = None,
     ) -> typing.Iterable[tuple["IndexedDirectory", typing.Iterable[tuple[File, typing.Any]]]]:
         assert workers_count > 0
         tasks: collections.deque[Task] = collections.deque()
@@ -519,12 +479,10 @@ class IndexedDirectory(Path):
                         todo_size_delta=file.size(),
                     )
                 )
-        if prefix is None:
-            printer = None
-        else:
-            printer = progress.Printer(prefix=prefix, status=status)
-            for task in tasks:
-                task.file.progress_queue = printer.queue
+
+        poll_manager = logger.poll(status)
+        for task in tasks:
+            object.__setattr__(task.file, "progress_queue", logger.queue)
         if min(workers_count, len(tasks)) < 2:
 
             def worker_target():
@@ -534,8 +492,7 @@ class IndexedDirectory(Path):
                         yield (task.file, task.handle_file(task.file))
                 except IndexError:
                     pass
-                if printer is not None:
-                    printer.close()
+                poll_manager.__exit__()
 
             yield (self, worker_target())
         else:
@@ -555,8 +512,7 @@ class IndexedDirectory(Path):
                                 result_available.wait(0.1)
                     except IndexError:
                         pass
-                if printer is not None:
-                    printer.close()
+                poll_manager.__exit__()
 
             def worker_target():
                 try:
@@ -579,34 +535,34 @@ class IndexedDirectory(Path):
                 worker.join()
         del status
         del worker_target
-        del printer
         del tasks
         self.clear_server_cache(recursive=False)
-        indent = "" if prefix is None else " " * ((len(prefix) - len(prefix.lstrip(" "))) + 4)
         for index, (name, directory) in enumerate(self.directories.items()):
-            yield from directory.recursive_map(
-                prefix=None if prefix is None else f"{indent}{format_count(index, len(self.directories))} {name}",
-                workers_count=workers_count,
-                handle_aps_file=handle_aps_file,
-                handle_dvs_file=handle_dvs_file,
-                handle_imu_file=handle_imu_file,
-                handle_other_file=handle_other_file,
-            )
+            with logger.group(progress.ProcessDirectory(index, len(self.directories), name, directory)):
+                yield from directory.recursive_map(
+                    logger=logger,
+                    workers_count=workers_count,
+                    handle_aps_file=handle_aps_file,
+                    handle_dvs_file=handle_dvs_file,
+                    handle_imu_file=handle_imu_file,
+                    handle_other_file=handle_other_file,
+                )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class Dataset(IndexedDirectory):
-    mode: str = "remote"
+    url: str = ""
+    mode: str = "disabled"
+    server_type: typing.Optional[str] = None
 
 
 @dataclasses.dataclass
 class Configuration:
     directory: pathlib.Path = dataclasses.field(init=False)
-    datasets: dict[str, IndexedDirectory] = dataclasses.field(init=False, repr=False)
+    datasets: dict[str, Dataset] = dataclasses.field(init=False, repr=False)
     path: typing.Union[str, os.PathLike] = "undr.toml"
-    provision: dataclasses.InitVar[bool] = True
 
-    def __post_init__(self, provision):
+    def __post_init__(self):
         self.path = pathlib.Path(self.path).resolve()
         with open(self.path) as configuration_file:
             configuration = toml.load(configuration_file, decoder=SerializableTomlDecoder())
@@ -623,7 +579,7 @@ class Configuration:
                 server=server_factory(
                     type=dataset["server_type"] if "server_type" in dataset else None,
                     url=dataset["url"],
-                    timeout=dataset["timeout"] if "timeout" in dataset else 10.0,
+                    timeout=dataset["timeout"] if "timeout" in dataset else default_timeout,
                 ),
                 parent=None,
                 metadata={
@@ -631,50 +587,56 @@ class Configuration:
                     for key, value in dataset.items()
                     if key != "name" and key != "doi" and key != "url" and key != "mode" and key != "server_type"
                 },
-                provision=False,
+                url=dataset["url"],
                 mode=dataset["mode"],
+                server_type=dataset["server_type"] if "server_type" in dataset else None,
             )
             for dataset in configuration["datasets"]
         }
-        if provision:
-            self.provision(force=False, quiet=True, workers_count=32)
 
-    def provision(self, force: bool, quiet: bool, workers_count: int) -> None:
+    def install(self, force: bool, logger: progress.Logger, workers_count: int) -> None:
         self.directory.mkdir(parents=True, exist_ok=True)
-        if not quiet:
-            print(format_info("provision"))
-        for index, (name, dataset) in enumerate(self.datasets.items()):
-            dataset.provision(prefix=None if quiet else f"{format_count(index, len(self.datasets))} {name}")
-        if not quiet:
-            print()
-            print(format_info("download"))
-        download_count = sum(1 for dataset in self.datasets.values() if dataset.mode != "remote")
-        for index, (name, dataset) in enumerate(self.datasets.items()):
-            if dataset.mode != "remote":
-                dataset.download(
-                    force=force,
-                    prefix=None if quiet else f"{format_count(index, download_count)} {name}",
-                    workers_count=workers_count,
-                )
-                dataset.clear_server_cache(recursive=True)
-        if not quiet:
-            print()
-            print(format_info("decompress"))
-        decompress_count = sum(1 for dataset in self.datasets.values() if dataset.mode == "local-decompressed")
-        for name, dataset in self.datasets.items():
-            if dataset.mode == "local-decompressed":
-                dataset.decompress(
-                    force=force, prefix=None if quiet else f"{format_count(index, decompress_count)} {name}"
-                )
+        with logger.group(progress.Phase("provision")):
+            provision_count = sum(1 for dataset in self.datasets.values() if dataset.mode != "disabled")
+            index = 0
+            for name, dataset in self.datasets.items():
+                if dataset.mode != "disabled":
+                    with logger.group(progress.ProcessDirectory(index, provision_count, name, dataset)):
+                        dataset.provision(logger)
+                    index += 1
+        with logger.group(progress.Phase("download")):
+            download_count = sum(
+                1 for dataset in self.datasets.values() if dataset.mode != "disabled" and dataset.mode != "remote"
+            )
+            index = 0
+            for name, dataset in self.datasets.items():
+                if dataset.mode != "disabled" and dataset.mode != "remote":
+                    with logger.group(progress.ProcessDirectory(index, download_count, name, dataset)):
+                        dataset.download(
+                            force=force,
+                            logger=logger,
+                            workers_count=workers_count,
+                        )
+                        dataset.clear_server_cache(recursive=True)
+                    index += 1
+        with logger.group(progress.Phase("decompress")):
+            decompress_count = sum(1 for dataset in self.datasets.values() if dataset.mode == "decompressed")
+            index = 0
+            for name, dataset in self.datasets.items():
+                if dataset.mode == "decompressed":
+                    with logger.group(progress.ProcessDirectory(index, decompress_count, name, dataset)):
+                        dataset.decompress(force=force, logger=logger)
+                    index += 1
 
     def doi_to_paths(self) -> dict[str, list[Path]]:
         doi_to_paths = {}
         for dataset in self.datasets.values():
-            for doi, paths in dataset.doi_to_paths().items():
-                if doi in doi_to_paths:
-                    doi_to_paths[doi].extend(paths)
-                else:
-                    doi_to_paths[doi] = paths
+            if dataset.mode != "disabled":
+                for doi, paths in dataset.doi_to_paths().items():
+                    if doi in doi_to_paths:
+                        doi_to_paths[doi].extend(paths)
+                    else:
+                        doi_to_paths[doi] = paths
         return doi_to_paths
 
     def bibtex(self, pretty: bool, timeout: float) -> str:

@@ -29,6 +29,7 @@
             }
         },
         "doi": {
+            "description": "The directory's Digital Object Identifier, used to generate BibTeX citations",
             "type": "string",
             "pattern": "^10[.].+$"
         },

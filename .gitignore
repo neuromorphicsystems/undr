@@ -1,6 +1,12 @@
 *.pyc
+*.spec
 *.egg-info
 *.eggs
+*.whl
+wheels
 __pycache__
 dist
 undr
+build
+!app/python/undr
+node_modules

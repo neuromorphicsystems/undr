@@ -88,10 +88,10 @@ def bundle() -> str:
             for subpath in path.iterdir():
                 if subpath.is_file():
                     certificates_paths.append(subpath)
-            if len(certificates_path) > 0:
+            if len(certificates_paths) > 0:
                 temporary_directory = pathlib.Path(tempfile.mkdtemp())
                 with open(temporary_directory / "ca-bundle.crt", "wb") as certificates_bundle:
-                    for path in certificates_path:
+                    for path in certificates_paths:
                         with open(path, "rb") as certificate:
                             certificates_bundle.write(certificate.read())
                 return str(temporary_directory / "ca-bundle.crt")

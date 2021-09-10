@@ -32,7 +32,7 @@
                     "mode": {
                         "description": "The download strategy",
                         "type": "string",
-                        "enum": ["local", "local-decompressed", "remote"]
+                        "enum": ["disabled", "remote", "local", "decompressed"]
                     },
                     "server_type": {
                         "description": "Server type for file list parsing",
