@@ -8,6 +8,11 @@ export default {
         emptyOutDir: true,
         minify: process.env.MODE === "development" ? false : "terser",
         outDir: join(dirname(dirname(__dirname)), "build", "renderer"),
+        rollupOptions: {
+            output: {
+                entryFileNames: "[name].js",
+            },
+        },
         target: "chrome91",
     },
     plugins: [svgrPlugin(), reactRefresh()],

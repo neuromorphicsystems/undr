@@ -11,7 +11,11 @@ export default {
         minify: process.env.MODE === "development" ? false : "terser",
         outDir: join(dirname(dirname(__dirname)), "build", "main"),
         rollupOptions: {
-            external: ["electron", ...builtinModules],
+            external: ["electron", "electron-store", ...builtinModules],
+            input: {
+                main: join(__dirname, "main.ts"),
+                preload: join(__dirname, "preload.ts"),
+            },
             output: {
                 entryFileNames: "[name].js",
             },

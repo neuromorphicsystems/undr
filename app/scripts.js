@@ -5,7 +5,7 @@ const fs = require("fs/promises");
 const path = require("path");
 const vite = require("vite");
 
-const commands = new Set(["release", "watch"]);
+const commands = new Set(["release", "watch", "generate-js"]);
 if (process.argv.length !== 3 || !commands.has(process.argv[2])) {
     console.error(
         `Syntax: node scripts.js [command], where command is in {${Array.from(
@@ -203,6 +203,13 @@ const interfaces = [
                         },
                     ],
                 });
+                break;
+            case "generate-js":
+                await fs.rm(path.join(__dirname, "build"), {
+                    recursive: true,
+                    force: true,
+                });
+                await bundle();
                 break;
             default:
                 throw new Error(`unexpected command "${process.argv[2]}"`);

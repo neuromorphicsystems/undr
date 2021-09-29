@@ -16,6 +16,7 @@ action_to_arguments = {
     },
     "install": {
         "options": {
+            "timeout": {"parser": float, "value": 60},
             "workers_count": {"parser": int, "value": 32},
         },
         "flags": {
@@ -23,6 +24,14 @@ action_to_arguments = {
                 "value": False,
             },
         },
+    },
+    "bibtex": {
+        "options": {
+            "timeout": {"parser": float, "value": 60},
+            "workers_count": {"parser": int, "value": 32},
+            "output": {"parser": str, "value": None},
+        },
+        "flags": {},
     },
 }
 
@@ -32,7 +41,7 @@ flag_pattern = re.compile(r"^--(\w+)$")
 
 
 def output(data: typing.Any) -> None:
-    message = json.dumps(data)
+    message = json.dumps(data, separators=(",", ":"))
     sys.stdout.buffer.write(struct.pack("<Q", len(message)) + message.encode())
     sys.stdout.flush()
 
@@ -86,6 +95,7 @@ class Logger(undr.progress.Logger):
                     "count": group.count,
                     "name": group.name,
                     "directory": group.directory.path.relative_to(self.root).as_posix(),
+                    "files": len(group.directory.files) + len(group.directory.other_files),
                 }
             )
 
@@ -160,11 +170,29 @@ try:
         )
     if action == "install":
         configuration = undr.Configuration(target)
+        for dataset in configuration.datasets.values():
+            dataset.set_timeout(arguments["options"]["timeout"]["value"], recursive=True)
         configuration.provision(
             force=arguments["flags"]["force"]["value"],
             logger=Logger(configuration.directory),
             workers_count=arguments["options"]["workers_count"]["value"],
         )
+    if action == "bibtex":
+        configuration = undr.Configuration(target)
+        for dataset in configuration.datasets.values():
+            if dataset.mode != "disabled":
+                dataset.set_timeout(arguments["options"]["timeout"]["value"], recursive=True)
+                object.__setattr__(dataset, "mode", "remote")
+        configuration.provision(
+            force=False,
+            logger=Logger(configuration.directory),
+            workers_count=arguments["options"]["workers_count"]["value"],
+        )
+        bibtex = configuration.bibtex(pretty=True, timeout=arguments["options"]["timeout"]["value"])
+        if arguments["options"]["output"]["value"] is None:
+            raise Exception("the option --output is required with the bibtex action")
+        with open(arguments["options"]["output"]["value"], "wb") as bibtex_file:
+            bibtex_file.write(bibtex.encode())
 except:
     output(
         {
