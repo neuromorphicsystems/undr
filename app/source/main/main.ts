@@ -21,7 +21,15 @@ const electronStore = new ElectronStore({
             enum: ["System default", "Light", "Dark"],
         },
         directory: {
-            type: "string",
+            type: ["string"],
+        },
+        timeout: {
+            type: "number",
+            exclusiveMinimum: 0.0,
+        },
+        workers_count: {
+            type: "integer",
+            minimum: 1,
         },
     },
 });
@@ -83,6 +91,7 @@ const state: State = {
     phase: null,
     details: null,
     datasets: [],
+    error: null,
 };
 
 const writeConfiguration = () => {
@@ -137,10 +146,13 @@ const startInterfaceAction = (interfaceAction: InterfaceAction): void => {
     );
     state.action = interfaceAction.action;
     state.details = null;
+    state.error = null;
     sendState();
     interfaceProcess.on("close", () => {
         interfaceProcess = null;
         state.action = null;
+        state.phase = null;
+        state.details = null;
         sendState();
     });
     interfaceProcess.stderr!.on("data", data => {
@@ -166,50 +178,50 @@ const startInterfaceAction = (interfaceAction: InterfaceAction): void => {
             if (length === 0n || buffer.length < length) {
                 break;
             }
-            const message = JSON.parse(
-                buffer.slice(0, Number(length)).toString()
-            );
-            switch (message.type) {
+            const data = JSON.parse(buffer.slice(0, Number(length)).toString());
+            switch (data.type) {
                 case "init":
-                    state.datasets = message.datasets;
+                    state.datasets = data.datasets;
                     break;
                 case "group_begin":
-                    if (message.group === "process_directory") {
-                        state.details = message.directory;
-                        if (!tree.hasOwnProperty(message.name)) {
-                            tree.childrenCount = message.count;
-                            tree.nameToChild[message.name] = {
+                    if (data.group === "process_directory") {
+                        state.details = data.directory;
+                        if (!tree.hasOwnProperty(data.name)) {
+                            tree.childrenCount = data.count;
+                            tree.nameToChild[data.name] = {
                                 childrenCount: 0,
                                 nameToChild: {},
                                 fileCount: 0,
                             };
                         }
-                        groupPath.push(message.name);
-                        tree = tree.nameToChild[message.name];
-                    } else if (message.group === "phase") {
-                        state.phase = message.name;
+                        groupPath.push(data.name);
+                        tree = tree.nameToChild[data.name];
+                    } else if (data.group === "phase") {
+                        state.details = null;
+                        state.phase = {
+                            index: data.index,
+                            count: data.count,
+                            name: data.name,
+                        };
                     }
                     break;
                 case "group_end":
-                    if (message.group === "process_directory") {
-                        state.details = null;
-                        tree.fileCount = message.files;
+                    if (data.group === "process_directory") {
+                        tree.fileCount = data.files;
                         groupPath.pop();
                         tree = state;
                         for (const name of groupPath) {
                             tree = tree.nameToChild[name];
                         }
-                    } else if (message.group === "phase") {
-                        state.phase = null;
                     }
                     break;
                 case "progress":
                     break;
                 case "error":
-                    console.error(message);
+                    state.error = data.message;
                     break;
                 default:
-                    throw new Error(`unknown message type "${message.type}"`);
+                    throw new Error(`unknown message type "${data.type}"`);
             }
             if (window) {
                 window!.webContents.send("state-update", state);
@@ -250,6 +262,22 @@ ipcMain.on("theme-load", event => {
 
 ipcMain.on("theme-store", (_, theme: string) => {
     electronStore.set("theme", theme);
+});
+
+ipcMain.on("timeout-load", event => {
+    event.returnValue = electronStore.get("timeout", null);
+});
+
+ipcMain.on("timeout-store", (_, timeout: number) => {
+    electronStore.set("timeout", timeout);
+});
+
+ipcMain.on("workers-count-load", event => {
+    event.returnValue = electronStore.get("workers_count", null);
+});
+
+ipcMain.on("workers-count-store", (_, workersCount: number) => {
+    electronStore.set("workers_count", workersCount);
 });
 
 ipcMain.on("theme-should-use-dark-colors", event => {
@@ -341,9 +369,21 @@ ipcMain.on("bibtex-export", () => {
                     return;
                 }
                 if (state.directory) {
+                    const timeout = electronStore.get("timeout") as
+                        | number
+                        | null;
+                    const workers_count = electronStore.get("workers_count") as
+                        | number
+                        | null;
                     startInterfaceAction({
                         action: "bibtex",
-                        options: { output: result.filePath! },
+                        options: {
+                            output: result.filePath!,
+                            ...(timeout && { timeout: timeout.toString() }),
+                            ...(workers_count && {
+                                workers_count: workers_count.toString(),
+                            }),
+                        },
                         flags: {},
                     });
                 }
@@ -353,4 +393,9 @@ ipcMain.on("bibtex-export", () => {
 
 ipcMain.on("state-load", event => {
     event.returnValue = state;
+});
+
+ipcMain.on("state-clear-error", () => {
+    state.error = null;
+    sendState();
 });

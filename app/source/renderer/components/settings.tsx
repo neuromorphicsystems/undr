@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Input from "./input";
 import Label, { Label as StyledLabel } from "./label";
@@ -8,6 +8,10 @@ import Switch from "./switch";
 type Props = {
     themeName: string;
     onThemeNameChange: (name: string) => void;
+    timeout: number;
+    onTimeoutChange: (timeout: number) => void;
+    workersCount: number;
+    onWorkersCountChange: (workersCount: number) => void;
 };
 
 const Settings = styled.div`
@@ -75,6 +79,8 @@ const Info = styled.div`
 `;
 
 export default function (props: Props) {
+    const [timeoutError, setTimeoutError] = useState(false);
+    const [workersCountError, setWorkersCountError] = useState(false);
     return (
         <Settings>
             <Title>Settings</Title>
@@ -96,10 +102,18 @@ export default function (props: Props) {
                         <Control>
                             <Label label={"Timeout"} right={true} />
                             <Input
-                                value={"60"}
+                                value={props.timeout.toString()}
                                 live={true}
-                                error={false}
-                                onChange={() => {}}
+                                error={timeoutError}
+                                onChange={value => {
+                                    const timeout = parseFloat(value);
+                                    const valid =
+                                        !isNaN(timeout) && timeout > 0.0;
+                                    setTimeoutError(!valid);
+                                    if (valid) {
+                                        props.onTimeoutChange(timeout);
+                                    }
+                                }}
                             />
                             <Label label={"seconds"} right={false} />
                         </Control>
@@ -112,10 +126,21 @@ export default function (props: Props) {
                         <Control>
                             <Label label={"Workers"} right={true} />
                             <Input
-                                value={"32"}
+                                value={props.workersCount.toString()}
                                 live={true}
-                                error={false}
-                                onChange={() => {}}
+                                error={workersCountError}
+                                onChange={value => {
+                                    const workersCount = parseInt(value.trim());
+                                    const valid =
+                                        /^\d+$/.test(value.trim()) &&
+                                        workersCount >= 1;
+                                    setWorkersCountError(!valid);
+                                    if (valid) {
+                                        props.onWorkersCountChange(
+                                            workersCount
+                                        );
+                                    }
+                                }}
                             />
                             <Label label={"threads"} right={false} />
                         </Control>

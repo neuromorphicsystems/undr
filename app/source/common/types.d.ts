@@ -17,6 +17,7 @@ export interface Theme {
     active: string;
     warning: string;
     error: string;
+    errorActive: string;
 }
 
 export interface InterfaceAction {
@@ -41,7 +42,12 @@ export interface Tree {
 export interface State extends Tree {
     directory: string | null;
     action: string | null;
-    phase: string | null;
+    phase: {
+        index: number;
+        count: number;
+        name: string;
+    } | null;
     details: string | null;
     datasets: Dataset[];
+    error: string | null;
 }

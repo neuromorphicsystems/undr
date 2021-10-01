@@ -252,29 +252,35 @@ if __name__ == "__main__":
 
     if args.command == "bibtex":
         configuration = Configuration(pathlib.Path(args.configuration))
+        count_offset = 0
         for dataset in configuration.datasets.values():
             if dataset.mode != "disabled":
                 if args.timeout is not None:
                     dataset.set_timeout(args.timeout, recursive=True)
                 object.__setattr__(dataset, "mode", "remote")
-        configuration.install(force=False, logger=progress.Quiet(), workers_count=args.workers_count)
-        bibtex = configuration.bibtex(pretty=True, timeout=args.timeout)
-        if args.output is None:
-            print(bibtex)
-        else:
-            with open(args.output, "wb") as bibtex_file:
-                bibtex_file.write(bibtex.encode())
+                count_offset = 1
+        logger = progress.Quiet() if args.output is None else progress.Printer()
+        logger.set_phase_offsets(index=0, count=count_offset)
+        configuration.install(force=False, logger=logger, workers_count=args.workers_count)
+        with logger.group(progress.Phase(count_offset, 1, "download references")):
+            bibtex = configuration.bibtex(pretty=True, timeout=args.timeout)
+            if args.output is None:
+                print(bibtex)
+            else:
+                with open(args.output, "wb") as bibtex_file:
+                    bibtex_file.write(bibtex.encode())
 
     if args.command == "doctor":
+        logger = progress.Printer()
         configuration = Configuration(pathlib.Path(args.configuration))
         for dataset in configuration.datasets.values():
             if dataset.mode != "disabled":
                 if args.timeout is not None:
                     dataset.set_timeout(args.timeout, recursive=True)
                 object.__setattr__(dataset, "mode", "remote")
-        configuration.install(force=False, logger=progress.Quiet(), workers_count=args.workers_count)
+        configuration.install(force=False, logger=logger, workers_count=args.workers_count)
         logger = progress.Printer()
-        with logger.group(progress.Phase("doctor")):
+        with logger.group(progress.Phase(1, 2, "inspect files")):
             count = sum(1 for dataset in configuration.datasets.values() if dataset.mode != "disabled")
             index = 0
             for name, dataset in configuration.datasets.items():
@@ -294,7 +300,7 @@ if __name__ == "__main__":
 
     if args.command == "check-local-directory":
         logger = progress.Printer()
-        with logger.group(progress.Phase("check local directory")):
+        with logger.group(progress.Phase(0, 1, "check local directory")):
             try:
                 directory = IndexedDirectory(
                     path=pathlib.Path(args.path),

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Directory from "../icons/directory.svg";
-import Download from "../icons/download.svg";
+import Install from "../icons/install.svg";
 import List from "../icons/list.svg";
 
 const Welcome = styled.div`
@@ -47,7 +47,7 @@ const Icon = styled.div`
         height: 13vw;
     }
     & path {
-        fill: ${props => props.theme.content2};
+        fill: ${props => props.theme.content1};
     }
 `;
 
@@ -111,17 +111,19 @@ export default function () {
                     </Step>
                     <Step>
                         <Icon>
-                            <Download />
+                            <Install />
                         </Icon>
                         <Text>
-                            3. Download
+                            3. Install
                             <br />
                             files
                         </Text>
                     </Step>
                 </Steps>
                 <LinkContainer>
-                    <Link onClick={window.undr.directory.choose}>Open a directory...</Link>
+                    <Link onClick={window.undr.directory.choose}>
+                        Open a directory...
+                    </Link>
                 </LinkContainer>
             </Content>
         </Welcome>

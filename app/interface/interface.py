@@ -62,6 +62,8 @@ class Logger(undr.progress.Logger):
                 {
                     "type": "group_begin",
                     "group": "phase",
+                    "index": group.index,
+                    "count": group.count,
                     "name": group.name,
                 }
             )
@@ -95,7 +97,9 @@ class Logger(undr.progress.Logger):
                     "count": group.count,
                     "name": group.name,
                     "directory": group.directory.path.relative_to(self.root).as_posix(),
-                    "files": len(group.directory.files) + len(group.directory.other_files),
+                    "files": None
+                    if (group.directory.files is None or group.directory.other_files is None)
+                    else (len(group.directory.files) + len(group.directory.other_files)),
                 }
             )
 
@@ -168,31 +172,39 @@ try:
                 ],
             }
         )
+        # @DEV init should also read local files
     if action == "install":
         configuration = undr.Configuration(target)
         for dataset in configuration.datasets.values():
             dataset.set_timeout(arguments["options"]["timeout"]["value"], recursive=True)
-        configuration.provision(
+        configuration.install(
             force=arguments["flags"]["force"]["value"],
             logger=Logger(configuration.directory),
             workers_count=arguments["options"]["workers_count"]["value"],
         )
     if action == "bibtex":
         configuration = undr.Configuration(target)
+        count_offset = 0
         for dataset in configuration.datasets.values():
             if dataset.mode != "disabled":
                 dataset.set_timeout(arguments["options"]["timeout"]["value"], recursive=True)
                 object.__setattr__(dataset, "mode", "remote")
-        configuration.provision(
+                count_offset = 1
+        logger = Logger(configuration.directory)
+        logger.set_phase_offsets(index=0, count=count_offset)
+        configuration.install(
             force=False,
-            logger=Logger(configuration.directory),
+            logger=logger,
             workers_count=arguments["options"]["workers_count"]["value"],
         )
-        bibtex = configuration.bibtex(pretty=True, timeout=arguments["options"]["timeout"]["value"])
-        if arguments["options"]["output"]["value"] is None:
-            raise Exception("the option --output is required with the bibtex action")
-        with open(arguments["options"]["output"]["value"], "wb") as bibtex_file:
-            bibtex_file.write(bibtex.encode())
+        with logger.group(undr.progress.Phase(count_offset, 1, "download references")):
+            bibtex = configuration.bibtex(pretty=True, timeout=arguments["options"]["timeout"]["value"])
+            if arguments["options"]["output"]["value"] is None:
+                raise Exception("the option --output is required with the bibtex action")
+            with open(arguments["options"]["output"]["value"], "wb") as bibtex_file:
+                bibtex_file.write(bibtex.encode())
+except KeyboardInterrupt:
+    pass
 except:
     output(
         {
@@ -200,3 +212,11 @@ except:
             "message": str(sys.exc_info()[1]),
         }
     )
+    # @DEV {
+    with open("interface_error.log", "w") as file:
+        file.write(str(sys.exc_info()))
+        file.write(str(sys.exc_info()[1]) + "\n")
+        import traceback
+
+        traceback.print_tb(sys.exc_info()[2], file=file)
+    # }

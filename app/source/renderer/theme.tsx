@@ -24,6 +24,7 @@ export const light: Theme = {
     active: "#ffc342",
     warning: "#e78420",
     error: "#db4733",
+    errorActive: "#a83627",
 };
 
 export const dark: Theme = {
@@ -45,4 +46,5 @@ export const dark: Theme = {
     active: "#1e88e5",
     warning: "#e78420",
     error: "#db4733",
+    errorActive: "#a83627",
 };

@@ -16,10 +16,10 @@ const DatasetComponent = styled.div`
     height: 50px;
     padding-right: 10px;
     &:nth-child(odd) {
-        background-color: ${props => props.theme.background1};
+        background-color: ${props => props.theme.background0};
     }
     &:nth-child(even) {
-        background-color: ${props => props.theme.background2};
+        background-color: ${props => props.theme.background1};
     }
 `;
 

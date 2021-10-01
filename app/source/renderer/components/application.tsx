@@ -35,6 +35,10 @@ export default function () {
     const [themeName, setThemeName] = useState(
         window.undr.theme.load() || "System default"
     );
+    const [timeout, setTimeout] = useState(window.undr.timeout.load() || 60);
+    const [workersCount, setWorkersCount] = useState(
+        window.undr.workersCount.load() || 32
+    );
     const [state, setState] = useState(window.undr.state.load());
     useEffect(() => {
         window.undr.state.onUpdate(setState);
@@ -71,6 +75,18 @@ export default function () {
                                 onThemeNameChange={newThemeName => {
                                     window.undr.theme.store(newThemeName);
                                     setThemeName(newThemeName);
+                                }}
+                                timeout={timeout}
+                                onTimeoutChange={newTimeout => {
+                                    window.undr.timeout.store(newTimeout);
+                                    setTimeout(newTimeout);
+                                }}
+                                workersCount={workersCount}
+                                onWorkersCountChange={newWorkersCount => {
+                                    window.undr.workersCount.store(
+                                        newWorkersCount
+                                    );
+                                    setWorkersCount(newWorkersCount);
                                 }}
                             />
                         </Route>

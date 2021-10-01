@@ -596,37 +596,49 @@ class Configuration:
 
     def install(self, force: bool, logger: progress.Logger, workers_count: int) -> None:
         self.directory.mkdir(parents=True, exist_ok=True)
-        with logger.group(progress.Phase("provision")):
-            provision_count = sum(1 for dataset in self.datasets.values() if dataset.mode != "disabled")
-            index = 0
-            for name, dataset in self.datasets.items():
-                if dataset.mode != "disabled":
-                    with logger.group(progress.ProcessDirectory(index, provision_count, name, dataset)):
-                        dataset.provision(logger)
-                    index += 1
-        with logger.group(progress.Phase("download")):
-            download_count = sum(
-                1 for dataset in self.datasets.values() if dataset.mode != "disabled" and dataset.mode != "remote"
-            )
-            index = 0
-            for name, dataset in self.datasets.items():
-                if dataset.mode != "disabled" and dataset.mode != "remote":
-                    with logger.group(progress.ProcessDirectory(index, download_count, name, dataset)):
-                        dataset.download(
-                            force=force,
-                            logger=logger,
-                            workers_count=workers_count,
-                        )
-                        dataset.clear_server_cache(recursive=True)
-                    index += 1
-        with logger.group(progress.Phase("decompress")):
-            decompress_count = sum(1 for dataset in self.datasets.values() if dataset.mode == "decompressed")
-            index = 0
-            for name, dataset in self.datasets.items():
-                if dataset.mode == "decompressed":
-                    with logger.group(progress.ProcessDirectory(index, decompress_count, name, dataset)):
-                        dataset.decompress(force=force, logger=logger)
-                    index += 1
+        provision_count = 0
+        download_count = 0
+        decompress_count = 0
+        phases = 0
+        for dataset in self.datasets.values():
+            if dataset.mode != "disabled":
+                provision_count += 1
+                phases = max(phases, 1)
+                if dataset.mode != "remote":
+                    download_count += 1
+                    phases = max(phases, 2)
+                    if dataset.mode != "local":
+                        decompress_count += 1
+                        phases = max(phases, 3)
+        if provision_count > 0:
+            with logger.group(progress.Phase(0, phases, "provision")):
+                index = 0
+                for name, dataset in self.datasets.items():
+                    if dataset.mode != "disabled":
+                        with logger.group(progress.ProcessDirectory(index, provision_count, name, dataset)):
+                            dataset.provision(logger)
+                        index += 1
+        if download_count > 0:
+            with logger.group(progress.Phase(1, phases, "download")):
+                index = 0
+                for name, dataset in self.datasets.items():
+                    if dataset.mode != "disabled" and dataset.mode != "remote":
+                        with logger.group(progress.ProcessDirectory(index, download_count, name, dataset)):
+                            dataset.download(
+                                force=force,
+                                logger=logger,
+                                workers_count=workers_count,
+                            )
+                            dataset.clear_server_cache(recursive=True)
+                        index += 1
+        if decompress_count > 0:
+            with logger.group(progress.Phase(2, phases, "decompress")):
+                index = 0
+                for name, dataset in self.datasets.items():
+                    if dataset.mode == "decompressed":
+                        with logger.group(progress.ProcessDirectory(index, decompress_count, name, dataset)):
+                            dataset.decompress(force=force, logger=logger)
+                        index += 1
 
     def doi_to_paths(self) -> dict[str, list[Path]]:
         doi_to_paths = {}

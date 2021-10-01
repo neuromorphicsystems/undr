@@ -2,10 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import type { State } from "../../common/types";
 import Dataset from "./dataset";
-import Add from "../icons/add.svg";
-import Bibtex from "../icons/bibtex.svg";
+import FooterBar from "./footerBar";
 import Directory from "../icons/directory.svg";
-import Download from "../icons/download.svg";
 
 type Props = {
     state: State;
@@ -27,7 +25,6 @@ const Title = styled.div`
     flex-shrink: 0;
     display: flex;
     gap: 20px;
-    flex-direction: row;
     justify-content: space-between;
     font-size: 15px;
     align-items: center;
@@ -106,42 +103,10 @@ const Filler = styled.div`
     flex-shrink: 0;
     flex-grow: 1;
     &:nth-child(odd) {
-        background-color: ${props => props.theme.background1};
+        background-color: ${props => props.theme.background0};
     }
     &:nth-child(even) {
-        background-color: ${props => props.theme.background2};
-    }
-`;
-
-const ActionBar = styled.div`
-    width: 100%;
-    height: 52px;
-    flex-shrink: 0;
-    display: flex;
-    border-top: 1px solid ${props => props.theme.backgroundSeparator};
-    background-color: ${props => props.theme.background2};
-    & > ${Button} {
-        flex-grow: 1;
-    }
-`;
-
-const ActionButton = styled(Button)`
-    flex-basis: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    &:not(:last-of-type) {
-        border-right: 1px solid ${props => props.theme.backgroundSeparator};
-    }
-    & svg {
-        height: 25px;
-        position: relative;
-        flex-shrink: 0;
-    }
-    & path {
-        fill: ${props =>
-            props.$disabled ? props.theme.content2 : props.theme.content1};
+        background-color: ${props => props.theme.background1};
     }
 `;
 
@@ -170,25 +135,7 @@ export default function (props: Props) {
                 ))}
                 <Filler />
             </Datasets>
-            <ActionBar>
-                <ActionButton $disabled={props.state.action != null}>
-                    <Add />
-                    <span>Add dataset</span>
-                </ActionButton>
-                <ActionButton
-                    $disabled={props.state.action != null}
-                    onClick={() => {
-                        window.undr.bibtex.export();
-                    }}
-                >
-                    <Bibtex />
-                    <span>Export BibTeX...</span>
-                </ActionButton>
-                <ActionButton $disabled={props.state.action != null}>
-                    <Download />
-                    <span>Download</span>
-                </ActionButton>
-            </ActionBar>
+            <FooterBar state={props.state} />
         </Home>
     );
 }

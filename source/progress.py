@@ -69,6 +69,8 @@ class Group:
 
 @dataclasses.dataclass(frozen=True)
 class Phase(Group):
+    index: int
+    count: int
     name: str
 
 
@@ -107,8 +109,9 @@ class Logger:
     def __init__(self, output_interval: float, speed_samples_count: int):
         self._output_interval = output_interval
         self._speed_samples_count = speed_samples_count
+        self._phase_index_offset = 0
+        self._phase_count_offset = 0
         self._running = False
-
         self._status: typing.Optional[Status] = None
         self._speed_samples: typing.Optional[collections.deque] = None
         self._begin: typing.Optional[float] = None
@@ -185,7 +188,14 @@ class Logger:
         self._begin = None
         self._begin_done_size = None
 
+    def set_phase_offsets(self, index: int, count: int) -> None:
+        self._phase_index_offset = index
+        self._phase_count_offset = count
+
     def group(self, instance: Group) -> "Logger.GroupManager":
+        if isinstance(instance, Phase):
+            object.__setattr__(instance, "index", instance.index + self._phase_index_offset)
+            object.__setattr__(instance, "count", instance.count + self._phase_count_offset)
         return Logger.GroupManager(logger=self, group=instance)
 
     def group_begin(self, group: Group) -> None:
@@ -240,7 +250,10 @@ class Printer(Logger):
             self.file_object.write("\n")
             self.prefix = ""
         if type(group) == Phase:
-            self.file_object.write(f"{format_info(group.name)}\n")
+            if group.count > 1:
+                self.file_object.write(f"{group.index + 1} / {group.count} {format_info(group.name)}\n")
+            else:
+                self.file_object.write(f"{format_info(group.name)}\n")
             self.file_object.flush()
         elif type(group) == ProcessDirectory:
             self.indent += 1

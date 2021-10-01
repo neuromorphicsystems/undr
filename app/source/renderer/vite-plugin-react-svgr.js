@@ -24,7 +24,7 @@ export default function svgrPlugin() {
                                 dimensions: false,
                                 svgoConfig: {
                                     multipass: true,
-                                }
+                                },
                             }),
                             { loader: "jsx" }
                         )

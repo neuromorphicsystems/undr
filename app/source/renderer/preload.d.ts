@@ -5,6 +5,7 @@ declare global {
         undr: {
             interface: {
                 run: (interfaceAction: InterfaceAction) => void;
+                cancel: () => void;
             };
             theme: {
                 load: () => string | null;
@@ -17,12 +18,21 @@ declare global {
                     callback: (shouldUseDarkColors: boolean) => void
                 ) => void;
             };
+            timeout: {
+                load: () => number | null;
+                store: (timeout: number) => void;
+            };
+            workersCount: {
+                load: () => number | null;
+                store: (workersCount: number) => void;
+            };
             directory: {
                 choose: () => void;
                 show: () => void;
             };
             state: {
                 load: () => State;
+                clearError: () => void;
                 onUpdate: (callback: (state: State) => void) => void;
                 offUpdate: (callback: (state: State) => void) => void;
             };
