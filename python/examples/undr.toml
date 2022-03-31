@@ -1,0 +1,11 @@
+directory = "datasets"
+
+[[datasets]]
+name = "dvs09"
+url = "http://localhost:5432/dvs09/"
+mode = "local"
+
+[[datasets]]
+name = "dvsflow16"
+url = "http://localhost:5432/dvsflow16/"
+mode = "local"

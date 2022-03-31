@@ -5,6 +5,10 @@
 *.whl
 wheels
 __pycache__
+python/examples/datasets
+python/examples/results
+python/examples/logs
+python/examples/progress.db
 dist
 undr
 build

@@ -1,3 +1,5 @@
+from __future__ import annotations
+import logging
 import os
 from . import certificates
 
@@ -8,8 +10,11 @@ import requests
 
 
 def from_doi(doi: str, pretty: bool, timeout: float) -> str:
+    logging.debug(f"request application/x-bibtex from https://dx.doi.org/{doi}")
     response = requests.get(
-        f"https://dx.doi.org/{doi}", timeout=timeout, headers={"Accept": "application/x-bibtex; charset=utf-8"}
+        f"https://dx.doi.org/{doi}",
+        timeout=timeout,
+        headers={"Accept": "application/x-bibtex; charset=utf-8"},
     )
     response.raise_for_status()
     if pretty:

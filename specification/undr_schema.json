@@ -20,10 +20,6 @@
                         "type": "string",
                         "pattern": "^(?:[A-Za-z0-9_\\-]+|[A-Za-z0-9_\\-\\.]+\\.(?!download$|lz$|decompress$)[^\\.]*)$"
                     },
-                    "doi": {
-                        "type": "string",
-                        "pattern": "^10[.].+$"
-                    },
                     "url": {
                         "description": "The remote server URL",
                         "type": "string",
@@ -32,17 +28,12 @@
                     "mode": {
                         "description": "The download strategy",
                         "type": "string",
-                        "enum": ["disabled", "remote", "local", "decompressed"]
-                    },
-                    "server_type": {
-                        "description": "Server type for file list parsing",
-                        "type": "string",
-                        "enum": ["apache", "nginx"]
+                        "enum": ["disabled", "remote", "local", "raw"]
                     },
                     "timeout": {
                         "description": "Socket timeout for server requests",
                         "type": "number",
-                        "minimum": 0
+                        "minimum": 0.0
                     }
                 },
                 "required": ["name", "url", "mode"]

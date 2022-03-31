@@ -1,3 +1,4 @@
+from __future__ import annotations
 import atexit
 import pathlib
 import shutil
@@ -19,7 +20,7 @@ def _cleanup() -> None:
 atexit.register(_cleanup)
 
 
-def bundle() -> str:
+def bundle() -> typing.Optional[str]:
     global temporary_directory
     if temporary_directory is not None:
         return str(temporary_directory / "ca-bundle.crt")
@@ -28,17 +29,17 @@ def bundle() -> str:
     if sys.platform == "darwin":
         # from https://github.com/sheagcraig/MacSesh/blob/master/macsesh/keychain.py
         from Security import (
-            errSecSuccess,
-            kSecClass,
-            kSecReturnRef,
-            kSecMatchLimit,
-            kSecMatchLimitAll,
-            SecItemCopyMatching,
-            kSecClassCertificate,
-            kSecMatchTrustedOnly,
-            SecItemExport,
-            kSecFormatUnknown,
-            SecTrustCopyAnchorCertificates,
+            errSecSuccess,  # type: ignore
+            kSecClass,  # type: ignore
+            kSecReturnRef,  # type: ignore
+            kSecMatchLimit,  # type: ignore
+            kSecMatchLimitAll,  # type: ignore
+            SecItemCopyMatching,  # type: ignore
+            kSecClassCertificate,  # type: ignore
+            kSecMatchTrustedOnly,  # type: ignore
+            SecItemExport,  # type: ignore
+            kSecFormatUnknown,  # type: ignore
+            SecTrustCopyAnchorCertificates,  # type: ignore
         )
         from urllib3.contrib._securetransport.bindings import CoreFoundation, Security
 
@@ -59,7 +60,9 @@ def bundle() -> str:
             certificates.extend(result)
         if len(certificates) == 0:
             return None
-        return_code, pem_data = SecItemExport(certificates, kSecFormatUnknown, 0, None, None)
+        return_code, pem_data = SecItemExport(
+            certificates, kSecFormatUnknown, 0, None, None
+        )
         if return_code != errSecSuccess:
             return None
         temporary_directory = pathlib.Path(tempfile.mkdtemp())
@@ -90,7 +93,9 @@ def bundle() -> str:
                     certificates_paths.append(subpath)
             if len(certificates_paths) > 0:
                 temporary_directory = pathlib.Path(tempfile.mkdtemp())
-                with open(temporary_directory / "ca-bundle.crt", "wb") as certificates_bundle:
+                with open(
+                    temporary_directory / "ca-bundle.crt", "wb"
+                ) as certificates_bundle:
                     for path in certificates_paths:
                         with open(path, "rb") as certificate:
                             certificates_bundle.write(certificate.read())

@@ -4,28 +4,23 @@ directory = "datasets"
 name = "dvs09"
 url = "https://rds.westernsydney.edu.au/Institutes/MARCS/ICNS/UNDR/dvs09/"
 mode = "disabled"
-server_type = "apache"
 
 [[datasets]]
 name = "dvsact16"
 url = "https://rds.westernsydney.edu.au/Institutes/MARCS/ICNS/UNDR/dvsact16/"
 mode = "disabled"
-server_type = "apache"
 
 [[datasets]]
 name = "dvsflow16"
 url = "https://rds.westernsydney.edu.au/Institutes/MARCS/ICNS/UNDR/dvsflow16/"
 mode = "disabled"
-server_type = "apache"
 
 [[datasets]]
 name = "ncaltech101"
 url = "https://rds.westernsydney.edu.au/Institutes/MARCS/ICNS/UNDR/ncaltech101/"
 mode = "disabled"
-server_type = "apache"
 
 [[datasets]]
 name = "nmnist"
 url = "https://rds.westernsydney.edu.au/Institutes/MARCS/ICNS/UNDR/nmnist/"
 mode = "disabled"
-server_type = "apache"

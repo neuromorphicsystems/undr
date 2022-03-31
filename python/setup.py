@@ -1,18 +1,31 @@
 import setuptools
 import sys
+import pathlib
 
-if not "-h" in sys.argv and not "--help" in sys.argv and ("sdist" in sys.argv or "develop" in sys.argv):
+dirname = pathlib.Path(__file__).resolve().parent
+
+if (
+    not "-h" in sys.argv
+    and not "--help" in sys.argv
+    and ("sdist" in sys.argv or "develop" in sys.argv)
+):
     import shutil
-    import pathlib
 
-    dirname = pathlib.Path(__file__).resolve().parent
     shutil.rmtree(dirname / "undr", ignore_errors=True)
     shutil.copytree(dirname / "source", dirname / "undr")
-    shutil.copyfile(dirname / "specification" / "undr_schema.json", dirname / "undr" / "undr_schema.json")
-    shutil.copyfile(dirname / "specification" / "-index_schema.json", dirname / "undr" / "-index_schema.json")
-    shutil.copyfile(dirname / "undr_default.toml", dirname / "undr" / "undr_default.toml")
+    shutil.copyfile(
+        dirname.parent / "specification" / "undr_schema.json",
+        dirname / "undr" / "undr_schema.json",
+    )
+    shutil.copyfile(
+        dirname.parent / "specification" / "-index_schema.json",
+        dirname / "undr" / "-index_schema.json",
+    )
+    shutil.copyfile(
+        dirname.parent / "undr_default.toml", dirname / "undr" / "undr_default.toml"
+    )
 
-with open("README.md") as file:
+with open(dirname.parent / "README.md") as file:
     long_description = file.read()
 
 setuptools.setup(
