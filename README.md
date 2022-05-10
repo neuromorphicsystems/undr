@@ -17,6 +17,7 @@
     - [Example configuration](#example-configuration)
       - [Apache](#apache)
       - [Nginx](#nginx)
+      - [Upload a dataset](#upload-a-dataset)
   - [Contribute](#contribute)
     - [Publish the module](#publish-the-module)
     - [Build the app](#build-the-app)
@@ -77,7 +78,7 @@ pip3 install undr
 ### Python APIs
 
 | API name | Complexity | Configurability | Parallel processing | Progress display |
-|----------|------------|-----------------|---------------------|------------------|
+| -------- | ---------- | --------------- | ------------------- | ---------------- |
 | loop     | simple     | high            | no                  | no               |
 | map      | simple     | low             | yes                 | yes              |
 | task     | complex    | high            | yes                 | yes              |
@@ -130,16 +131,37 @@ server {
 }
 ```
 
-## Contribute
+#### Upload a dataset
 
-```shh
-cd python
+-   `python3 -m undr check-conformity /path/to/dataset`
+
+-   Caveat: An UNDR server can provide multiple compressed files (different formats) for each resource. The Python UNDR library always picks the best compression (smallest encoded size). `check-conformity` only checks the best compression and will not report errors for other compressions.
+
+-   for macOS users (.DS_Store)
+
+Add to _~/.zshrc_:
+
+```sh
+# rmdsstore removes .DS_Store files recursively
+rmdsstore() {
+    if [ $# -eq 0 ]; then
+        printf 'usage: rmdsstore directory\n' >&2
+        return
+    fi
+    find "$1" -name ".DS_Store" -delete -print
+}
 ```
 
-Run `black source` to format the source code (see https://github.com/psf/black).
-Run `pyright source` to check types (see https://github.com/microsoft/pyright).
+Run `rmdsstore /path/to/dataset` before running `python3 -m undr check-conformity /path/to/dataset`.
 
-Local installation: `python3 -m pip install -e .`
+## Contribute
+
+```sh
+cd python
+black . # format the source code (see https://github.com/psf/black)
+pyright . #check types (see https://github.com/microsoft/pyright)
+python3 -m pip install -e . # local installation
+```
 
 ### Publish the module
 

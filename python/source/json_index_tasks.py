@@ -126,9 +126,9 @@ class Index(remote.DownloadFile):
             own_doi=None,
             metadata={},
             server=server,
-            # size, hash and compressions are set to None on puprose
-            # they are exposed to Selector.index_force,
-            # but the index_force policy cannot depend on the (unknown) index size
+            # size, hash and compressions are not available for index files
+            # they are always non-null when path.File objects are exposed to the user via Selector,
+            # so we keep the type as a non-optional
             size=None,  # type: ignore
             hash=None,  # type: ignore
             compressions=None,  # type: ignore
@@ -538,6 +538,12 @@ class CheckLocalDirectoryRecursive(task.Task):
             metadata={},
             server=remote.NullServer(),
             doi_and_metadata_loaded=False,
+        )
+        check.handle_directory(
+            directory=directory,
+            send_message=lambda message: manager.send_message(
+                check.Error(path_id=directory.path_id, message=message)
+            ),
         )
         index_data = json_index.load(directory.local_path / "-index.json")
         for file in itertools.chain(

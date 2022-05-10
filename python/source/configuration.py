@@ -71,6 +71,20 @@ class IndexStatus:
     selector: json_index_tasks.Selector
     downloaded_and_processed: bool
 
+    def push(self, message: typing.Any) -> tuple[bool, typing.Optional["IndexStatus"]]:
+        if isinstance(message, json_index_tasks.IndexLoaded):
+            self.final_index_files += message.children
+            return (False, self)
+        if isinstance(message, json_index_tasks.DirectoryScanned):
+            self.current_index_files += 1
+            if (
+                message.download_bytes.initial != message.download_bytes.final
+                or message.process_bytes.initial != message.process_bytes.final
+            ):
+                self.downloaded_and_processed = False
+            return (self.current_index_files == self.final_index_files, self)
+        return False, None
+
 
 @dataclasses.dataclass
 class IndexesStatuses:
@@ -81,19 +95,10 @@ class IndexesStatuses:
         Updates the indexing status and returns it if message is an IndexLoaded or DirectoryScanned object.
         If the message was the last indexing message for this dataset, the first argument is True.
         """
-        if isinstance(message, json_index_tasks.IndexLoaded):
-            status = self.name_to_status[message.path_id.parts[0]]
-            status.final_index_files += message.children
-            return (False, status)
-        if isinstance(message, json_index_tasks.DirectoryScanned):
-            status = self.name_to_status[message.path_id.parts[0]]
-            status.current_index_files += 1
-            if (
-                message.download_bytes.initial != message.download_bytes.final
-                or message.process_bytes.initial != message.process_bytes.final
-            ):
-                status.downloaded_and_processed = False
-            return (status.current_index_files == status.final_index_files, status)
+        if isinstance(
+            message, (json_index_tasks.IndexLoaded, json_index_tasks.DirectoryScanned)
+        ):
+            return self.name_to_status[message.path_id.parts[0]].push(message=message)
         return False, None
 
 

@@ -30,7 +30,7 @@ with open(dirname.parent / "README.md") as file:
 
 setuptools.setup(
     name="undr",
-    version="0.0.9",
+    version="1.0.0",
     url="https://github.com/neuromorphicsystems/undr",
     author="Alexandre Marcireau",
     author_email="alexandre.marcireau@gmail.com",

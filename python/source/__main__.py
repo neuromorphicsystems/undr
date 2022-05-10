@@ -4,6 +4,7 @@ import logging
 import multiprocessing
 import pathlib
 import pkgutil
+import sys
 import typing
 from . import check
 from . import configuration
@@ -11,8 +12,9 @@ from . import constants
 from . import display
 from . import formats
 from . import install_mode
+from . import json_index_tasks
+from . import remote
 from . import task
-from . import utilities
 
 dirname = pathlib.Path(__file__).resolve().parent
 
@@ -79,22 +81,16 @@ if __name__ == "__main__":
         help="Read all the files and check their invariants (timestamps order, spatial coordinates range...)",
     )
     add_common_arguments(doctor_parser)
-    check_for_upload_parser = subparsers.add_parser(
-        "check-for-upload",
+    check_conformance_parser = subparsers.add_parser(
+        "check-conformance",
         help="Inspect a directory before uploading it to an UNDR server",
     )
-    check_for_upload_parser.add_argument("path", help="Path to the local directory")
-    check_for_upload_parser.add_argument(
-        "--delete-extra-files",
-        "-d",
+    check_conformance_parser.add_argument("path", help="Path to the local directory")
+    check_conformance_parser.add_argument(
+        "--skip-format-index",
+        "-s",
         action="store_true",
-        help="Delete the files that are not listed in -index.json",
-    )
-    check_for_upload_parser.add_argument(
-        "--format-index",
-        "-i",
-        action="store_true",
-        help="Sort the entries in -index.json",
+        help="Do not format -index.json files",
     )
     args = parser.parse_args()
 
@@ -191,55 +187,76 @@ if __name__ == "__main__":
         else:
             print(display.format_error(f"{error.path_id}: {error.message}"))
 
-    """
-    if args.command == "check-for-upload":
-        logger = progress.Printer()
-        with logger.group(progress.Phase(0, 1, "check local directory")):
-            try:
-                directory = IndexedDirectory(
-                    path=pathlib.Path(args.path),
-                    own_doi=None,
-                    server=server_factory(
-                        url=f"{pathlib.Path(args.path).as_posix()}/",
-                        timeout=default_timeout,
-                        type="local",
+    if args.command == "check-conformance":
+        conformance_error: typing.Optional[str] = None
+        try:
+            path = pathlib.Path(args.path)
+            check.structure_recursive(path)
+            index_status = configuration.IndexStatus(
+                dataset_settings=None,  # type: ignore
+                current_index_files=0,
+                final_index_files=1,
+                server=remote.NullServer(),
+                selector=json_index_tasks.Selector(),
+                downloaded_and_processed=True,
+            )
+            with display.Display(
+                statuses=[
+                    display.Status.from_path_id_and_mode(
+                        path_id=pathlib.PurePosixPath(path.name),
+                        dataset_mode=install_mode.Mode.RAW,
                     ),
-                    parent=None,
-                    metadata={},
+                ],
+                output_interval=constants.CONSUMER_POLL_PERIOD,
+                download_speed_samples=constants.SPEED_SAMPLES,
+                process_speed_samples=constants.SPEED_SAMPLES,
+                download_tag=display.Tag(label="download", icon="↓"),
+                process_tag=display.Tag(label="process", icon="⚛"),
+            ) as terminal_display, task.ProcessManager() as manager:
+                manager.schedule(
+                    task=json_index_tasks.Index(
+                        path_root=path.parent,
+                        path_id=pathlib.PurePosixPath(path.name),
+                        server=index_status.server,
+                        selector=json_index_tasks.Selector(),
+                        priority=0,
+                        force=False,
+                        directory_doi=False,
+                    ),
+                    priority=0,
                 )
-                directory.provision(logger=progress.Quiet())
-                check_for_upload(
-                    directory,
-                    delete_ds_store=args.delete_ds_store,
-                    format_index=args.format_index,
-                )
-                try:
-                    directory.download(
-                        force=False, logger=progress.Quiet(), workers_count=1
-                    )
-                except FileNotFoundError as error:
-                    raise Exception(
-                        '"{}" not found (listed in "{}")'.format(
-                            error, pathlib.Path(str(error)).parent / "-index.json"
+                for message in manager.messages():
+                    if isinstance(message, task.Exception):
+                        raise Exception(str(message.traceback_exception))
+                    terminal_display.push(message)
+                    indexing_complete, status = index_status.push(message=message)
+                    if indexing_complete and status is not None:
+                        manager.schedule(
+                            task=json_index_tasks.CheckLocalDirectoryRecursive(
+                                path_root=path.parent,
+                                path_id=pathlib.PurePosixPath(path.name),
+                                switch=formats.Switch(
+                                    handle_aps=check.handle_aps,
+                                    handle_dvs=check.handle_dvs,
+                                    handle_imu=check.handle_imu,
+                                    handle_other=check.handle_other,
+                                ),
+                                priority=1,
+                            ),
+                            priority=1,
                         )
-                    )
-                with logger.group(
-                    progress.ProcessDirectory(
-                        0, 1, pathlib.Path(args.path).name, directory
-                    )
-                ):
-                    for _, results in directory.recursive_map(
-                        logger=logger,
-                        handle_aps_file=check_aps_file,
-                        handle_dvs_file=check_dvs_file,
-                        handle_imu_file=check_imu_file,
-                        handle_other_file=check_other_file,
-                        workers_count=args.workers_count,
-                    ):
-                        for file, errors in list(results):
-                            for error in errors:
-                                logger.error(f'{error} in "{file.path}"')
-            except:
-                logger.error(str(sys.exc_info()[1]))
-                sys.exit(1)
-        """
+            if not args.skip_format_index:
+                check.format_index_recursive(
+                    path=path,
+                    handle_path=lambda path: print(
+                        display.format_info(f"Formatted {path}")
+                    ),
+                )
+        except KeyboardInterrupt:
+            conformance_error = "Interrupted"
+        except:
+            conformance_error = str(sys.exc_info()[1])
+        if conformance_error is None:
+            print(display.format_info("No errors detected"))
+        else:
+            print(display.format_error(conformance_error))

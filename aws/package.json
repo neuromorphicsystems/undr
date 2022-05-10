@@ -1,0 +1,17 @@
+{
+    "private": true,
+    "dependencies": {
+        "cross-env": "7.0.3",
+        "esbuild": "0.14.38",
+        "mustache": "4.2.0",
+        "prettier": "2.6.2"
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "arrowParens": "avoid"
+    },
+    "scripts": {
+        "build": "cross-env MODE=production node build.js",
+        "lint": "prettier --write ."
+    }
+}

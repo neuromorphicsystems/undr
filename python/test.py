@@ -5,8 +5,6 @@ import pathlib
 import tempfile
 
 
-
-
 """
 with tempfile.TemporaryDirectory() as temporary_directory_name:
     temporary_directory = pathlib.Path(temporary_directory_name)
