@@ -1,34 +1,63 @@
-const esbuild = require("esbuild");
-const fs = require("fs");
-const mustache = require("mustache");
-const prettier = require("prettier");
+import * as esbuild from "esbuild";
+import * as fs from "fs";
+import mustache from "mustache";
+import * as path from "path";
+import * as process from "node:process";
+import * as svgr from "@svgr/core";
 
-(async () => {
-    await Promise.all([
-        esbuild.build({
-            entryPoints: ["app.ts"],
-            bundle: true,
-            outfile: "build/script.js",
-        }),
-        esbuild.build({
-            entryPoints: ["style.css"],
-            bundle: true,
-            outfile: "build/style.css",
-        }),
-    ]);
+fs.mkdirSync("build", { recursive: true });
+
+const resultToFile = result => {
     fs.writeFileSync(
-        "build/index.html",
-        prettier.format(
-            mustache.render(fs.readFileSync("index.mustache").toString(), {
-                title: "UNDR",
-                script: fs.readFileSync("build/script.js").toString(),
-                style: fs.readFileSync("build/style.css").toString(),
-            }),
+        path.join("build", "index.html"),
+        mustache.render(
+            fs.readFileSync(path.join("source", "index.mustache")).toString(),
             {
-                tabWidth: 4,
-                arrowParens: "avoid",
-                parser: "html",
+                title: "UNDR",
+                script: result.outputFiles[0].text,
             }
         )
     );
-})();
+    if (process.argv.includes("--watch")) {
+        console.log(`\x1b[32m✓\x1b[0m ${new Date().toLocaleString()}`);
+    }
+};
+
+esbuild
+    .build({
+        entryPoints: [path.join("source", "app.tsx")],
+        bundle: true,
+        define: {
+            S3_URL: JSON.stringify(process.env.npm_package_config_s3_url),
+            S3_WEBSITE_URL: JSON.stringify(
+                process.env.npm_package_config_s3_website_url
+            ),
+        },
+        write: false,
+        minify: process.env.MODE === "production",
+        watch: process.argv.includes("--watch")
+            ? {
+                  onRebuild: async (error, result) => {
+                      if (!error) {
+                          resultToFile(result);
+                      }
+                  },
+              }
+            : false,
+        plugins: [
+            {
+                name: "svgr",
+                setup(build) {
+                    build.onLoad({ filter: /\.svg$/ }, async args => ({
+                        contents: await svgr.transform(
+                            await fs.promises.readFile(args.path),
+                            { typescript: true, dimensions: false },
+                            { filePath: args.path }
+                        ),
+                        loader: "tsx",
+                    }));
+                },
+            },
+        ],
+    })
+    .then(resultToFile);
