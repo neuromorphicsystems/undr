@@ -72,8 +72,7 @@ const NameCell = styled.div`
         }
     }
     & > a {
-        width: 0;
-        flex-grow: 1;
+        flex-shrink: 1;
         overflow: hidden;
         text-overflow: ellipsis;
         text-decoration: none;
