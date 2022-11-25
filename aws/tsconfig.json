@@ -4,7 +4,7 @@
         "allowUnusedLabels": true,
         "alwaysStrict": true,
         "exactOptionalPropertyTypes": true,
-        "jsx": "preserve",
+        "jsx": "react-jsx",
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
         "noImplicitOverride": true,

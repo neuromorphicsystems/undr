@@ -1,11 +1,11 @@
 from __future__ import annotations
-from lzip import RemainingBytesError as RemainingBytesError
 from .configuration import (
     Configuration as Configuration,
     configuration_from_path as configuration_from_path,
     IndexesStatuses as IndexesStatuses,
     IndexStatus as IndexStatus,
 )
+from .decode import RemainingBytesError as RemainingBytesError
 from .formats import (
     ApsFile as ApsFile,
     DvsFile as DvsFile,

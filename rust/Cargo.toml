@@ -1,0 +1,23 @@
+[package]
+name = "undr"
+version = "0.1.0"
+authors = [
+    "International Centre for Neuromorphic Systems",
+    "Alexandre Marcireau",
+]
+description = "The UNDR protocol implemented in Rust"
+homepage = "https://github.com/neuromorphicsystems/undr/"
+repository = "https://github.com/neuromorphicsystems/undr/"
+readme = "../README.md"
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+brotli = "3.3.4"
+jsonschema = "0.16.1"
+serde_json = "1.0"
+toml = "0.5.9"
+
+[profile.release]
+lto = true
+codegen-units = 1

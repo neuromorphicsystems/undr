@@ -52,20 +52,41 @@ class NoneCompression(Compression):
             self.buffer = bytes()
 
         def decompress(self, buffer: bytes):
-            if len(self.buffer) > 0:
-                buffer = self.buffer + buffer
-                self.buffer = bytes()
-            if len(buffer) % self.word_size == 0:
+            if len(self.buffer) == 0:
+                if len(buffer) % self.word_size == 0:
+                    return buffer
+                else:
+                    remaning_bytes_count = len(buffer) % self.word_size
+                    buffer, self.buffer = (
+                        buffer[0 : len(self.buffer) - remaning_bytes_count],
+                        buffer[len(buffer) - remaning_bytes_count :],
+                    )
+                    return buffer
+            remaning_bytes_count = (len(self.buffer) + len(buffer)) % self.word_size
+            if remaning_bytes_count == 0:
+                buffer, self.buffer = self.buffer + buffer, bytes()
                 return buffer
-            remaning_bytes = len(buffer) % self.word_size
-            self.buffer = buffer[len(buffer) - remaning_bytes :]
-            return buffer[0 : len(self.buffer) - remaning_bytes]
+            if remaning_bytes_count < len(buffer):
+                buffer, self.buffer = (
+                    self.buffer + buffer[0 : len(buffer) - remaning_bytes_count],
+                    buffer[len(buffer) - remaning_bytes_count :],
+                )
+                return buffer
+            if remaning_bytes_count == len(buffer):
+                buffer, self.buffer = self.buffer, buffer
+                return buffer
+            buffer, self.buffer = (
+                self.buffer[0 : len(self.buffer) + len(buffer) - remaning_bytes_count],
+                self.buffer[len(self.buffer) + len(buffer) - remaning_bytes_count :]
+                + buffer,
+            )
+            return buffer
 
         def finish(self):
-            remaning_bytes = len(self.buffer) % self.word_size
+            remaning_bytes_count = len(self.buffer) % self.word_size
             return (
-                self.buffer[0 : len(self.buffer) - remaning_bytes],
-                self.buffer[len(self.buffer) - remaning_bytes :],
+                self.buffer[0 : len(self.buffer) - remaning_bytes_count],
+                self.buffer[len(self.buffer) - remaning_bytes_count :],
             )
 
     def decoder(self, word_size: int):
@@ -73,21 +94,26 @@ class NoneCompression(Compression):
 
 
 @dataclasses.dataclass(frozen=True)
-class LzipCompression(Compression):
-    class Decoder(Decoder):
+class BrotliCompression(Compression):
+    class Decoder(NoneCompression.Decoder):
         def __init__(self, word_size: int):
-            import lzip_extension
+            super().__init__(word_size=word_size)
+            import brotli
 
-            self.decoder = lzip_extension.Decoder(word_size)
+            self.decoder = brotli.Decompressor()
 
         def decompress(self, buffer: bytes):
-            return self.decoder.decompress(buffer)
+            decompressed_bytes = self.decoder.process(buffer)
+
+            return super().decompress(decompressed_bytes)
 
         def finish(self):
-            return self.decoder.finish()
+            if not self.decoder.is_finished():
+                raise Exception("the Brotli decoded expected more data")
+            return super().finish()
 
     def decoder(self, word_size: int):
-        return LzipCompression.Decoder(word_size=word_size)
+        return BrotliCompression.Decoder(word_size=word_size)
 
 
 class DecompressFile(task.Task):
@@ -183,8 +209,8 @@ class DecompressFile(task.Task):
 def compression_from_dict(data: dict[str, typing.Any], base_size: int, base_hash: str):
     if data["type"] == "none":
         return NoneCompression(suffix=data["suffix"], size=base_size, hash=base_hash)
-    if data["type"] == "lzip":
-        return LzipCompression(
+    if data["type"] == "brotli":
+        return BrotliCompression(
             suffix=data["suffix"], size=data["size"], hash=data["hash"]
         )
     raise RuntimeError("unsupported compression type {}".format(data["type"]))

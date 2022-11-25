@@ -1,10 +1,10 @@
-- [Deploy](#deploy)
-- [URL](#url)
-    - [`uri = undr.s3-ap-southeast-2.amazonaws.com`](#uri--undrs3-ap-southeast-2amazonawscom)
-    - [`uri = undr.s3-website-ap-southeast-2.amazonaws.com`](#uri--undrs3-website-ap-southeast-2amazonawscom)
-    - [`uri = dvin548rgfj0n.cloudfront.net`](#uri--dvin548rgfj0ncloudfrontnet)
-    - [`uri = d1juofrn4vv0j9.cloudfront.net`](#uri--d1juofrn4vv0j9cloudfrontnet)
-    - [`uri = www.undr.space`](#uri--wwwundrspace)
+-   [Deploy](#deploy)
+-   [URL](#url)
+    -   [`uri = undr.s3-ap-southeast-2.amazonaws.com`](#uri--undrs3-ap-southeast-2amazonawscom)
+    -   [`uri = undr.s3-website-ap-southeast-2.amazonaws.com`](#uri--undrs3-website-ap-southeast-2amazonawscom)
+    -   [`uri = dvin548rgfj0n.cloudfront.net`](#uri--dvin548rgfj0ncloudfrontnet)
+    -   [`uri = d1juofrn4vv0j9.cloudfront.net`](#uri--d1juofrn4vv0j9cloudfrontnet)
+    -   [`uri = www.undr.space`](#uri--wwwundrspace)
 
 ## Deploy
 
@@ -13,6 +13,7 @@ aws configure
 ```
 
 ```sh
+npm run lint
 npm run build
 aws s3api put-object --bucket undr --key index.html --content-type 'text/html' --body build/index.html
 aws cloudfront create-invalidation --distribution-id E1Y0XU2SEIEYXC --paths '/index.html'

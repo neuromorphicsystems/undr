@@ -511,11 +511,11 @@ class Configuration:
             exist_ok: bool,
         ):
             (write_root / path_id).mkdir(exist_ok=exist_ok)
-            for child in json_index.load(read_root / path_id / "-index.json")[
+            for child_directory_name in json_index.load(read_root / path_id / "-index.json")[
                 "directories"
             ]:
                 mkdir_recursive(
-                    path_id=path_id / child,
+                    path_id=path_id / child_directory_name,
                     read_root=read_root,
                     write_root=write_root,
                     exist_ok=exist_ok,

@@ -9,7 +9,7 @@
             "properties": {
                 "name": {
                     "type": "string",
-                    "pattern": "^(?:[A-Za-z0-9_\\-]+|[A-Za-z0-9_\\-\\.]+\\.(?!download$|lz|decompress$)[^\\.]*)$"
+                    "pattern": "^(?:[A-Za-z0-9_\\-]+|[A-Za-z0-9_\\-\\.]+\\.(?!download$|br|decompress$)[^\\.]*)$"
                 }
             },
             "required": ["name"]
@@ -51,7 +51,7 @@
                                     "type": {
                                         "description": "Compression algorithm",
                                         "type": "string",
-                                        "enum": ["lzip"]
+                                        "enum": ["brotli"]
                                     },
                                     "size": {
                                         "description": "Compressed size in bytes",

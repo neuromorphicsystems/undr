@@ -7,7 +7,6 @@ import operator
 import pathlib
 import requests
 import typing
-from lzip import RemainingBytesError as RemainingBytesError
 from . import constants
 from . import decode
 from . import remote
@@ -172,7 +171,7 @@ class File(Path):
                     if len(chunk) == 0:
                         break
                     if len(chunk) % word_size != 0:
-                        raise RemainingBytesError(word_size=word_size, buffer=chunk)
+                        raise decode.RemainingBytesError(word_size=word_size, buffer=chunk)
                     yield chunk
                     hash.update(chunk)
                     self.manager.send_message(
@@ -239,7 +238,7 @@ class File(Path):
                         )
                     )
                 if len(remaining_bytes) > 0:
-                    raise RemainingBytesError(word_size, remaining_bytes)
+                    raise decode.RemainingBytesError(word_size, remaining_bytes)
             digest = hash.hexdigest()
             if digest != self.hash:
                 raise Exception(
@@ -330,7 +329,7 @@ class File(Path):
                     )
                 )
             if len(remaining_bytes) > 0:
-                raise RemainingBytesError(word_size, remaining_bytes)
+                raise decode.RemainingBytesError(word_size, remaining_bytes)
             decode_digest = decode_hash.hexdigest()
             if decode_digest != self.hash:
                 raise Exception(

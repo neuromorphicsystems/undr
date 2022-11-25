@@ -191,11 +191,11 @@ class Index(remote.DownloadFile):
                 children=len(index_data["directories"]),
             )
         )
-        for child_directory in index_data["directories"]:
+        for child_directory_name in index_data["directories"]:
             manager.schedule(
                 Index(
                     path_root=self.path_root,
-                    path_id=directory.path_id / child_directory,
+                    path_id=directory.path_id / child_directory_name,
                     server=self.server,
                     selector=self.selector,
                     priority=self.priority,
@@ -411,11 +411,11 @@ class InstallFilesRecursive(task.Task):
                     manager.schedule(decompress_task, self.priority)
                 else:
                     raise Exception(f"unexpected action {actual_action}")
-        for child_directory in index_data["directories"]:
+        for child_directory_name in index_data["directories"]:
             manager.schedule(
                 InstallFilesRecursive(
                     path_root=self.path_root,
-                    path_id=self.path_id / child_directory,
+                    path_id=self.path_id / child_directory_name,
                     server=self.server,
                     selector=self.selector,
                     priority=self.priority,
@@ -485,11 +485,11 @@ class ProcessFilesRecursive(task.Task):
                     ),
                     priority=self.priority,
                 )
-        for child_directory in index_data["directories"]:
+        for child_directory_name in index_data["directories"]:
             manager.schedule(
                 ProcessFilesRecursive(
                     path_root=self.path_root,
-                    path_id=self.path_id / child_directory,
+                    path_id=self.path_id / child_directory_name,
                     server=self.server,
                     selector=self.selector,
                     process_file_class=self.process_file_class,
@@ -563,11 +563,11 @@ class CheckLocalDirectoryRecursive(task.Task):
                 ),
                 priority=self.priority,
             )
-        for child_directory in index_data["directories"]:
+        for child_directory_name in index_data["directories"]:
             manager.schedule(
                 CheckLocalDirectoryRecursive(
                     path_root=self.path_root,
-                    path_id=self.path_id / child_directory,
+                    path_id=self.path_id / child_directory_name,
                     switch=self.switch,
                     priority=self.priority,
                 ),

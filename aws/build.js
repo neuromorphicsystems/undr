@@ -33,6 +33,9 @@ esbuild
                 process.env.npm_package_config_s3_website_url
             ),
         },
+        jsx: "automatic",
+        jsxDev: process.env.MODE === "development",
+        target: ["es2021"],
         write: false,
         minify: process.env.MODE === "production",
         watch: process.argv.includes("--watch")

@@ -1,5 +1,4 @@
 from __future__ import annotations
-from lzip import RemainingBytesError
 import collections
 import dataclasses
 import itertools
@@ -7,6 +6,7 @@ import json
 import numpy
 import pathlib
 import typing
+from . import decode
 from . import formats
 from . import json_index
 from . import path
@@ -39,7 +39,7 @@ def handle_aps(file: formats.ApsFile, send_message: formats.SendMessage):
                     frames["width"] != file.width, frames["height"] != file.height
                 )
             )
-    except RemainingBytesError as error:
+    except decode.RemainingBytesError as error:
         empty = False
         send_message(
             Error(path_id=file.path_id, message=f"{len(error.buffer)} extra bytes")
@@ -83,7 +83,7 @@ def handle_dvs(file: formats.DvsFile, send_message: formats.SendMessage):
             out_of_bounds_count += numpy.count_nonzero(
                 numpy.logical_or(events["x"] >= file.width, events["y"] >= file.height)
             )
-    except RemainingBytesError as error:
+    except decode.RemainingBytesError as error:
         empty = False
         send_message(
             Error(path_id=file.path_id, message=f"{len(error.buffer)} extra bytes")
@@ -123,7 +123,7 @@ def handle_imu(file: formats.ImuFile, send_message: formats.SendMessage):
             non_monotonic_ts += numpy.count_nonzero(
                 numpy.diff(imus["t"].astype("<i8")) < 0
             )
-    except RemainingBytesError as error:
+    except decode.RemainingBytesError as error:
         send_message(
             Error(path_id=file.path_id, message=f"{len(error.buffer)} extra bytes")
         )
@@ -167,8 +167,8 @@ def handle_directory(
         children.remove(local_path)
         if not local_path.is_file():
             raise Exception(f"{local_path} is not a file")
-    for directory_name in index_data["directories"]:
-        directory_path = directory.local_path / directory_name
+    for child_directory_name in index_data["directories"]:
+        directory_path = directory.local_path / child_directory_name
         if not directory_path in children:
             raise Exception(f"{directory_path} does not exist")
         children.remove(directory_path)
@@ -192,8 +192,8 @@ def structure_recursive(path: pathlib.Path):
     if not index_path.is_file():
         raise Exception(f"{index_path} is not a file")
     index_data = json_index.load(index_path)
-    for directory in index_data["directories"]:
-        structure_recursive(path / directory)
+    for child_directory_name in index_data["directories"]:
+        structure_recursive(path / child_directory_name)
 
 
 def format_index_recursive(
@@ -209,5 +209,5 @@ def format_index_recursive(
         handle_path(index_path)
         with open(index_path, "wb") as index_file:
             index_file.write(new_index_content)
-    for directory in index_data["directories"]:
-        format_index_recursive(path=path / directory, handle_path=handle_path)
+    for child_directory_name in index_data["directories"]:
+        format_index_recursive(path=path / child_directory_name, handle_path=handle_path)

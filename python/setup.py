@@ -38,11 +38,11 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=[
+        "brotli >= 1.0",
         "jsonschema-rs >= 0.9",
-        "lzip >= 1.0",
-        "numpy >= 1.20",
+        "numpy >= 1.23",
         "pyobjc-framework-SecurityInterface >= 7.3; sys_platform == 'darwin'",
-        "requests >= 2.25",
+        "requests >= 2.28",
         "toml >= 0.10",
     ],
     classifiers=[
