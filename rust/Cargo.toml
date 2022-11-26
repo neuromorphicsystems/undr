@@ -15,6 +15,9 @@ include = ["specification/*.json", "specification/*.toml"]
 categories = ["parser-implementations"]
 keywords = ["UNDR"]
 
+[lib]
+path = "src/lib.rs"
+
 [dependencies]
 brotli = "3.3"
 lazy_static = "1.4"
