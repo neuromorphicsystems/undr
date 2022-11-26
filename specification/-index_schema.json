@@ -1,22 +1,16 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$schema": "https://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/neuromorphicsystems/undr/main/specification/-index_schema.json",
     "title": "-index",
     "description": "A directory index to store metadata",
     "definitions": {
-        "path_object": {
+        "resource": {
             "type": "object",
             "properties": {
                 "name": {
                     "type": "string",
-                    "pattern": "^(?:[A-Za-z0-9_\\-]+|[A-Za-z0-9_\\-\\.]+\\.(?!download$|br|decompress$)[^\\.]*)$"
-                }
-            },
-            "required": ["name"]
-        },
-        "resource": {
-            "type": "object",
-            "properties": {
+                    "pattern": "^[A-Za-z0-9_\\-\\.]+$"
+                },
                 "size": {
                     "description": "Uncompressed size in bytes",
                     "type": "integer",
@@ -78,7 +72,7 @@
                     "pattern": "^10[.].+$"
                 }
             },
-            "required": ["size", "hash", "compressions"]
+            "required": ["name", "size", "hash", "compressions"]
         }
     },
     "type": "object",
@@ -112,7 +106,7 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "pattern": "^[A-Za-z0-9_\\-]+"
+                "pattern": "^[A-Za-z0-9_\\-\\.]+$"
             }
         },
         "files": {
@@ -120,9 +114,6 @@
             "type": "array",
             "items": {
                 "allOf": [
-                    {
-                        "$ref": "#/definitions/path_object"
-                    },
                     {
                         "$ref": "#/definitions/resource"
                     },
@@ -176,9 +167,6 @@
             "type": "array",
             "items": {
                 "allOf": [
-                    {
-                        "$ref": "#/definitions/path_object"
-                    },
                     {
                         "$ref": "#/definitions/resource"
                     },

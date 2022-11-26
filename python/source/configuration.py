@@ -511,9 +511,9 @@ class Configuration:
             exist_ok: bool,
         ):
             (write_root / path_id).mkdir(exist_ok=exist_ok)
-            for child_directory_name in json_index.load(read_root / path_id / "-index.json")[
-                "directories"
-            ]:
+            for child_directory_name in json_index.load(
+                read_root / path_id / "-index.json"
+            )["directories"]:
                 mkdir_recursive(
                     path_id=path_id / child_directory_name,
                     read_root=read_root,
@@ -534,6 +534,14 @@ def configuration_from_path(path: typing.Union[str, os.PathLike]):
     path = pathlib.Path(path).resolve()
     with open(path) as configuration_file:
         configuration = toml.load(configuration_file)
+    schema.validate(configuration)
+    names = set()
+    for dataset in configuration["datasets"]:
+        if dataset["name"] in names:
+            raise Exception(
+                f"two datasets share the same name \"{dataset['name']}\" in \"{path}\""
+            )
+        names.add(dataset["name"])
     directory = pathlib.Path(configuration["directory"])
     if not directory.is_absolute():
         directory = path.parent / directory
