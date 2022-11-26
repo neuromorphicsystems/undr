@@ -12,6 +12,8 @@ readme = "../README.md"
 license = "MIT"
 edition = "2021"
 include = ["specification/*.json", "specification/*.toml"]
+categories = ["parser-implementations"]
+keywords = ["UNDR"]
 
 [dependencies]
 brotli = "3.3"
