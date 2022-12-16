@@ -126,7 +126,7 @@ class Index(remote.DownloadFile):
             own_doi=None,
             metadata={},
             server=server,
-            # size, hash and compressions are not available for index files
+            # size, hash, and compressions are not available for index files
             # they are always non-null when path.File objects are exposed to the user via Selector,
             # so we keep the type as a non-optional
             size=None,  # type: ignore
@@ -204,7 +204,6 @@ class Index(remote.DownloadFile):
                 ),
                 priority=self.priority,
             )
-        directory_scanned.final_count = len(index_data["files"])
         if self.selector.scan_filesystem(directory=directory):
             name_to_size = {
                 path.name: path.stat().st_size
@@ -271,6 +270,10 @@ class Index(remote.DownloadFile):
                                 f"{compressed_name}{constants.DOWNLOAD_SUFFIX}"
                             )
                             if (
+                                # in process mode, files are not persisted to the disk
+                                # data is downloaded (or read from the disk), decompressed if necessaary,
+                                # and processed in chunks
+                                # for simplicity, partially persisted downloads are ignored and re-downloaded from scratch
                                 action != Selector.Action.PROCESS
                                 and partial_compressed_name in name_to_size
                             ):

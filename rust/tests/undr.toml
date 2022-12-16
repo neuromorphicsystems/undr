@@ -3,9 +3,14 @@ directory = "datasets"
 [[datasets]]
 name = "dvs09"
 url = "http://www.undr.space/dvs09/"
-mode = "local"
+mode = "raw"
 
 [[datasets]]
 name = "dvsflow16"
 url = "http://www.undr.space/dvsflow16/"
-mode = "local"
+mode = "raw"
+
+[[datasets]]
+name = "nmnist"
+url = "http://www.undr.space/nmnist/"
+mode = "raw"

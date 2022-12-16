@@ -34,7 +34,8 @@
                                         "enum": ["none"]
                                     },
                                     "suffix": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "pattern": "^[A-Za-z0-9_\\-\\.]+$"
                                     }
                                 },
                                 "required": ["type", "suffix"]
@@ -58,7 +59,8 @@
                                         "pattern": "^[a-f0-9]{56}$"
                                     },
                                     "suffix": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "pattern": "^[A-Za-z0-9_\\-\\.]+$"
                                     }
                                 },
                                 "required": ["type", "size", "hash", "suffix"]
@@ -176,8 +178,7 @@
                             "metadata": {
                                 "type": "object"
                             }
-                        },
-                        "required": ["metadata"]
+                        }
                     }
                 ]
             }

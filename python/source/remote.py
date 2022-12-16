@@ -140,6 +140,8 @@ class DownloadFile(Download):
         )
         if self.force:
             self.stream = open(download_path, "wb")
+            if self.expected_hash is not None:
+                self.hash = utilities.new_hash()
             return 0
         if (self.path_root / self.path_id).is_file():
             size = (
