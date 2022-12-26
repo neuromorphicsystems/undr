@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="100px" height="100px" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>bibtex</title>
-    <g id="bibtex" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <path d="M30,18 L82,18 L82,10 L30,10 C23.2,10 18,15.2 18,22 L18,82 C18,86.4 21.6,90 26,90 L82,90 L82,26 L30,26 C28,26 26,24.4 26,22 C26,19.6 28,18 30,18 Z M54,78 L26,78 L26,70 L54,70 L54,78 Z M62,62 L26,62 L26,54 L62,54 L62,62 Z M74,38 L74,46 L26,46 L26,38 L74,38 Z" id="Shape" fill="#5E5E5E" fill-rule="nonzero"></path>
-    </g>
-</svg>

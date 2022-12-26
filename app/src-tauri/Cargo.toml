@@ -1,0 +1,24 @@
+[package]
+name = "app"
+version = "0.1.0"
+description = "A Tauri App"
+authors = ["Alexandre Marcireau", "International Centre for Neuromorphic Systems"]
+license = ""
+repository = ""
+default-run = "app"
+edition = "2021"
+rust-version = "1.66"
+
+[build-dependencies]
+tauri-build = { version = "1.2.1", features = [] }
+
+[dependencies]
+serde = "1.0"
+serde_json = "1.0"
+tauri = { version = "1.2.2", features = ["dialog-open"] }
+thiserror = "1.0"
+undr = {path = "../../rust"}
+
+[features]
+default = [ "custom-protocol" ]
+custom-protocol = [ "tauri/custom-protocol" ]

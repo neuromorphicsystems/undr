@@ -183,40 +183,10 @@ python3 -m twine upload dist/*
 
 ### Build the app
 
-1. Copy the UNDR library to the app build tree
-
-```sh
-python3 app/interface-prebuild.py
-```
-
-2. Package the Python app using Cubuzoa
-
-```sh
-cd /path/to/cubuzoa
-python3 cubuzoa.py build /path-to-undr/app/python --os linux --version '==3.8'
-python3 cubuzoa.py build /path-to-undr/app/python --os 'macos|windows' --version '==3.9'
-```
-
-or build only for your platform
-
-```sh
-cd app/interface
-mkdir local-build
-cd local-build
-pyinstaller --distpath ../build --add-data ../undr/-index_schema.json:undr --add-data ../undr/undr_default.toml:undr --add-data ../undr/undr_schema.json:undr -n interface-cp39-macosx -y ../interface.py
-```
-
-3. Delete the UNDR library copy
-
-```sh
-rm -rf app/python/undr
-```
-
-4. Build the Electron app
-
 ```sh
 cd app
-npm run release # or npm run watch for continuous development
+npm install
+npm run tauri dev
 ```
 
 ### Download with existing CLI
