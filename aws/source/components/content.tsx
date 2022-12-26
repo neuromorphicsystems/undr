@@ -130,9 +130,6 @@ interface ChildrenProps {
 }
 
 const Children = styled.div<ChildrenProps>`
-    padding-left: 15px;
-    padding-right: 15px;
-    padding-bottom: 15px;
     display: ${props => (props.visible ? "block" : "none")};
     @media (max-width: 512px) {
         padding-left: 0;
@@ -275,11 +272,12 @@ const HeaderModifiedCell = styled(HeaderCell)`
 const Child = styled.div`
     display: flex;
     height: 40px;
-    &:nth-child(even) {
-        background-color: ${props => props.theme.background1};
-    }
+    border-bottom: 1px solid ${props => props.theme.background2};
     & > ${SizeCell}, & > ${ModifiedCell} {
         justify-content: right;
+    }
+    &:hover {
+        background-color: ${props => props.theme.background1};
     }
 `;
 

@@ -1,3 +1,4 @@
+-   [Develop](#develop)
 -   [Deploy](#deploy)
 -   [URL](#url)
     -   [`uri = undr.s3-ap-southeast-2.amazonaws.com`](#uri--undrs3-ap-southeast-2amazonawscom)
@@ -5,6 +6,14 @@
     -   [`uri = dvin548rgfj0n.cloudfront.net`](#uri--dvin548rgfj0ncloudfrontnet)
     -   [`uri = d1juofrn4vv0j9.cloudfront.net`](#uri--d1juofrn4vv0j9cloudfrontnet)
     -   [`uri = www.undr.space`](#uri--wwwundrspace)
+
+## Develop
+
+```sh
+npm install
+npm run watch
+# open build/index.html
+```
 
 ## Deploy
 
