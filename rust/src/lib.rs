@@ -132,7 +132,7 @@ fn index_directory(
                         final_bytes: metadata.len(),
                     },
                     _ => match std::fs::metadata(
-                        &path_root.join_with_suffix(&index_path_id, constants::DOWNLOAD_SUFFIX),
+                        path_root.join_with_suffix(&index_path_id, constants::DOWNLOAD_SUFFIX),
                     ) {
                         Ok(metadata) if metadata.file_type().is_file() => Value {
                             initial_bytes: metadata.len(),

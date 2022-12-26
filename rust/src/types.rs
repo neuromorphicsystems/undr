@@ -55,7 +55,7 @@ impl PathRoot {
             self.0.join(&path_id.0)
         } else {
             self.0.join(
-                &path_id
+                path_id
                     .0
                     .chars()
                     .map(|character| {
