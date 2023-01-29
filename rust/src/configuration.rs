@@ -42,7 +42,7 @@ pub struct DatasetSettings {
     pub timeout: Option<f64>,
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Configuration {
     pub directory: std::path::PathBuf,
     pub datasets: Vec<DatasetSettings>,
@@ -70,15 +70,13 @@ pub enum ConfigurationError {
 
     #[error("the timeout is negative")]
     NegativeTimeout(f64),
-
-    #[error("creating the datasets directory")]
-    Create { path: std::path::PathBuf },
 }
 
 impl Configuration {
+    /// returns the parsed configuration (which contains the resolved datasets directory) and the un-resolved datasets directory.
     pub fn from_path<P: AsRef<std::path::Path>>(
         path: P,
-    ) -> std::result::Result<Self, ConfigurationError> {
+    ) -> std::result::Result<(Self, std::path::PathBuf), ConfigurationError> {
         let path = std::fs::canonicalize(path.as_ref()).map_err(|_| ConfigurationError::Read {
             path: path.as_ref().to_owned(),
         })?;
@@ -100,6 +98,7 @@ impl Configuration {
                 }
             }
         }
+        let datasets_directory = configuration.directory.clone();
         if configuration.directory.is_relative() {
             configuration.directory = path
                 .parent()
@@ -107,13 +106,11 @@ impl Configuration {
                     path: path.clone(),
                     directory: configuration.directory.clone(),
                 })?
-                .join(configuration.directory);
+                .join(&configuration.directory)
         }
-        std::fs::create_dir_all(&configuration.directory).map_err(|_| {
-            ConfigurationError::Read {
-                path: configuration.directory.clone(),
-            }
-        })?;
-        Ok(configuration)
+        // canonicalize only works with existing files / directories
+        // std::path::PathBuf::components performs fewer but useful normalizations and does not check the file system
+        configuration.directory = configuration.directory.components().collect();
+        Ok((configuration, datasets_directory))
     }
 }

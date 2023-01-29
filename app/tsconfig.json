@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "outDir": "build",
+        "strictNullChecks": true
+    },
+    "files": ["build.js", "build.d.ts"],
+    "include": ["source/**/*.ts", "source/**/*.tsx"]
+}

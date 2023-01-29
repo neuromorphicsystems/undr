@@ -7,31 +7,22 @@ import * as svgr from "@svgr/core";
 
 fs.mkdirSync("build", { recursive: true });
 
-const resultToFile = result => {
-    fs.writeFileSync(
-        path.join("build", "index.html"),
-        mustache.render(
-            fs.readFileSync(path.join("source", "index.mustache")).toString(),
-            {
-                title: "UNDR",
-                script: result.outputFiles[0].text,
-            }
-        )
-    );
-};
-
-esbuild
-    .build({
+(async () => {
+    const context = await esbuild.context({
         entryPoints: [path.join("source", "app.tsx")],
         bundle: true,
         define: {
-            S3_URL: JSON.stringify(process.env.npm_package_config_s3_url),
-            S3_WEBSITE_URL: JSON.stringify(
-                process.env.npm_package_config_s3_website_url
+            UNDR_DEFAULT_TOML: JSON.stringify(
+                fs
+                    .readFileSync(
+                        path.join(path.resolve(".."), "undr_default.toml")
+                    )
+                    .toString()
             ),
         },
         jsx: "automatic",
         jsxDev: process.env.MODE === "development",
+        sourcemap: process.env.MODE === "development",
         target: ["es2021"],
         write: false,
         minify: process.env.MODE === "production",
@@ -49,6 +40,43 @@ esbuild
                     }));
                 },
             },
+            {
+                name: "bundle",
+                setup(build) {
+                    build.onEnd(result => {
+                        if (result.errors.length === 0) {
+                            fs.writeFileSync(
+                                path.join("build", "index.html"),
+                                mustache.render(
+                                    fs
+                                        .readFileSync(
+                                            path.join(
+                                                "source",
+                                                "index.mustache"
+                                            )
+                                        )
+                                        .toString(),
+                                    {
+                                        title: "UNDR",
+                                        script: result.outputFiles[0].text,
+                                    }
+                                )
+                            );
+                            if (process.argv.includes("--watch")) {
+                                console.log(
+                                    `\x1b[32m✓\x1b[0m ${new Date().toLocaleString()}`
+                                );
+                            }
+                        }
+                    });
+                },
+            },
         ],
-    })
-    .then(resultToFile);
+    });
+    if (process.argv.includes("--watch")) {
+        await context.watch();
+    } else {
+        await context.rebuild();
+        await context.dispose();
+    }
+})();

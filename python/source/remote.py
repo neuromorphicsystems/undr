@@ -63,13 +63,24 @@ class Download(task.Task):
     This odd but flexible lifecycle lets users yield on response chunks (see path for an example).
     """
 
-    def __init__(self, path_id: pathlib.PurePosixPath, server: Server, stream: bool):
+    def __init__(
+        self,
+        path_id: pathlib.PurePosixPath,
+        suffix: typing.Union[str, None],
+        server: Server,
+        stream: bool,
+    ):
         self.path_id = path_id
+        self.suffix = suffix
         self.server = server
         self.stream = stream
 
     def url(self):
-        return self.server.path_id_to_url(self.path_id)
+        return self.server.path_id_to_url(
+            self.path_id
+            if self.suffix is None
+            else utilities.posix_path_with_suffix(self.path_id, self.suffix)
+        )
 
     def run(self, session: requests.Session, manager: task.Manager):
         skip = self.on_begin(manager=manager)
@@ -116,6 +127,7 @@ class DownloadFile(Download):
         self,
         path_root: pathlib.Path,
         path_id: pathlib.PurePosixPath,
+        suffix: typing.Union[str, None],
         server: Server,
         force: bool,
         expected_size: typing.Optional[int],
@@ -123,6 +135,7 @@ class DownloadFile(Download):
     ):
         super().__init__(
             path_id=path_id,
+            suffix=suffix,
             server=server,
             stream=expected_size is None
             or expected_size >= constants.CHUNK_SIZE * constants.STREAM_CHUNK_THRESHOLD,
@@ -135,17 +148,20 @@ class DownloadFile(Download):
         self.hash: typing.Optional[hashlib._Hash] = None
 
     def on_begin(self, manager: task.Manager):
-        download_path = utilities.path_with_suffix(
-            self.path_root / self.path_id, constants.DOWNLOAD_SUFFIX
+        file_path = (
+            self.path_root / self.path_id
+            if self.suffix is None
+            else utilities.path_with_suffix(self.path_root / self.path_id, self.suffix)
         )
+        download_path = utilities.path_with_suffix(file_path, constants.DOWNLOAD_SUFFIX)
         if self.force:
             self.stream = open(download_path, "wb")
             if self.expected_hash is not None:
                 self.hash = utilities.new_hash()
             return 0
-        if (self.path_root / self.path_id).is_file():
+        if file_path.is_file():
             size = (
-                (self.path_root / self.path_id).stat().st_size
+                file_path.stat().st_size
                 if self.expected_size is None
                 else self.expected_size
             )
@@ -184,9 +200,12 @@ class DownloadFile(Download):
     def on_range_failed(self, manager: task.Manager):
         assert self.stream is not None
         self.stream.close()
-        download_path = utilities.path_with_suffix(
-            self.path_root / self.path_id, constants.DOWNLOAD_SUFFIX
+        file_path = (
+            self.path_root / self.path_id
+            if self.suffix is None
+            else utilities.path_with_suffix(self.path_root / self.path_id, self.suffix)
         )
+        download_path = utilities.path_with_suffix(file_path, constants.DOWNLOAD_SUFFIX)
         size = download_path.stat().st_size
         manager.send_message(
             Progress(
@@ -231,18 +250,24 @@ class DownloadFile(Download):
                     raise Exception(
                         f'bad hash for "{self.path_id}" (expected "{self.expected_hash}", got "{hash}")'
                     )
-            if self.expected_size is not None:
-                download_path = utilities.path_with_suffix(
-                    self.path_root / self.path_id, constants.DOWNLOAD_SUFFIX
+            file_path = (
+                self.path_root / self.path_id
+                if self.suffix is None
+                else utilities.path_with_suffix(
+                    self.path_root / self.path_id, self.suffix
                 )
+            )
+            download_path = utilities.path_with_suffix(
+                file_path, constants.DOWNLOAD_SUFFIX
+            )
+            if self.expected_size is not None:
+
                 size = download_path.stat().st_size
                 if size != self.expected_size:
                     raise Exception(
                         f'bad size for "{self.path_id}" (expected "{self.expected_size}", got "{size}")'
                     )
-            utilities.path_with_suffix(
-                self.path_root / self.path_id, constants.DOWNLOAD_SUFFIX
-            ).rename(self.path_root / self.path_id)
+            download_path.rename(file_path)
             manager.send_message(
                 Progress(
                     path_id=self.path_id,

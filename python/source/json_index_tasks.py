@@ -138,6 +138,7 @@ class Index(remote.DownloadFile):
         super().__init__(
             path_root=path_root,
             path_id=path_id / "-index.json",
+            suffix=None,
             server=server,
             force=force,
             expected_size=None,
@@ -374,9 +375,8 @@ class InstallFilesRecursive(task.Task):
             if actual_action != 0:
                 download_task = remote.DownloadFile(
                     path_root=self.path_root,
-                    path_id=utilities.posix_path_with_suffix(
-                        file.path_id, file.best_compression.suffix
-                    ),
+                    path_id=file.path_id,
+                    suffix=file.best_compression.suffix,
                     server=self.server,
                     force=self.force,
                     expected_size=file.best_compression.size,

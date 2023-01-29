@@ -1,29 +1,30 @@
 {
     "private": true,
     "type": "module",
-
     "dependencies": {
         "@tauri-apps/api": "1.2.0",
         "@svgr/core": "6.5.1",
         "cross-env": "7.0.3",
-        "esbuild": "0.16.8",
+        "esbuild": "0.17.3",
+        "framer-motion": "8.5.0",
         "mustache": "4.2.0",
         "react": "18.2.0",
         "react-dom": "18.2.0",
+        "react-router-dom": "6.7.0",
         "styled-components": "5.3.6"
     },
     "devDependencies": {
-        "@tauri-apps/cli": "1.2.2",
+        "@tauri-apps/cli": "1.2.3",
         "@types/mustache": "4.2.2",
-        "@types/node": "18.11.16",
-        "@types/react": "18.0.26",
-        "@types/react-dom": "18.0.9",
+        "@types/node": "18.11.18",
+        "@types/react": "18.0.27",
+        "@types/react-dom": "18.0.10",
         "@types/styled-components": "5.1.26",
-        "@typescript-eslint/eslint-plugin": "5.46.1",
-        "@typescript-eslint/parser": "5.46.1",
-        "eslint": "8.30.0",
-        "eslint-plugin-react": "7.31.11",
-        "prettier": "2.8.1"
+        "@typescript-eslint/eslint-plugin": "5.48.2",
+        "@typescript-eslint/parser": "5.48.2",
+        "eslint": "8.32.0",
+        "eslint-plugin-react": "7.32.1",
+        "prettier": "2.8.3"
     },
     "eslintConfig": {
         "env": {
@@ -41,7 +42,9 @@
                 "jsx": true
             },
             "ecmaVersion": "latest",
-            "sourceType": "module"
+            "project": "./tsconfig.json",
+            "sourceType": "module",
+            "tsconfigRootDir": "."
         },
         "plugins": [
             "react",
@@ -51,6 +54,7 @@
             "no-unused-vars": "off",
             "react/jsx-uses-react": "off",
             "react/react-in-jsx-scope": "off",
+            "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-unused-vars": [
                 "warn",
                 {
@@ -58,7 +62,8 @@
                     "varsIgnorePattern": "^_",
                     "caughtErrorsIgnorePattern": "^_"
                 }
-            ]
+            ],
+            "@typescript-eslint/no-empty-function": "off"
         },
         "settings": {
             "react": {
@@ -73,7 +78,7 @@
     "scripts": {
         "tauri": "tauri",
         "build": "cross-env MODE=production node build.js",
-        "build-dev": "cross-env MODE=development node build.js",
-        "lint": "prettier --write . --ignore-path .gitignore && eslint --ignore-path .gitignore ."
+        "lint": "prettier --write . --ignore-path .gitignore && eslint --ignore-path .gitignore .",
+        "watch": "cross-env MODE=development node build.js --watch"
     }
 }

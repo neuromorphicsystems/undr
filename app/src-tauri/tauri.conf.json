@@ -1,18 +1,26 @@
 {
     "$schema": "../node_modules/@tauri-apps/cli/schema.json",
     "build": {
-        "beforeBuildCommand": "npm run build",
-        "beforeDevCommand": "npm run build",
+        "beforeBuildCommand": "cross-env MODE=production npm run build",
+        "beforeDevCommand": "cross-env MODE=development npm run build",
         "devPath": "../build",
         "distDir": "../build"
     },
     "package": {
-        "productName": "app",
+        "productName": "Undr",
         "version": "0.1.0"
     },
     "tauri": {
         "allowlist": {
             "dialog": {
+                "message": true,
+                "open": true,
+                "save": true
+            },
+            "os": {
+                "all": true
+            },
+            "shell": {
                 "open": true
             }
         },
@@ -58,10 +66,13 @@
         "windows": [
             {
                 "fullscreen": false,
-                "height": 600,
+                "height": 800,
+                "minHeight": 420,
+                "minWidth": 350,
                 "resizable": true,
                 "title": "UNDR",
-                "width": 800
+                "visible": false,
+                "width": 600
             }
         ]
     }

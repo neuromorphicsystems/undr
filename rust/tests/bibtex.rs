@@ -1,26 +1,26 @@
 async fn try_bibtex() -> anyhow::Result<()> {
-    let bibtex = undr::Configuration::from_path(
+    undr::Configuration::from_path(
         std::fs::canonicalize(std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")))?
             .join("tests")
             .join("undr.toml"),
     )?
+    .0
     .bibtex(
+        std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true)),
         |message| {
             println!("{:?}", message);
         },
-        false,
-        32,
-        32,
+        undr::Force(false),
+        undr::FilePermits(64),
+        undr::DownloadIndexPermits(32),
+        undr::DownloadDoiPermits(8),
         None,
-        true,
-    )
-    .await?;
-    std::fs::write(
         std::fs::canonicalize(std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")))?
             .join("tests")
             .join("test.bib"),
-        bibtex,
-    )?;
+        undr::Pretty(true),
+    )
+    .await?;
     Ok(())
 }
 

@@ -4,21 +4,26 @@ async fn try_install() -> anyhow::Result<()> {
             .join("tests")
             .join("undr.toml"),
     )?;
-    let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
     configuration
+        .0
         .install(
-            running,
+            std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true)),
             |message| {
                 println!("{:?}", message);
             },
-            true,
-            false,
-            false,
-            32,
-            std::thread::available_parallelism()
-                .unwrap_or(std::num::NonZeroUsize::new(1).unwrap())
-                .get()
-                * 2,
+            undr::Force(true),
+            undr::Keep(false),
+            undr::DispatchDois(false),
+            undr::CalculateSize(false),
+            undr::FilePermits(64),
+            undr::DownloadIndexPermits(32),
+            undr::DownloadPermits(32),
+            undr::DecodePermits(
+                std::thread::available_parallelism()
+                    .unwrap_or(std::num::NonZeroUsize::new(1).unwrap())
+                    .get()
+                    * 2,
+            ),
         )
         .await?;
     Ok(())
