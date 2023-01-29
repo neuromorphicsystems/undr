@@ -1,0 +1,11 @@
+directory = "datasets"
+
+[[datasets]]
+name = "dvs09"
+url = "http://www.undr.space/dvs09/"
+mode = "local"
+
+[[datasets]]
+name = "dvsflow16"
+url = "http://www.undr.space/dvsflow16/"
+mode = "local"

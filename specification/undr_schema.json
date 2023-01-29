@@ -1,5 +1,5 @@
 {
-    "$schema": "https://gregsdennis.github.io/json-everything/meta/unique-keys",
+    "$schema": "https://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/neuromorphicsystems/undr/main/undr/undr_schema.json",
     "title": "undr configuration",
     "description": "A configuration file for the UNDR package",
@@ -18,11 +18,7 @@
                     "name": {
                         "description": "The dataset name, used as directory name",
                         "type": "string",
-                        "pattern": "^(?:[A-Za-z0-9_\\-]+|[A-Za-z0-9_\\-\\.]+\\.(?!download$|lz$|decompress$)[^\\.]*)$"
-                    },
-                    "doi": {
-                        "type": "string",
-                        "pattern": "^10[.].+$"
+                        "pattern": "^[A-Za-z0-9_\\-.]+$"
                     },
                     "url": {
                         "description": "The remote server URL",
@@ -32,22 +28,16 @@
                     "mode": {
                         "description": "The download strategy",
                         "type": "string",
-                        "enum": ["disabled", "remote", "local", "decompressed"]
-                    },
-                    "server_type": {
-                        "description": "Server type for file list parsing",
-                        "type": "string",
-                        "enum": ["apache", "nginx"]
+                        "enum": ["disabled", "remote", "local", "raw"]
                     },
                     "timeout": {
                         "description": "Socket timeout for server requests",
                         "type": "number",
-                        "minimum": 0
+                        "minimum": 0.0
                     }
                 },
                 "required": ["name", "url", "mode"]
-            },
-            "uniqueKeys": ["/name"]
+            }
         }
     },
     "required": ["directory", "datasets"]

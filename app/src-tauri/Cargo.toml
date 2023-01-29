@@ -1,0 +1,31 @@
+[package]
+name = "app"
+version = "0.1.0"
+description = "A Tauri App"
+authors = [
+    "Alexandre Marcireau",
+    "International Centre for Neuromorphic Systems",
+]
+license = ""
+repository = ""
+default-run = "app"
+edition = "2021"
+rust-version = "1.66"
+
+[build-dependencies]
+tauri-build = {version = "1.2.1", features = [] }
+
+[dependencies]
+notify = {version = "5.0", default-features = false, features = [
+    "macos_kqueue",
+] }
+serde = "1.0"
+serde_json = "1.0"
+tauri = {version = "1.2.3", features = ["dialog-message", "dialog-open", "dialog-save", "os-all", "shell-open"] }
+tokio = "1.24"
+toml = "0.5.11"
+undr = {path = "../../rust"}
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

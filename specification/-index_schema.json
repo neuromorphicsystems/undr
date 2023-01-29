@@ -1,37 +1,115 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$schema": "https://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/neuromorphicsystems/undr/main/specification/-index_schema.json",
     "title": "-index",
     "description": "A directory index to store metadata",
     "definitions": {
-        "path_object": {
+        "resource": {
             "type": "object",
             "properties": {
                 "name": {
                     "type": "string",
-                    "pattern": "^(?:[A-Za-z0-9_\\-]+|[A-Za-z0-9_\\-\\.]+\\.(?!download$|lz|decompress$)[^\\.]*)$"
+                    "pattern": "^[A-Za-z0-9_\\-.]+$"
+                },
+                "size": {
+                    "description": "Uncompressed size in bytes",
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "hash": {
+                    "description": "SHA3-224 (FIPS 202) hash of the uncompressed bytes",
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{56}$"
+                },
+                "compressions": {
+                    "type": "array",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "description": "Compression algorithm",
+                                        "type": "string",
+                                        "enum": ["none"]
+                                    },
+                                    "suffix": {
+                                        "type": "string",
+                                        "pattern": "^[A-Za-z0-9_\\-.]+$"
+                                    }
+                                },
+                                "required": ["type", "suffix"]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "description": "Compression algorithm",
+                                        "type": "string",
+                                        "enum": ["brotli"]
+                                    },
+                                    "size": {
+                                        "description": "Compressed size in bytes",
+                                        "type": "integer",
+                                        "minimum": 0
+                                    },
+                                    "hash": {
+                                        "description": "SHA3-224 (FIPS 202) hash of the compressed bytes",
+                                        "type": "string",
+                                        "pattern": "^[a-f0-9]{56}$"
+                                    },
+                                    "suffix": {
+                                        "type": "string",
+                                        "pattern": "^[A-Za-z0-9_\\-.]+$"
+                                    }
+                                },
+                                "required": ["type", "size", "hash", "suffix"]
+                            }
+                        ]
+                    },
+                    "minItems": 1
                 },
                 "doi": {
                     "type": "string",
                     "pattern": "^10[.].+$"
                 }
             },
-            "required": ["name"]
+            "required": ["name", "size", "hash", "compressions"]
         }
     },
     "type": "object",
     "properties": {
+        "version": {
+            "description": "schema version (Semantic Versioning 2.0.0)",
+            "type": "object",
+            "properties": {
+                "major": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1
+                },
+                "minor": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "patch": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "doi": {
+            "description": "The directory's Digital Object Identifier used to generate BibTeX references",
+            "type": "string",
+            "pattern": "^10[.].+$"
+        },
         "directories": {
             "description": "Subdirectories in the same directory as the index",
             "type": "array",
             "items": {
-                "$ref": "#/definitions/path_object"
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_\\-.]+$"
             }
-        },
-        "doi": {
-            "description": "The directory's Digital Object Identifier, used to generate BibTeX citations",
-            "type": "string",
-            "pattern": "^10[.].+$"
         },
         "files": {
             "description": "Dataset files with a supported format",
@@ -39,46 +117,49 @@
             "items": {
                 "allOf": [
                     {
-                        "$ref": "#/definitions/path_object"
+                        "$ref": "#/definitions/resource"
                     },
                     {
                         "properties": {
-                            "type": {
-                                "description": "File type in the list of supported types",
-                                "type": "string",
-                                "enum": ["aps", "dvs", "imu"]
+                            "properties": {
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "description": "File type in the list of supported types",
+                                                "enum": ["aps", "dvs"]
+                                            },
+                                            "width": {
+                                                "description": "The sensor width in pixels",
+                                                "type": "integer",
+                                                "minimum": 0
+                                            },
+                                            "height": {
+                                                "description": "The sensor height in pixels",
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        },
+                                        "required": ["type", "width", "height"]
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "description": "File type in the list of supported types",
+                                                "enum": ["imu"]
+                                            }
+                                        },
+                                        "required": ["type"]
+                                    }
+                                ]
                             },
-                            "original_name": {
-                                "description": "The recording name in the original dataset",
-                                "type": "string"
-                            },
-                            "sensor": {
-                                "description": "The sensor used to acquire the data",
-                                "type": "string",
-                                "enum": ["atis", "davis240c", "dvs128"]
-                            },
-                            "scene": {
-                                "description": "The type of scene that produced the data",
-                                "type": "string",
-                                "enum": ["real", "screen", "synthetic"]
-                            },
-                            "width": {
-                                "description": "The sensor width in pixels",
-                                "type": "integer",
-                                "minimum": 0
-                            },
-                            "height": {
-                                "description": "The sensor height in pixels",
-                                "type": "integer",
-                                "minimum": 0
-                            },
-                            "date": {
-                                "description": "The recording acquisition date",
-                                "type": "string",
-                                "format": "date-time"
+                            "metadata": {
+                                "type": "object"
                             }
                         },
-                        "required": ["type"]
+                        "required": ["properties"]
                     }
                 ]
             }
@@ -87,9 +168,24 @@
             "description": "Other files bundled with the dataset",
             "type": "array",
             "items": {
-                "$ref": "#/definitions/path_object"
+                "allOf": [
+                    {
+                        "$ref": "#/definitions/resource"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "metadata": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                ]
             }
+        },
+        "metadata": {
+            "type": "object"
         }
     },
-    "required": ["directories", "files", "other_files"]
+    "required": ["version", "directories", "files", "other_files"]
 }

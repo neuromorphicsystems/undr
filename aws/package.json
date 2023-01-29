@@ -1,0 +1,79 @@
+{
+    "private": true,
+    "type": "module",
+    "config": {
+        "s3_url": "https://dvin548rgfj0n.cloudfront.net",
+        "s3_website_url": "https://www.undr.space"
+    },
+    "dependencies": {
+        "@svgr/core": "6.5.1",
+        "cross-env": "7.0.3",
+        "esbuild": "0.16.8",
+        "mustache": "4.2.0",
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "styled-components": "5.3.6"
+    },
+    "devDependencies": {
+        "@types/mustache": "4.2.2",
+        "@types/node": "18.11.16",
+        "@types/react": "18.0.26",
+        "@types/react-dom": "18.0.9",
+        "@types/styled-components": "5.1.26",
+        "@typescript-eslint/eslint-plugin": "5.46.1",
+        "@typescript-eslint/parser": "5.46.1",
+        "eslint": "8.30.0",
+        "eslint-plugin-react": "7.31.11",
+        "prettier": "2.8.1"
+    },
+    "eslintConfig": {
+        "env": {
+            "browser": true,
+            "es2021": true
+        },
+        "extends": [
+            "eslint:recommended",
+            "plugin:react/recommended",
+            "plugin:@typescript-eslint/recommended"
+        ],
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+            "ecmaFeatures": {
+                "jsx": true
+            },
+            "ecmaVersion": "latest",
+            "sourceType": "module"
+        },
+        "plugins": [
+            "react",
+            "@typescript-eslint"
+        ],
+        "rules": {
+            "no-unused-vars": "off",
+            "react/jsx-uses-react": "off",
+            "react/react-in-jsx-scope": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                {
+                    "argsIgnorePattern": "^_",
+                    "varsIgnorePattern": "^_",
+                    "caughtErrorsIgnorePattern": "^_"
+                }
+            ]
+        },
+        "settings": {
+            "react": {
+                "version": "detect"
+            }
+        }
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "arrowParens": "avoid"
+    },
+    "scripts": {
+        "build": "cross-env MODE=production node build.js",
+        "lint": "prettier --write . --ignore-path .gitignore && eslint --ignore-path .gitignore .",
+        "watch": "cross-env MODE=development node build.js --watch"
+    }
+}

@@ -1,0 +1,34 @@
+[package]
+name = "undr"
+version = "0.2.0"
+authors = [
+    "International Centre for Neuromorphic Systems",
+    "Alexandre Marcireau",
+]
+description = "The UNDR protocol implemented in Rust"
+homepage = "https://github.com/neuromorphicsystems/undr/"
+repository = "https://github.com/neuromorphicsystems/undr/"
+readme = "../README.md"
+license = "MIT"
+edition = "2021"
+categories = ["parser-implementations"]
+keywords = ["UNDR"]
+
+[dependencies]
+brotli = "3.3"
+digest = "0.10.6"
+futures = "0.3.25"
+generic-array = "0.14.6"
+lazy_static = "1.4"
+regex = "1.7"
+reqwest = "0.11.13"
+serde = {version = "1.0", features = ["derive"]}
+serde_json = "1.0"
+sha3 = "0.10.6"
+thiserror = "1.0"
+tokio = {version = "1.22", features = ["macros", "rt-multi-thread", "sync"]}
+toml = "0.5.9"
+url = {version = "2.3", features = ["serde"]}
+
+[dev-dependencies]
+anyhow = "1.0"
