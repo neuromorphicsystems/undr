@@ -2,18 +2,12 @@ from __future__ import annotations
 import dataclasses
 import hashlib
 import io
-import os
 import pathlib
+import requests
 import typing
-from . import certificates
 from . import constants
 from . import task
 from . import utilities
-
-certificates_bundle = certificates.bundle()
-if certificates_bundle is not None:
-    os.environ["REQUESTS_CA_BUNDLE"] = certificates_bundle
-import requests
 
 
 @dataclasses.dataclass

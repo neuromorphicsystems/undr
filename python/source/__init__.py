@@ -13,6 +13,7 @@ from .formats import (
     SendMessage as SendMessage,
     Switch as Switch,
 )
+from .install_mode import Mode as Mode
 from .json_index_tasks import (
     DirectoryScanned as DirectoryScanned,
     Index as Index,
@@ -23,6 +24,7 @@ from .json_index_tasks import (
 from .path import File as File
 from .path_directory import Directory as Directory
 from .persist import Store as Store, ReadOnlyStore as ReadOnlyStore
+from .simple import (default_datasets as default_datasets, install as install)
 from .task import (
     Exception as Exception,
     Manager as Manager,
@@ -30,7 +32,6 @@ from .task import (
     Task as Task,
 )
 from . import bibtex as bibtex
-from . import certificates as certificates
 from . import check as check
 from . import configuration as configuration
 from . import constants as constants

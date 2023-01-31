@@ -210,4 +210,6 @@ def format_index_recursive(
         with open(index_path, "wb") as index_file:
             index_file.write(new_index_content)
     for child_directory_name in index_data["directories"]:
-        format_index_recursive(path=path / child_directory_name, handle_path=handle_path)
+        format_index_recursive(
+            path=path / child_directory_name, handle_path=handle_path
+        )

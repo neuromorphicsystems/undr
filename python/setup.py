@@ -39,9 +39,8 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     install_requires=[
         "brotli >= 1.0",
-        "jsonschema-rs >= 0.9",
-        "numpy >= 1.23",
-        "pyobjc-framework-SecurityInterface >= 7.3; sys_platform == 'darwin'",
+        "jsonschema-rs >= 0.16",
+        "numpy >= 1.24",
         "requests >= 2.28",
         "toml >= 0.10",
     ],

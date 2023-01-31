@@ -2,10 +2,12 @@
 
 ```sh
 cd python
+python3 setup.py develop
 black . # format the source code (see https://github.com/psf/black)
 pyright . #check types (see https://github.com/microsoft/pyright)
-python3 -m pip install -e . # local installation
 ```
+
+To uninstall the local development version, run `python3 setup.py develop --uninstall`
 
 ### Publish the module
 

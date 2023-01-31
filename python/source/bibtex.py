@@ -1,11 +1,6 @@
 from __future__ import annotations
 import logging
 import os
-from . import certificates
-
-certificates_bundle = certificates.bundle()
-if certificates_bundle is not None:
-    os.environ["REQUESTS_CA_BUNDLE"] = certificates_bundle
 import requests
 
 

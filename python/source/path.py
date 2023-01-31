@@ -24,9 +24,13 @@ except:
 
 class Download(remote.Download):
     def __init__(
-        self, path_id: pathlib.PurePosixPath, server: remote.Server, stream: bool
+        self,
+        path_id: pathlib.PurePosixPath,
+        suffix: typing.Union[str, None],
+        server: remote.Server,
+        stream: bool,
     ):
-        super().__init__(path_id=path_id, server=server, stream=stream)
+        super().__init__(path_id=path_id, suffix=suffix, server=server, stream=stream)
         self.response: typing.Optional[requests.Response] = None
 
     def on_begin(self, manager: task.Manager) -> int:
@@ -56,61 +60,6 @@ class Path:
 
 @dataclasses.dataclass(frozen=True)
 class File(Path):
-    class Download(remote.Download):
-        def __init__(
-            self, path_id: pathlib.PurePosixPath, server: remote.Server, stream: bool
-        ):
-            self.path_id = path_id
-            self.server = server
-            self.stream = stream
-
-        def url(self):
-            return self.server.path_id_to_url(self.path_id)
-
-        def run(self, session: requests.Session, manager: task.Manager):
-            skip = self.on_begin(manager)
-            if skip < 0:
-                self.on_end(manager)
-            else:
-                response: typing.Optional[requests.Response] = None
-                if skip > 0:
-                    response = session.get(
-                        self.url(),
-                        timeout=self.server.timeout,
-                        stream=self.stream,
-                        headers={"Range": f"bytes={skip}-"},
-                    )
-                    if response.status_code != 206:
-                        self.on_range_failed(manager)
-                        response = None
-                if response is None:
-                    response = session.get(
-                        self.url(),
-                        timeout=self.server.timeout,
-                        stream=self.stream,
-                    )
-                response.raise_for_status()
-                cancelled = False
-                for chunk in response.iter_content(chunk_size=constants.CHUNK_SIZE):
-                    if not self.on_data(chunk, manager):
-                        cancelled = True
-                        break
-                response.close()
-                if not cancelled:
-                    self.on_end(manager)
-
-        def on_begin(self, manager: task.Manager) -> int:
-            raise NotImplementedError()
-
-        def on_range_failed(self, manager: task.Manager):
-            raise NotImplementedError()
-
-        def on_data(self, data: bytes, manager: task.Manager) -> bool:
-            raise NotImplementedError()
-
-        def on_end(self, manager: task.Manager):
-            raise NotImplementedError()
-
     size: int = dataclasses.field(compare=False, hash=False)
     hash: str = dataclasses.field(compare=False, hash=False)
     compressions: tuple[decode.Compression, ...] = dataclasses.field(
@@ -171,7 +120,9 @@ class File(Path):
                     if len(chunk) == 0:
                         break
                     if len(chunk) % word_size != 0:
-                        raise decode.RemainingBytesError(word_size=word_size, buffer=chunk)
+                        raise decode.RemainingBytesError(
+                            word_size=word_size, buffer=chunk
+                        )
                     yield chunk
                     hash.update(chunk)
                     self.manager.send_message(
@@ -266,9 +217,8 @@ class File(Path):
                 # this task is created to re-use download logic but it is never scheduled
                 # we call run directy below
                 download = Download(
-                    path_id=utilities.posix_path_with_suffix(
-                        self.path_id, self.best_compression.suffix
-                    ),
+                    path_id=self.path_id,
+                    suffix=self.best_compression.suffix,
                     server=self.server,
                     stream=self.size
                     >= constants.CHUNK_SIZE * constants.STREAM_CHUNK_THRESHOLD,
