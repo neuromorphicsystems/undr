@@ -1,5 +1,5 @@
 project = "UNDR"
-copyright = "2023, Alexandre Marcireau"
+copyright = "2023, Alexandre Marcireau, ICNS"
 author = "Alexandre Marcireau"
 extensions = ["myst_parser"]
 templates_path = ["_templates"]

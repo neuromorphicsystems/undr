@@ -19,6 +19,7 @@
             - [Nginx](#nginx)
             - [Upload a dataset](#upload-a-dataset)
         - [Download with existing CLI](#download-with-existing-cli)
+    - [Build documentation](#build-documentation)
 
 ## Getting Started
 
@@ -155,3 +156,7 @@ Run `rmdsstore /path/to/dataset` before running `python3 -m undr check-conformit
 
 wget --no-parent --recursive --level=inf http://localhost:5432/dvs09/
 find . -iname '\*.br' | while read filename; do brotli -d -j "$filename"; done;
+
+## Build documentation
+
+sphinx-build documentation documentation/_build
