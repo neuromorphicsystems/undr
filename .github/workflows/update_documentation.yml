@@ -9,11 +9,9 @@ jobs:
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-python@v3
-            - name: Install dependencies
-                run: pip install -r documentation/requirements.txt
-            - name: Sphinx build
-                run: sphinx-build documentation documentation/_build
-            - name: Deploy
+            - run: pip install -r documentation/requirements.txt
+            - run: sphinx-build documentation documentation/_build
+            - name: deploy
                 uses: peaceiris/actions-gh-pages@v3
                 if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
                 with:

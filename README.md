@@ -29,6 +29,8 @@
 pip3 install undr
 ```
 
+Documentation: https://neuromorphicsystems.github.io/undr/
+
 ### Generate a default configuration file
 
 ```sh
