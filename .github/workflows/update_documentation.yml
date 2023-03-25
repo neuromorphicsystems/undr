@@ -12,10 +12,10 @@ jobs:
             - run: pip install -r documentation/requirements.txt
             - run: sphinx-build documentation documentation/_build
             - name: deploy
-                uses: peaceiris/actions-gh-pages@v3
-                if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-                with:
-                    publish_branch: gh-pages
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    publish_dir: documentation/_build/
-                    force_orphan: true
+              uses: peaceiris/actions-gh-pages@v3
+              if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+              with:
+                  publish_branch: gh-pages
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: documentation/_build/
+                  force_orphan: true
