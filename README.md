@@ -159,4 +159,7 @@ find . -iname '\*.br' | while read filename; do brotli -d -j "$filename"; done;
 
 ## Build documentation
 
+```sh
+pip install -r documentation/requirements.txt
 sphinx-build documentation documentation/_build
+```
