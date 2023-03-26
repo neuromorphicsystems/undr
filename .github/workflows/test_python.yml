@@ -41,6 +41,5 @@ jobs:
         with:
           name: undr-sdist
           path: undr.tar.gz
-      - run: ls
-      - run: python -m pip install undr.tar.gz
+      - run: python -m pip install ./undr.tar.gz
       - run: python -c 'import undr'

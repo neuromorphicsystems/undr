@@ -14,9 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v3
-        - uses: actions-rs/toolchain@v1
-          with:
-            toolchain: stable
+        - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain none -y
         - name: Install dependencies
           run: |
             sudo apt-get update
