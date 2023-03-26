@@ -6,4 +6,5 @@ examples/datasets
 examples/logs
 examples/progress.db
 examples/results
+sdist
 undr

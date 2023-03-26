@@ -1,0 +1,23 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+env:
+    CIBW_ARCHS_MACOS: x86_64 arm64
+    CIBW_ARCHS_LINUX: auto aarch64 ppc64le s390x
+
+jobs:
+  build:
+    name: Build the library
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v3
+        - uses: actions-rs/toolchain@v1
+          with:
+            toolchain: stable
+        - run: npm install
+          working-directory: app
+        - run: npm run tauri build -- --debug
+          working-directory: app

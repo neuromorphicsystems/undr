@@ -23,6 +23,15 @@ def version_to_string(version: tuple[int, int, int]):
 with open(dirname.parent / "app" / "src-tauri" / "tauri.conf.json") as tauri_file:
     tauri = json.load(tauri_file)
 app_version = string_to_version(tauri["package"]["version"])
+with open(dirname.parent / "app" / "src-tauri" / "Cargo.toml", "rb") as cargo_file:
+    app_version_cargo = string_to_version(
+        tomllib.load(cargo_file)["package"]["version"]
+    )
+    if tomllib.load(cargo_file)["package"]["version"] != app_version:
+        sys.stderr.write(
+            f'mismatched versions in "app/src-tauri/tauri.conf.json" and "app/src-tauri/Cargo.toml" ({app_version} and {app_version_cargo})'
+        )
+        sys.exit(1)
 
 exec(
     open(dirname.parent / "python" / "source" / "version.py").read()
