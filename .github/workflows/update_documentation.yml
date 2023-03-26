@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   update_documentation:
+    if: startsWith(github.event.head_commit.message, '[doc]')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
