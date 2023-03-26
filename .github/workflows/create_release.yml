@@ -19,10 +19,14 @@ jobs:
         run: printf "VALUE='v$(python scripts/version.py --maximum)'" >> $GITHUB_OUTPUT
       - name: Release body
         id: release_body
-        run: printf "VALUE='$(python scripts/release_body.py)'" >> $GITHUB_OUTPUT
+        run: |
+          delimiter="$(openssl rand -hex 8)"
+          echo "VALUE<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          python scripts/release_body.py >> $GITHUB_OUTPUT
+          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
       - uses: softprops/action-gh-release@v1
         with:
-          body: ${{ fromJSON(steps.release_body.outputs.VALUE) }}
+          body: ${{ steps.release_body.outputs.VALUE }}
           tag_name: ${{ steps.release_name.outputs.VALUE }}
           draft: true
           prerelease: false
