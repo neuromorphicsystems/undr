@@ -1,21 +1,25 @@
 name: Update documentation
 
 on: push
+
 permissions:
-    contents: write
+  contents: write
+
 jobs:
-    update_documentation:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-python@v3
-            - run: pip install -r documentation/requirements.txt
-            - run: sphinx-build documentation documentation/_build
-            - name: deploy
-              uses: peaceiris/actions-gh-pages@v3
-              if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-              with:
-                  publish_branch: gh-pages
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_dir: documentation/_build/
-                  force_orphan: true
+  update_documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install -r documentation/requirements.txt
+      - run: sphinx-build documentation documentation/_build
+      - name: deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: documentation/_build/
+          force_orphan: true

@@ -22,7 +22,7 @@ jobs:
         run: printf "VALUE='$(python scripts/release_body.py)'" >> $GITHUB_OUTPUT
       - uses: softprops/action-gh-release@v1
         with:
-          body: ${{ steps.release_body.outputs.VALUE }}
+          body: ${{ fromJSON(steps.release_body.outputs.VALUE) }}
           tag_name: ${{ steps.release_name.outputs.VALUE }}
           draft: true
           prerelease: false
