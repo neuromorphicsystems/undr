@@ -40,10 +40,10 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=[
-        "brotli>=1.0, brotli<2",
+        "brotli>=1.0,<2",
         "jsonschema-rs>=0.16",
-        "numpy>=1.24, numpy<2",
-        "requests>=2.28, requests<3",
+        "numpy>=1.24,<2",
+        "requests>=2.28,<3",
         "toml>=0.10",
     ],
     classifiers=[
