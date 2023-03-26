@@ -24,9 +24,10 @@ if (
     shutil.copyfile(
         dirname.parent / "undr_default.toml", dirname / "undr" / "undr_default.toml"
     )
+    shutil.copyfile(dirname.parent / "README.md", dirname / "long_description.md")
 
-with open(dirname.parent / "README.md") as file:
-    long_description = file.read()
+with open(dirname / "long_description.md") as long_description_file:
+    long_description = long_description_file.read()
 
 exec(open(dirname / "source" / "version.py").read())  # defines __version__
 
