@@ -28,9 +28,11 @@ if (
 with open(dirname.parent / "README.md") as file:
     long_description = file.read()
 
+exec(open(dirname / "source" / "version.py").read())  # defines __version__
+
 setuptools.setup(
     name="undr",
-    version="1.0.0",
+    version=__version__,  # type: ignore
     url="https://github.com/neuromorphicsystems/undr",
     author="Alexandre Marcireau",
     author_email="alexandre.marcireau@gmail.com",
@@ -38,11 +40,11 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=[
-        "brotli >= 1.0",
-        "jsonschema-rs >= 0.16",
-        "numpy >= 1.24",
-        "requests >= 2.28",
-        "toml >= 0.10",
+        "brotli>=1.0, brotli<2",
+        "jsonschema-rs>=0.16",
+        "numpy>=1.24, numpy<2",
+        "requests>=2.28, requests<3",
+        "toml>=0.10",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

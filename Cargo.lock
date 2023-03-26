@@ -3178,7 +3178,7 @@ checksum = "9e79c4d996edb816c91e4308506774452e55e95c3c9de07b6729e17e15a5ef81"
 
 [[package]]
 name = "undr"
-version = "0.2.0"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "brotli",

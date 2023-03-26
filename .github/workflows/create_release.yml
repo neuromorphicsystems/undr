@@ -1,0 +1,28 @@
+name: Create release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.head_commit.message, '[release]')
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Release name
+        id: release_name
+        run: printf "VALUE='v$(python scripts/version.py --maximum)'" >> $GITHUB_OUTPUT
+      - name: Release body
+        id: release_body
+        run: printf "VALUE='$(python scripts/release_body.py)'" >> $GITHUB_OUTPUT
+      - uses: softprops/action-gh-release@v1
+        with:
+          body: ${{ steps.release_body.outputs.VALUE }}
+          tag_name: ${{ steps.release_name.outputs.VALUE }}
+          draft: true
+          prerelease: false

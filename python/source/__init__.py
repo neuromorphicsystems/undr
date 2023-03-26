@@ -1,4 +1,5 @@
 from __future__ import annotations
+from .version import __version__ as __version__
 from .configuration import (
     Configuration as Configuration,
     configuration_from_path as configuration_from_path,
@@ -24,7 +25,7 @@ from .json_index_tasks import (
 from .path import File as File
 from .path_directory import Directory as Directory
 from .persist import Store as Store, ReadOnlyStore as ReadOnlyStore
-from .simple import (default_datasets as default_datasets, install as install)
+from .simple import default_datasets as default_datasets, install as install
 from .task import (
     Exception as Exception,
     Manager as Manager,
