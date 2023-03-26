@@ -1,4 +1,4 @@
-name: Build
+name: Test App
 
 on:
   push:
@@ -17,6 +17,17 @@ jobs:
         - uses: actions-rs/toolchain@v1
           with:
             toolchain: stable
+        - run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.0-dev \
+            build-essential \
+            curl \
+            wget \
+            libssl-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
         - run: npm install
           working-directory: app
         - run: npm run tauri build -- --debug
