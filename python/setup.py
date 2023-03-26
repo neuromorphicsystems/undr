@@ -29,7 +29,7 @@ if (
 with open(dirname / "long_description.md") as long_description_file:
     long_description = long_description_file.read()
 
-exec(open(dirname / "source" / "version.py").read())  # defines __version__
+exec(open(dirname / "undr" / "version.py").read())  # defines __version__
 
 setuptools.setup(
     name="undr",
