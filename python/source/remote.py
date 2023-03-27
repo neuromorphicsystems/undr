@@ -138,7 +138,7 @@ class DownloadFile(Download):
         self.expected_size = expected_size
         self.expected_hash = expected_hash
         self.stream: typing.Optional[io.BufferedWriter] = None
-        self.hash: typing.Optional[hashlib._Hash] = None
+        self.hash: typing.Optional["hashlib._Hash"] = None
 
     def on_begin(self, manager: task.Manager):
         file_path = (

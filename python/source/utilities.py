@@ -28,11 +28,11 @@ def posix_path_with_suffix(
     return pathlib.PurePosixPath(f"{path}{suffix}")
 
 
-def new_hash() -> hashlib._Hash:
+def new_hash() -> "hashlib._Hash":
     return hashlib.sha3_224()
 
 
-def hash(chunks: typing.Iterable[bytes]) -> hashlib._Hash:
+def hash(chunks: typing.Iterable[bytes]) -> "hashlib._Hash":
     hash_object = new_hash()
     for chunk in chunks:
         hash_object.update(chunk)
