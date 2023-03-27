@@ -1,11 +1,11 @@
+from __future__ import annotations
 import dataclasses
 import functools
 import typing
 
 import numpy
-import requests
 
-from . import path, raw, task
+from . import path, raw
 
 if typing.TYPE_CHECKING:
     from . import path_directory
