@@ -2,8 +2,8 @@ import errno
 import functools
 import json
 import pathlib
-from . import constants
-from . import utilities
+
+from . import constants, utilities
 
 schema = utilities.load_schema("-index_schema.json")
 

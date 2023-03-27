@@ -5,15 +5,18 @@ import pathlib
 import pkgutil
 import sys
 import typing
-from . import check
-from . import configuration
-from . import constants
-from . import display
-from . import formats
-from . import install_mode
-from . import json_index_tasks
-from . import remote
-from . import task
+
+from . import (
+    check,
+    configuration,
+    constants,
+    display,
+    formats,
+    install_mode,
+    json_index_tasks,
+    remote,
+    task,
+)
 
 dirname = pathlib.Path(__file__).resolve().parent
 

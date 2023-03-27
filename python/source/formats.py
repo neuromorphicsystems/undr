@@ -1,11 +1,11 @@
 import dataclasses
 import functools
+import typing
+
 import numpy
 import requests
-import typing
-from . import path
-from . import task
-from . import raw
+
+from . import path, raw, task
 
 if typing.TYPE_CHECKING:
     from . import path_directory

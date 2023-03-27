@@ -1,10 +1,10 @@
 import dataclasses
 import pathlib
-import requests
 import typing
-from . import constants
-from . import task
-from . import utilities
+
+import requests
+
+from . import constants, task, utilities
 
 
 @dataclasses.dataclass

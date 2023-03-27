@@ -1,4 +1,3 @@
-
 CHUNK_SIZE: int = 65536
 CONSUMER_POLL_PERIOD: float = 0.1
 DECOMPRESS_SUFFIX: str = ".decompress"

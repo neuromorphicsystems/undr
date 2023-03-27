@@ -3,18 +3,22 @@ import enum
 import itertools
 import logging
 import pathlib
-import requests
 import typing
-from . import check
-from . import constants
-from . import decode
-from . import formats
-from . import json_index
-from . import path
-from . import path_directory
-from . import remote
-from . import task
-from . import utilities
+
+import requests
+
+from . import (
+    check,
+    constants,
+    decode,
+    formats,
+    json_index,
+    path,
+    path_directory,
+    remote,
+    task,
+    utilities,
+)
 
 
 @dataclasses.dataclass
@@ -89,7 +93,7 @@ class Selector:
         Action.DOWNLOAD_SKIP,
     }
 
-    def action(self, file: path.File) -> Selector.Action:
+    def action(self, file: path.File) -> "Selector.Action":
         """
         Called by Index, InstallFilesRecursive and ProcessFilesRecursive to select the files to process.
         """

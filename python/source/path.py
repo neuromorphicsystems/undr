@@ -4,13 +4,11 @@ import functools
 import math
 import operator
 import pathlib
-import requests
 import typing
-from . import constants
-from . import decode
-from . import remote
-from . import task
-from . import utilities
+
+import requests
+
+from . import constants, decode, remote, task, utilities
 
 if typing.TYPE_CHECKING:
     from . import path_directory
@@ -53,7 +51,7 @@ class Path:
     def local_path(self) -> pathlib.Path:
         return self.path_root / self.path_id
 
-    def __truediv__(self, other: str) -> Path:
+    def __truediv__(self, other: str) -> "Path":
         raise NotImplementedError()
 
 

@@ -1,6 +1,7 @@
-import setuptools
-import sys
 import pathlib
+import sys
+
+import setuptools
 
 dirname = pathlib.Path(__file__).resolve().parent
 

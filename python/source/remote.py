@@ -2,11 +2,11 @@ import dataclasses
 import hashlib
 import io
 import pathlib
-import requests
 import typing
-from . import constants
-from . import task
-from . import utilities
+
+import requests
+
+from . import constants, task, utilities
 
 
 @dataclasses.dataclass
@@ -254,7 +254,6 @@ class DownloadFile(Download):
                 file_path, constants.DOWNLOAD_SUFFIX
             )
             if self.expected_size is not None:
-
                 size = download_path.stat().st_size
                 if size != self.expected_size:
                     raise Exception(

@@ -3,6 +3,7 @@
 ```sh
 cd python
 python3 setup.py develop
+isort . # sort imports (see https://github.com/PyCQA/isort)
 black . # format the source code (see https://github.com/psf/black)
 pyright . #check types (see https://github.com/microsoft/pyright)
 ```

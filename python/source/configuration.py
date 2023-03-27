@@ -4,22 +4,26 @@ import logging
 import multiprocessing
 import os
 import pathlib
+import typing
+
 import requests
 import toml
-import typing
-from . import bibtex
-from . import constants
-from . import display
-from . import formats
-from . import install_mode
-from . import path
-from . import path_directory
-from . import json_index
-from . import json_index_tasks
-from . import persist
-from . import remote
-from . import task
-from . import utilities
+
+from . import (
+    bibtex,
+    constants,
+    display,
+    formats,
+    install_mode,
+    json_index,
+    json_index_tasks,
+    path,
+    path_directory,
+    persist,
+    remote,
+    task,
+    utilities,
+)
 
 schema = utilities.load_schema("undr_schema.json")
 

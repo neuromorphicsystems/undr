@@ -2,15 +2,12 @@ import collections
 import dataclasses
 import itertools
 import json
-import numpy
 import pathlib
 import typing
-from . import decode
-from . import formats
-from . import json_index
-from . import path
-from . import path_directory
-from . import utilities
+
+import numpy
+
+from . import decode, formats, json_index, path, path_directory, utilities
 
 
 @dataclasses.dataclass

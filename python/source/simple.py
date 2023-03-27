@@ -2,11 +2,11 @@ import functools
 import multiprocessing
 import pathlib
 import pkgutil
-import toml
 import typing
-from . import configuration
-from . import constants
-from . import install_mode
+
+import toml
+
+from . import configuration, constants, install_mode
 
 
 @functools.cache

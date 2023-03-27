@@ -1,6 +1,8 @@
 import dataclasses
 import pathlib
+
 import requests
+
 import undr
 
 configuration = undr.configuration_from_path("undr.toml")

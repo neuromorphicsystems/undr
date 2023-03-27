@@ -5,7 +5,6 @@ import logging
 import multiprocessing
 import pathlib
 import pickle
-import requests
 import socket
 import socketserver
 import struct
@@ -14,6 +13,9 @@ import time
 import traceback
 import types
 import typing
+
+import requests
+
 from . import constants
 
 

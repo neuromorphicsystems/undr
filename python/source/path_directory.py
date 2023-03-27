@@ -2,10 +2,8 @@ import dataclasses
 import functools
 import itertools
 import typing
-from . import constants
-from . import formats
-from . import json_index
-from . import path
+
+from . import constants, formats, json_index, path
 
 
 @dataclasses.dataclass(frozen=True)

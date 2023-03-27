@@ -1,9 +1,8 @@
-import unittest
-import undr.task
-
 import pathlib
 import tempfile
+import unittest
 
+import undr.task
 
 """
 with tempfile.TemporaryDirectory() as temporary_directory_name:

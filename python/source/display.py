@@ -10,11 +10,8 @@ import threading
 import time
 import types
 import typing
-from . import decode
-from . import json_index_tasks
-from . import install_mode
-from . import remote
-from . import utilities
+
+from . import decode, install_mode, json_index_tasks, remote, utilities
 
 ANSI_COLORS_ENABLED = os.getenv("ANSI_COLORS_DISABLED") is None
 
@@ -101,7 +98,7 @@ class Status:
             ),
         )
 
-    def speeds(self, previous_status: Status, interval: float):
+    def speeds(self, previous_status: "Status", interval: float):
         return (
             (self.download.current_bytes - self.download.initial_bytes)
             - (
@@ -119,7 +116,7 @@ class Status:
     def label(self):
         return "/".join(self.path_id.parts)
 
-    def progress_and_representation(self, download_tag: Tag, process_tag: Tag):
+    def progress_and_representation(self, download_tag: "Tag", process_tag: "Tag"):
         if self.indexing:
             return None, f"index {self.current_index_files} / {self.final_index_files}"
         representation = f"{download_tag.icon} "
