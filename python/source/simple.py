@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import functools
 import multiprocessing
 import pathlib
@@ -10,7 +11,7 @@ import toml
 from . import configuration, constants, install_mode
 
 
-@functools.cache
+@functools.lru_cache(maxsize=None)
 def name_to_url() -> dict[str, str]:
     undr_default_bytes = pkgutil.get_data("undr", "undr_default.toml")
     assert undr_default_bytes is not None

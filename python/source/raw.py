@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import numpy
 
 DVS_DTYPE = numpy.dtype([("t", "<u8"), ("x", "<u2"), ("y", "<u2"), ("p", "<u1")])
