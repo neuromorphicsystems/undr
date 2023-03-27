@@ -1,4 +1,3 @@
-from __future__ import annotations
 from .version import __version__ as __version__
 from .configuration import (
     Configuration as Configuration,
