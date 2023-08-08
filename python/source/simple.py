@@ -27,14 +27,14 @@ def default_datasets() -> list[str]:
 
 def install(
     name: str,
-    url: typing.Union[str, None] = None,
+    url: typing.Optional[str] = None,
     timeout: float = constants.DEFAULT_TIMEOUT,
     mode: typing.Union[str, install_mode.Mode] = install_mode.Mode.LOCAL,
     directory: typing.Union[str, pathlib.Path] = "datasets",
     show_display: bool = True,
     workers: int = multiprocessing.cpu_count() * 2,
     force: bool = False,
-    log_directory: typing.Union[pathlib.Path, None] = None,
+    log_directory: typing.Optional[pathlib.Path] = None,
 ):
     if url is None:
         url = name_to_url()[name]

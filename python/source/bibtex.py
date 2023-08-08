@@ -6,6 +6,20 @@ import requests
 
 
 def from_doi(doi: str, pretty: bool, timeout: float) -> str:
+    """Downloads and formats BibTeX from https://dx.doi.org/.
+
+    Args:
+        doi (str): Digital object identifier (DOI) string starting with ``10.``.
+        pretty (bool): Whether to correct line breaks and indents.
+            Otherwise, this function returns the raw reponse from https://dx.doi.org/.
+        timeout (float): Request timeout in seconds.
+
+    Raises:
+        :py:class:`requests.exceptions.HTTPError`: if a network error occurs (unreachable server, timeout...).
+
+    Returns:
+        str: BibTeX entry for the given DOI.
+    """
     logging.debug(f"request application/x-bibtex from https://dx.doi.org/{doi}")
     response = requests.get(
         f"https://dx.doi.org/{doi}",

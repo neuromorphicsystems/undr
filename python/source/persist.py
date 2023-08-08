@@ -13,10 +13,19 @@ import typing
 
 @dataclasses.dataclass
 class Progress:
+    """Message that indicates that the given resource has been persisted."""
+
     path_id: pathlib.PurePosixPath
+    """The resource's unique path ID.
+    """
 
 
 class ReadOnlyStore:
+    """Stores the IDs of processed tasks.
+
+    This store provides a method to check whether a task has been performed but it cannot be modified. Users will probably prefer the writable :py:class:`Store`.
+    """
+
     def __init__(
         self,
         path: typing.Union[str, os.PathLike],
@@ -35,6 +44,14 @@ class ReadOnlyStore:
             raise Exception('the table "complete" does not have the expected format')
 
     def __contains__(self, id: str):
+        """Whether the given ID has been processed.
+
+        Args:
+            id (str): The ID to check.
+
+        Returns:
+            bool: True if the file is in the store, which means that it has been processed.
+        """
         return (
             self.cursor.execute(
                 "select * from complete where id == ?", (id,)
@@ -43,10 +60,17 @@ class ReadOnlyStore:
         )
 
     def close(self):
+        """Closes the store's database.
+        """
         self.cursor.close()
         self.connection.close()
 
     def __enter__(self):
+        """Enables the use of the "with" statement.
+
+        Returns:
+            Display: A store context that calls :py:meth:`close` on exit.
+        """
         return self
 
     def __exit__(
@@ -55,6 +79,13 @@ class ReadOnlyStore:
         value: typing.Optional[BaseException],
         traceback: typing.Optional[types.TracebackType],
     ):
+        """Enables the use of the "with" statement.
+
+        Args:
+            type (typing.Optional[typing.Type[BaseException]]): None if the context exits without an exception, and the raised exception's class otherwise.
+            value (typing.Optional[BaseException]): None if the context exits without an exception, and the raised exception otherwise.
+            traceback (typing.Optional[types.TracebackType]): None if the context exits without an exception, and the raised exception's traceback otherwise.
+        """
         self.close()
 
     def __getstate__(self):

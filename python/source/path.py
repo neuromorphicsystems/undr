@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import dataclasses
+import exception
 import functools
 import math
 import operator
@@ -22,10 +23,21 @@ except:
 
 
 class Download(remote.Download):
+    """Downloads a remote file.
+
+    This task is never used with a scheduler. Its run function is called by :py:meth:`File.chunks` to recycle the download logic implemented in py:class:`undr.remote.Download`.
+
+    Args:
+        path_id (pathlib.PurePosixPath): The resource's unique path id.
+        suffix (typing.Optional[str]): Added to the file name while it is being downloaded.
+        server (Server): The remote server.
+        stream (bool): Whether to download the file in chunks (slightly slower for small files, reduces memory usage for large files).
+    """
+
     def __init__(
         self,
         path_id: pathlib.PurePosixPath,
-        suffix: typing.Union[str, None],
+        suffix: typing.Optional[str],
         server: remote.Server,
         stream: bool,
     ):
@@ -35,52 +47,126 @@ class Download(remote.Download):
     def on_begin(self, manager: task.Manager) -> int:
         return 0
 
-    def on_response_ready(
-        self, response: requests.Response, manager: task.Manager
-    ) -> None:
+    def on_response_ready(self, response: requests.Response, manager: task.Manager):
         self.response = response
 
 
 @dataclasses.dataclass(frozen=True)
 class Path:
+    """A file or directory in a dataset.
+
+    A path can point to a local resource or represent a remote resource.
+    """
+
     path_root: pathlib.Path
+    """Path to the root "datasets" directory used to generate local paths.
+    """
+
     path_id: pathlib.PurePosixPath
+    """A POSIX path uniquely identifying the resource (including its dataset).
+    """
+
     own_doi: typing.Optional[str] = dataclasses.field(compare=False, hash=False)
+    """This resource's DOI, used by all its children unless they have their own DOI.
+    """
+
     metadata: dict[str, typing.Any] = dataclasses.field(compare=False, hash=False)
+    """Any data not strictly required to decode the file (stored in -index.json).
+    """
+
     server: remote.Server = dataclasses.field(repr=False, compare=False, hash=False)
+    """The resource's remote server, used to download data if it is not available locally.
+    """
 
     @functools.cached_property
     def local_path(self) -> pathlib.Path:
+        """Returns the local file path.
+
+        This function always return a path, even if the local resource does not exist.
+
+        Returns:
+            pathlib.Path: The path to the local resource.
+        """
         return self.path_root / self.path_id
 
     def __truediv__(self, other: str) -> "Path":
+        """Concatenates this path with a string to create a new path.
+
+        Args:
+            other (str): Suffix to append to this path.
+
+        Returns:
+            Path: The concatenated result.
+        """
         raise NotImplementedError()
 
 
 @dataclasses.dataclass(frozen=True)
 class File(Path):
+    """Represents a local or remote file."""
+
     size: int = dataclasses.field(compare=False, hash=False)
+    """The decompressed file size in bytes.
+    """
+
     hash: str = dataclasses.field(compare=False, hash=False)
+    """The decompressed file hash (SHA3-224).
+    """
+
     compressions: tuple[decode.Compression, ...] = dataclasses.field(
         repr=False, compare=False, hash=False
     )
+    """List of compressions available on the server.
+    """
+
     session: typing.Optional[requests.Session] = dataclasses.field(
         repr=False, compare=False, hash=False
     )
+    """An open session that can be used to download resources.
+    """
+
     manager: task.Manager = dataclasses.field(repr=False, compare=False, hash=False)
+    """Can be called to schedule new tasks and report updates.
+    """
 
     @functools.cached_property
     def best_compression(self) -> decode.Compression:
+        """Returns the best compression supported by the remote server for this file.
+
+        Best is defined here as "smallest encoded size".
+
+        Returns:
+            decode.Compression: Compression format that yields the smallest version of this file.
+        """
         return min(self.compressions, key=operator.attrgetter("size"))
 
     @functools.cached_property
     def word_size(self) -> int:
+        """The size of an entry in this file, in bytes.
+
+        This can be used to ensure that entries (events, frames...) are not split while reading.
+        A decoded file's size in bytes must be a multiple of the value returned by this function.
+
+        Returns:
+            int: Number of bytes used by each entry.
+        """
         return 1
 
     @staticmethod
     def attributes_from_dict(
         data: dict[str, typing.Any], parent: "path_directory.Directory"
-    ):
+    ) -> dict[str, typing.Any]:
+        """Converts -index.json data to a dict of this class's arguments.
+
+        The returned dict can be used to initialise an instance of this class.
+
+        Args:
+            data (dict[str, typing.Any]): Parsed JSON data.
+            parent (path_directory.Directory): The file's parent directory.
+
+        Returns:
+            dict[str, typing.Any]: Data that can be used to initialize this class.
+        """
         return {
             "path_root": parent.path_root,
             "path_id": parent.path_id / data["name"],
@@ -103,12 +189,38 @@ class File(Path):
 
     @classmethod
     def from_dict(cls, data: dict[str, typing.Any], parent: "path_directory.Directory"):
+        """Conerts -index.json data to an instance of this class.
+
+        Args:
+            data (dict[str, typing.Any]): Parsed JSON data.
+            parent (path_directory.Directory): The file's parent directory.
+
+        Returns:
+            File: The file represented by the given data.
+        """
         return cls(**File.attributes_from_dict(data=data, parent=parent))
 
     def __truediv__(self, other: str) -> Path:
         raise Exception(f'the file path "{self.path_id}" cannot be extended')
 
     def _chunks(self, word_size: int) -> typing.Iterable[bytes]:
+        """Returns an iterator over the file's decompressed bytes.
+
+        Users should prefer :py:func:`chunks` since files know their word size.
+
+        Args:
+            word_size (int): size of an entry (events, frames...) in the file.
+
+        Raises:
+            decode.RemainingBytesError: if the total file size is not a multiple of `word_size`.
+            Exception: if the hash is incorrect.
+
+        Returns:
+            typing.Iterable[bytes]: @DEV how to document iterators?
+
+        Yields:
+            Iterator[typing.Iterable[bytes]]: @DEV how to document iterators?
+        """
         assert word_size > 0
         if self.local_path.is_file():
             hash = utilities.new_hash()
@@ -135,9 +247,7 @@ class File(Path):
                     )
             digest = hash.hexdigest()
             if digest != self.hash:
-                raise Exception(
-                    f'bad hash for "{self.path_id}" (expected "{self.hash}", got "{digest}")'
-                )
+                raise exception.HashMismatch(self.path_id, self.hash, digest)
             self.manager.send_message(
                 decode.Progress(
                     path_id=self.path_id,
@@ -191,9 +301,7 @@ class File(Path):
                     raise decode.RemainingBytesError(word_size, remaining_bytes)
             digest = hash.hexdigest()
             if digest != self.hash:
-                raise Exception(
-                    f'bad hash for "{self.path_id}" (expected "{self.hash}", got "{digest}")'
-                )
+                raise exception.HashMismatch(self.path_id, self.hash, digest)
             self.manager.send_message(
                 decode.Progress(
                     path_id=self.path_id,
@@ -295,10 +403,29 @@ class File(Path):
             )
 
     def chunks(self) -> typing.Iterable[bytes]:
+        """Returns an iterator over the file's decompressed bytes.
+
+        Returns:
+            typing.Iterable[bytes]: Iterator over the decompressed file's bytes. The size of the chunks may vary.
+        """
         yield from self._chunks(word_size=1)
 
     def attach_session(self, session: typing.Optional[requests.Session]):
+        """Binds a session to this file.
+
+        The session is used for all subsequent downloads.
+
+        Args:
+            session (typing.Optional[requests.Session]): An open session to use for downloads.
+        """
         self.__dict__["session"] = session
 
     def attach_manager(self, manager: typing.Optional[task.Manager]):
+        """Binds a manager to this file.
+
+        The file sends all subsequent updates (download and processing) to the manager.
+
+        Args:
+            manager (typing.Optional[task.Manager]): The manager to use to keep track of progress.
+        """
         self.__dict__["manager"] = manager

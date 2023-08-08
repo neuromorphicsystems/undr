@@ -7,18 +7,42 @@ import json
 import pathlib
 import typing
 
+import requests
 import numpy
 
-from . import decode, formats, json_index, path, path_directory, utilities
+from . import (
+    decode,
+    formats,
+    json_index,
+    json_index_tasks,
+    path,
+    path_directory,
+    remote,
+    task,
+    utilities,
+)
 
 
 @dataclasses.dataclass
 class Error:
+    """Reports invariant violations while checking data files."""
+
     path_id: pathlib.PurePosixPath
+    """Identifier of the problematic resource.
+    """
+
     message: str
+    """Description of the problem.
+    """
 
 
 def handle_aps(file: formats.ApsFile, send_message: formats.SendMessage):
+    """Checks the invariants of an APS file.
+
+    Args:
+        file (formats.ApsFile): The file to check.
+        send_message (formats.SendMessage): Callback channel for errors.
+    """
     non_monotonic_ts = 0
     size_mismatches = 0
     empty = True
@@ -65,6 +89,12 @@ def handle_aps(file: formats.ApsFile, send_message: formats.SendMessage):
 
 
 def handle_dvs(file: formats.DvsFile, send_message: formats.SendMessage):
+    """Checks the invariants of a DVS file.
+
+    Args:
+        file (formats.DvsFile): The file to check.
+        send_message (formats.SendMessage): Callback channel for errors.
+    """
     non_monotonic_ts = 0
     out_of_bounds_count = 0
     empty = True
@@ -109,6 +139,12 @@ def handle_dvs(file: formats.DvsFile, send_message: formats.SendMessage):
 
 
 def handle_imu(file: formats.ImuFile, send_message: formats.SendMessage):
+    """Checks the invariants of an IMU file.
+
+    Args:
+        file (formats.ImuFile): The file to check.
+        send_message (formats.SendMessage): Callback channel for errors.
+    """
     non_monotonic_ts = 0
     empty = True
     try:
@@ -139,12 +175,27 @@ def handle_imu(file: formats.ImuFile, send_message: formats.SendMessage):
 
 
 def handle_other(file: path.File, send_message: formats.SendMessage):
+    """Checks the invariants of an "other" file.
+
+    This function simply consumes the file bytes.
+    This guarantees that the file can be read and that the index contains the right hash and number of bytes.
+
+    Args:
+        file (formats.ImuFile): The file to check.
+        send_message (formats.SendMessage): Callback channel for errors.
+    """
     collections.deque(file.chunks(), maxlen=0)
 
 
 def handle_directory(
     directory: path_directory.Directory, send_message: formats.SendMessage
 ):
+    """Checks that system files are listed in the index, and vice-versa.
+
+    Args:
+        directory (path_directory.Directory): The directory to check.
+        send_message (formats.SendMessage): Callback channel for errors.
+    """
     index_data = json_index.load(directory.local_path / "-index.json")
     children = set(directory.local_path.iterdir())
     for file in itertools.chain(
@@ -161,34 +212,65 @@ def handle_directory(
             file.local_path, file.best_compression.suffix
         )
         if not local_path in children:
-            raise Exception(f"{local_path} does not exist")
+            send_message(
+                Error(
+                    path_id=file.path_id,
+                    message=f"{local_path} does not exist",
+                )
+            )
         children.remove(local_path)
         if not local_path.is_file():
-            raise Exception(f"{local_path} is not a file")
+            send_message(
+                Error(
+                    path_id=file.path_id,
+                    message=f"{local_path} is not a file",
+                )
+            )
     for child_directory_name in index_data["directories"]:
         directory_path = directory.local_path / child_directory_name
         if not directory_path in children:
-            raise Exception(f"{directory_path} does not exist")
+            send_message(
+                Error(
+                    path_id=directory.path_id,
+                    message=f"{directory_path} does not exist",
+                )
+            )
         children.remove(directory_path)
         if not directory_path.is_dir():
-            raise Exception(f"{directory_path} is not a directory")
+            send_message(
+                Error(
+                    path_id=directory.path_id,
+                    message=f"{directory_path} is not a directory",
+                )
+            )
     for child in children:
         if child.name != "-index.json":
-            raise Exception(
-                f"{child} is not listed in {directory.local_path / '-index.json'}"
+            send_message(
+                Error(
+                    path_id=directory.path_id,
+                    message=f"{child} is not listed in {directory.local_path / '-index.json'}",
+                )
             )
 
 
 def structure_recursive(path: pathlib.Path):
+    """Rexucrively checks that the given path exists and that it has an UNDR structure (-index.json).
+
+    Args:
+        path (pathlib.Path): The file system path to check.
+
+    Raises:
+        RuntimeError: if the path is not a directory or does not contain a -index.json file.
+    """
     if not path.exists():
-        raise Exception(f"{path} does not exist")
+        raise RuntimeError(f"{path} does not exist")
     if not path.is_dir():
-        raise Exception(f"{path} is not a directory")
+        raise RuntimeError(f"{path} is not a directory")
     index_path = path / "-index.json"
     if not index_path.exists():
-        raise Exception(f"{index_path} does not exist")
+        raise RuntimeError(f"{index_path} does not exist")
     if not index_path.is_file():
-        raise Exception(f"{index_path} is not a file")
+        raise RuntimeError(f"{index_path} is not a file")
     index_data = json_index.load(index_path)
     for child_directory_name in index_data["directories"]:
         structure_recursive(path / child_directory_name)
@@ -197,6 +279,12 @@ def structure_recursive(path: pathlib.Path):
 def format_index_recursive(
     path: pathlib.Path, handle_path: typing.Callable[[pathlib.Path], None]
 ):
+    """Validates the given index and formats its content.
+
+    Args:
+        path (pathlib.Path): Path of the index's parent directory.
+        handle_path (typing.Callable[[pathlib.Path], None]): Called if the index was reformatted.
+    """
     index_path = path / "-index.json"
     with open(index_path, "rb") as index_file:
         index_content = index_file.read()
@@ -211,3 +299,96 @@ def format_index_recursive(
         format_index_recursive(
             path=path / child_directory_name, handle_path=handle_path
         )
+
+
+class CheckFile(json_index_tasks.ProcessFile):
+    """Uses a switch to process files and wraps messages into :py:class:`undr.check.Error`.
+
+    Args:
+        file (path.File): The file to process.
+        switch (formats.Switch): Switch that maps file types to actions.
+    """
+
+    def __init__(self, file: path.File, switch: formats.Switch):
+        super().__init__(file=file)
+        self.switch = switch
+
+    def run(self, session: requests.Session, manager: task.Manager):
+        self.file.attach_session(session)
+        self.file.attach_manager(manager)
+        self.switch.handle_file(
+            file=self.file,
+            send_message=lambda message: manager.send_message(
+                Error(path_id=self.file.path_id, message=message)
+            ),
+        )
+
+
+class CheckLocalDirectoryRecursive(task.Task):
+    """Dispatches check actions to validate the invariants of local files.
+
+    This can be used to make sure that a dataset has been properly downloaded or to check files before uploading a dataset to a server.
+
+    Args:
+        path_root (pathlib.Path): The root path to generate local file paths.
+        path_id (pathlib.PurePosixPath): The path ID of the directory that will be scanned recursively.
+        priority (int): Priority of this task and all recursively created tasks (tasks with lower priorities are scheduled first).
+    """
+
+    def __init__(
+        self,
+        path_root: pathlib.Path,
+        path_id: pathlib.PurePosixPath,
+        priority: int,
+    ):
+        self.path_root = path_root
+        self.path_id = path_id
+        self.priority = priority
+
+    def run(self, session: requests.Session, manager: task.Manager):
+        directory = path_directory.Directory(
+            path_root=self.path_root,
+            path_id=self.path_id,
+            own_doi=None,
+            metadata={},
+            server=remote.NullServer(),
+            doi_and_metadata_loaded=False,
+        )
+        handle_directory(
+            directory=directory,
+            send_message=lambda message: manager.send_message(
+                Error(path_id=directory.path_id, message=message)
+            ),
+        )
+        index_data = json_index.load(directory.local_path / "-index.json")
+        for file in itertools.chain(
+            (
+                formats.file_from_dict(data=data, parent=directory)
+                for data in index_data["files"]
+            ),
+            (
+                path.File.from_dict(data=data, parent=directory)
+                for data in index_data["other_files"]
+            ),
+        ):
+            manager.schedule(
+                CheckFile(
+                    file=file,
+                    switch=formats.Switch(
+                        handle_aps=handle_aps,
+                        handle_dvs=handle_dvs,
+                        handle_imu=handle_imu,
+                        handle_other=handle_other,
+                    ),
+                ),
+                priority=self.priority,
+            )
+        for child_directory_name in index_data["directories"]:
+            manager.schedule(
+                CheckLocalDirectoryRecursive(
+                    path_root=self.path_root,
+                    path_id=self.path_id / child_directory_name,
+                    priority=self.priority,
+                ),
+                priority=self.priority,
+            )

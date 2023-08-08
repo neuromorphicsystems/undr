@@ -22,14 +22,28 @@ from . import constants
 
 
 class Task:
-    def __repr__(self):
+    """A processing task to be performed by a worker."""
+
+    def __repr__(self) -> str:
         return f"{self.__class__}({self.__dict__})"
 
     def run(self, session: requests.Session, manager: "Manager") -> None:
+        """Called by a worker to perform this task.
+
+        Args:
+            session (requests.Session): An open session that the task can use to download resources.
+            manager (Manager): Can be called to schedule new tasks or report updates.
+        """
         raise NotImplementedError()
 
 
 class Chain(Task):
+    """A sequence of tasks that must run sequentially.
+
+    Args:
+        Task (typing.Sequence[Task]): The list of tasks to run sequentially in the given order.
+    """
+
     def __init__(self, tasks: typing.Sequence[Task]):
         self.tasks = tasks
 
@@ -39,7 +53,21 @@ class Chain(Task):
 
 
 class Manager:
+    """Schedules and keeps track of tasks.
+
+    This is an abtract class, use of one of its implementations such as :py:class:`ProcessManager` to create objects.
+
+    """
+
     def schedule(self, task: Task, priority: int = 1) -> None:
+        """Runs a task with the given priority.
+
+        Tasks with lower priorities are scheduled first. The maximum priority level depends on the implementation. At least two levels, 0 (highest priority) and 1, must be supported by all implementations.
+
+        Args:
+            task (Task): The task that this manager must run (possibly on a different thread).
+            priority (int, optional): Priority level. Defaults to 1.
+        """
         raise NotImplementedError()
 
     def send_message(self, message: typing.Any) -> None:
@@ -47,7 +75,7 @@ class Manager:
 
 
 class NullManager(Manager):
-    def send_message(self, message: typing.Any) -> None:
+    def send_message(self, message: typing.Any):
         pass
 
 
@@ -109,11 +137,27 @@ def receive_type(client: socket.socket, expected_type: bytes):
     assert type == expected_type and message == b""
 
 
-class ProcessManager:
+class ProcessManager(Manager):
     class ClosePolicy(enum.Enum):
+        """Strategy used to terminate worker threads."""
+
         JOIN = 0
+        """Consume all messages and shutdown threads.
+
+        This should be used to wait for the end of the program normally.
+        """
+
         CANCEL = 1
+        """Shutdown threads without consuming buffered messages.
+
+        This should be used to stop thread workers after user-initiated cancellation (CTRL-C).
+        """
+
         KILL = 2
+        """Kill threads without consuming buffered messages.
+
+        This should be used after a thread raises an error, to stop the remaning worker threads.
+        """
 
     class Proxy(Manager):
         def __init__(self, server_port: int):

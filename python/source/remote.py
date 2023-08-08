@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import exception
 import hashlib
 import io
 import pathlib
@@ -13,19 +14,52 @@ from . import constants, task, utilities
 
 @dataclasses.dataclass
 class Progress:
+    """Message that reports download progress."""
+
     path_id: pathlib.PurePosixPath
+    """Path ID of the associated resource
+    """
+
     initial_bytes: int
+    """Number of bytes of the remote resource that were already downloaded when the current download began.
+    """
+
     current_bytes: int
+    """Number of bytes of the remote resource that have been downloaded so far.
+    """
+
     final_bytes: int
+    """Total number of bytes of the remote resource.
+    """
+
     complete: bool
+    """Whether this resource has been completely downloaded.
+    """
 
 
 @dataclasses.dataclass(frozen=True)
 class Server:
-    url: str
-    timeout: float
+    """Represents a remote server."""
 
-    def path_id_to_url(self, path_id: pathlib.PurePosixPath):
+    url: str
+    """The server's base URL.
+
+    Resources URL are calculated by appending the file's path ID to the server URL. A slash is inserted before the path ID if the server's URL does not end with one.
+    """
+
+    timeout: float
+    """Timeout in seconds for requests to this server.
+    """
+
+    def path_id_to_url(self, path_id: pathlib.PurePosixPath) -> str:
+        """Calculates a resource URL from its path ID.
+
+        Args:
+            path_id (pathlib.PurePosixPath): The resource's path ID, including the dataset name.
+
+        Returns:
+            str: The resource's remote URL.
+        """
         if len(path_id.parts) == 1:
             return self.url
         return "{}{}{}".format(
@@ -37,6 +71,12 @@ class Server:
 
 @dataclasses.dataclass(frozen=True)
 class NullServer(Server):
+    """A placeholder server that raises an exception when used.
+
+    Some functions and classes require a server to download resources that are no available locally.
+    If the resources are known to be local, this server can be used to detect download attempts.
+    """
+
     def __init__(self):
         super().__init__(url="", timeout=0.0)
 
@@ -45,23 +85,33 @@ class NullServer(Server):
 
 
 class Download(task.Task):
-    """
-    This task downloads a file from a server, calling lifecycle callbacks as follows:
-    - on_begin is called before contacting the server. It can be used to create write
-        resources and must return an offset in bytes. Download resumes from that offset if it is non-zero.
-        If the offset is negative, the task assumes the download is complete and it calls on_end immediately.
-    - on_range_failed is called if on_begin returned a non-zero offset AND if the server
-        rejects the range request (HTTP 206). It can be used to clean up 'append' resources and replace them
-        with 'write' resources. The actual download starts after on_range_failed as if on_begin returned 0.
-    - on_response_ready is called when the response is ready for iteration. The subclass MUST call response.close()
-        after reading the response (and pprobably self.on_end(manager=manager)).
-    This odd but flexible lifecycle lets users yield on response chunks (see path for an example).
+    """Retrieves data from a remote server.
+
+    This is an abstract task that calls its methods (lifecycle callbacks) as follows:
+
+    - :py:meth:`on_begin` is called before contacting the server.
+      This function can be used to create write resources and must return an offset in bytes.
+      Download resumes from that offset if it is non-zero.
+      If the offset is negative, the task assumes that the download is complete and it calls :py:meth:`on_end` immediately.
+    - :py:meth:`on_range_failed` is called if :py:meth:`on_begin` returned a non-zero offset and the server
+      rejects the range request (HTTP 206). It can be used to clean up 'append' resources and replace them
+      with 'write' resources. The actual download starts after :py:meth:`on_range_failed` as if :py:meth:`on_begin` returned 0.
+    - :py:meth:`on_response_ready` is called when the response is ready for iteration.
+      The subclass must call :py:meth:`requests.Response.close` after reading the response (and probably :py:meth:`on_end`).
+
+    This lifecycle allows users to yield on response chunks (see :py:meth:`undr.path.File._chunks` for an example).
+
+    Args:
+        path_id (pathlib.PurePosixPath): The resource's unique path id.
+        suffix (typing.Optional[str]): Added to the file name while it is being downloaded.
+        server (Server): The remote server.
+        stream (bool): Whether to download the file in chunks (slightly slower for small files, reduces memory usage for large files).
     """
 
     def __init__(
         self,
         path_id: pathlib.PurePosixPath,
-        suffix: typing.Union[str, None],
+        suffix: typing.Optional[str],
         server: Server,
         stream: bool,
     ):
@@ -70,7 +120,12 @@ class Download(task.Task):
         self.server = server
         self.stream = stream
 
-    def url(self):
+    def url(self) -> str:
+        """Returns the file's remote URL.
+
+        Returns:
+            str: File URL on the server.
+        """
         return self.server.path_id_to_url(
             self.path_id
             if self.suffix is None
@@ -103,26 +158,69 @@ class Download(task.Task):
             self.on_response_ready(response=response, manager=manager)
 
     def on_begin(self, manager: task.Manager) -> int:
+        """Called before contacting the server.
+
+        This function must return an offset in bytes.
+
+        - 0 indicates that the file is not downloaded yet.
+        - Positive values indicate the number of bytes already downloaded.
+        - Negative values indicate that the download is already complete and must be skipped.
+
+        Args:
+            manager (task.Manager): The task manager for reporting updates.
+
+        Returns:
+            int: Number of bytes already downloaded.
+        """
         raise NotImplementedError()
 
     def on_range_failed(self, manager: task.Manager) -> None:
+        """Called if the HTTP range call fails.
+
+        The HTTP range request asks the serve to resumes download at
+        a given byte offset. It used when :py:meth:`on_begin` returns a non-zero value.
+        Range is not always supported by the server. This function should reset counters
+        and ready the local file system for a standard (full) download.
+
+        Args:
+            manager (task.Manager): The task manager for reporting updates.
+        """
         raise NotImplementedError()
 
     def on_response_ready(
         self, response: requests.Response, manager: task.Manager
     ) -> None:
+        """Called when the HTTP response object is ready.
+
+        The reponse object can be used to download the remote file.
+
+        Args:
+            response (requests.Response): HTTP response object.
+            manager (task.Manager): The task manager for reporting updates.
+        """
         raise NotImplementedError()
 
     def on_end(self, manager: task.Manager) -> None:
+        """Called when the download task completes.
+
+        This function is called automatically if the byte offset
+        returned by :py:meth:`on_begin` is nagative.
+        Implementations should call it after consuming the response in :py:meth:`on_response_ready`.
+
+        Args:
+            manager (task.Manager): The task manager for reporting updates.
+        """
         raise NotImplementedError()
 
 
 class DownloadFile(Download):
+    """Retrieves data from a remote server and saves it to a file."""
+
     def __init__(
         self,
         path_root: pathlib.Path,
         path_id: pathlib.PurePosixPath,
-        suffix: typing.Union[str, None],
+        suffix: typing.Optional[str],
         server: Server,
         force: bool,
         expected_size: typing.Optional[int],
@@ -142,7 +240,18 @@ class DownloadFile(Download):
         self.stream: typing.Optional[io.BufferedWriter] = None
         self.hash: typing.Optional["hashlib._Hash"] = None
 
-    def on_begin(self, manager: task.Manager):
+    def on_begin(self, manager: task.Manager) -> int:
+        """Opens the local file before starting the download.
+
+        If the file exists, this function opens it in append mode
+        and returns its size in bytes.
+
+        Args:
+            manager (task.Manager): The task manager for reporting updates.
+
+        Returns:
+            int: Number of bytes already downloaded.
+        """
         file_path = (
             self.path_root / self.path_id
             if self.suffix is None
@@ -193,6 +302,11 @@ class DownloadFile(Download):
         return 0
 
     def on_range_failed(self, manager: task.Manager):
+        """Re-opens the file in write mode.
+
+        Args:
+            manager (task.Manager): The task manager for reporting updates.
+        """
         assert self.stream is not None
         self.stream.close()
         file_path = (
@@ -218,6 +332,12 @@ class DownloadFile(Download):
     def on_response_ready(
         self, response: requests.Response, manager: task.Manager
     ) -> None:
+        """Iterates over the file chunks and writes them to the file.
+
+        Args:
+            response (requests.Response): HTTP response object.
+            manager (task.Manager): The task manager for reporting updates.
+        """
         assert self.stream is not None
         for chunk in response.iter_content(constants.CHUNK_SIZE):
             self.stream.write(chunk)
@@ -237,14 +357,22 @@ class DownloadFile(Download):
         self.on_end(manager=manager)
 
     def on_end(self, manager: task.Manager):
+        """Checks the hash and closes the file.
+
+        Args:
+            manager (task.Manager): The task manager for reporting updates.
+
+        Raises:
+            exception.HashMismatch: if the provided and effective hashes are different.
+            exception.SizeMismatch: if the provided and effective sizes are different.
+        """
         if self.stream is not None:
             self.stream.close()
             if self.hash is not None:
+                assert self.expected_hash is not None
                 hash = self.hash.hexdigest()
                 if hash != self.expected_hash:
-                    raise Exception(
-                        f'bad hash for "{self.path_id}" (expected "{self.expected_hash}", got "{hash}")'
-                    )
+                    raise exception.HashMismatch(self.path_id, self.expected_hash, hash)
             file_path = (
                 self.path_root / self.path_id
                 if self.suffix is None
@@ -258,10 +386,8 @@ class DownloadFile(Download):
             if self.expected_size is not None:
                 size = download_path.stat().st_size
                 if size != self.expected_size:
-                    raise Exception(
-                        f'bad size for "{self.path_id}" (expected "{self.expected_size}", got "{size}")'
-                    )
-            download_path.rename(file_path)
+                    raise exception.SizeMismatch(self.path_id, self.expected_size, size)
+            download_path.replace(file_path)
             manager.send_message(
                 Progress(
                     path_id=self.path_id,

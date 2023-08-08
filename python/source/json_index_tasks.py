@@ -10,7 +10,6 @@ import typing
 import requests
 
 from . import (
-    check,
     constants,
     decode,
     formats,
@@ -25,34 +24,94 @@ from . import (
 
 @dataclasses.dataclass
 class IndexLoaded:
+    """Message indicating that the given index file has been loaded."""
+
     path_id: pathlib.PurePosixPath
+    """Path ID of the directory whose index has been loaded.
+    """
+
     children: int
+    """Number of subdirectories that will subsequently be loaded.
+    """
 
 
 @dataclasses.dataclass
 class Value:
+    """Represents download or process progress."""
+
     initial: int
+    """Number of bytes already downloaded or processed when the action started.
+    """
+
     final: int
+    """Total number of bytes to download or process.
+    """
 
 
 @dataclasses.dataclass
 class DirectoryScanned:
+    """Reports information about a local directory."""
+
     path_id: pathlib.PurePosixPath
-    initial_download_count: int  # does not include -index.json
-    initial_process_count: int  # does not include -index.json
+    """Path ID of the directory.
+    """
+
+    initial_download_count: int
+    """Number of files already downloaded when the action started ("files" and "other_files").
+
+    This count does not include -index.json.
+    """
+
+    initial_process_count: int
+    """Number of files already processed when the action started ("files" and "other_files").
+
+    This count does not include -index.json.
+    """
+
     final_count: int  # does not include -index.json
+    """Total number of files in this directory ("files" and "other_files").
+
+    This count does not include -index.json.
+    """
+
     index_bytes: Value
+    """Size of the index file (-index.json) in bytes.
+    """
+
     download_bytes: Value
+    """Total size of the compressed files in this directory, in bytes.
+
+    This size does not include -index.json.
+    """
+
     process_bytes: Value
+    """Total size of the files in this directory, in bytes.
+
+    This size does not include -index.json.
+    """
 
 
 @dataclasses.dataclass
 class Doi:
+    """Message dispatched when a DOI is found in the index."""
+
     path_id: pathlib.PurePosixPath
+    """Path ID of the associated resource.
+    """
+
     value: str
+    """Digital object identifier (DOI) string starting with ``10.``.
+    """
 
 
 class UncompressedDecodeProgress(task.Task):
+    """Dummy task that repoorts progress on "decompression" for uncompressed resources.
+
+    Resources that are not compressed are directly downloaded in raw format.
+    The conversion from "local" to "raw" (decompression) requires no further action for such resources.
+    This action dispatches decompression progress as if they were compressed, to simplify the architecture of progress trackers.
+    """
+
     def __init__(self, path_id: pathlib.PurePosixPath, size: int):
         self.path_id = path_id
         self.size = size
@@ -70,16 +129,48 @@ class UncompressedDecodeProgress(task.Task):
 
 
 class Selector:
+    """Delegate called to pick an action for each file.
+
+    Selectors are used during the indexing phase to calculate the number of bytes to download and/or process,
+    and during the processing phase to choose the action to perform.
+    """
+
     class Action(enum.Enum):
-        IGNORE = 0  # skip this file and do not report it
-        DOI = 1  # skip this file, do not report it but publish own DOIs
-        SKIP = 2  # skip this file but report it as downloaded and processed
-        DOWNLOAD_SKIP = 3  # skip operations on this file but report it as downloaded
-        DOWNLOAD = 4  # download only
-        DECOMPRESS = 5  # download and decompress
-        PROCESS = 6  # download, decompress, and process all bytes
+        """Specifies the operation to perform for a given file.
+
+        The action also determines whether the file's bytes should be
+        accounted for during the indexing phase.
+        This is useful to report non-zero progress after resuming a job,
+        but skip the actual processing.
+        """
+
+        IGNORE = 0
+        """Skips this file and does not report it.
+        """
+        DOI = 1
+        """Skips this file, does not report it, but publishes own DOIs.
+        """
+        SKIP = 2
+        """Skips this file but reports it as downloaded and processed.
+        """
+
+        DOWNLOAD_SKIP = 3
+        """Skips operations on this file but reports it as downloaded.
+        """
+        DOWNLOAD = 4
+        """Downloads and reports.
+        """
+        DECOMPRESS = 5
+        """Downloads, decompresses, and reports.
+        """
+        PROCESS = 6
+        """Downloads, decompresses, processes, and reports.
+        """
 
     SKIP_ACTIONS = {Action.SKIP, Action.DOWNLOAD_SKIP}
+    """The set of actions that skip all operations on the file.
+    """
+
     REPORT_DOWNLOAD_ACTIONS = {
         Action.SKIP,
         Action.DOWNLOAD_SKIP,
@@ -87,34 +178,57 @@ class Selector:
         Action.DECOMPRESS,
         Action.PROCESS,
     }
+    """The set of actions that (at least) download the file.
+    """
+
     REPORT_PROCESS_ACTIONS = {Action.SKIP, Action.DECOMPRESS, Action.PROCESS}
+    """The set of actions that download and process the file.
+    """
+
     INSTALL_IGNORE_ACTIONS = {
         Action.IGNORE,
         Action.DOI,
         Action.SKIP,
         Action.DOWNLOAD_SKIP,
     }
+    """The set of actions that ignore the file for reporting purposes.
+    """
 
     def action(self, file: path.File) -> "Selector.Action":
-        """
-        Called by Index, InstallFilesRecursive and ProcessFilesRecursive to select the files to process.
+        """Returns the action to apply to the given file.
+
+        Called by :py:class:`Index`, :py:class:`InstallFilesRecursive` and :py:class:`ProcessFilesRecursive`.
+        The default implementation returns `Selector.Action.PROCESS`.
         """
         return Selector.Action.PROCESS
 
     def scan_filesystem(self, directory: path_directory.Directory) -> bool:
-        """
-        Called by Index to decide whether it needs to scan the file system.
-        `directory_scan` may return False if action returns one of the following
-        for every file in `directory`:
-        - Selector.Action.IGNORE
-        - Selector.Action.DOI
-        - Selector.Action.SKIP
-        - Selector.Action.DOWNLOAD_SKIP
+        """Whether to scan the filesystem.
+
+        Called by :py:class:`Index` to decide whether it needs to scan the file system.
+        This function may return False if :py:func:`action` returns one of the following for every file in the directory:
+
+        - :py:attr:`Selector.Action.IGNORE`
+        - :py:attr:`Selector.Action.DOI`
+        - :py:attr:`Selector.Action.SKIP`
+        - :py:attr:`Selector.Action.DOWNLOAD_SKIP`
         """
         return True
 
 
 class Index(remote.DownloadFile):
+    """Downloads an index file (-index.json).
+
+    Args:
+        path_root (pathlib.Path): The root path to generate local file paths.
+        path_id (pathlib.PurePosixPath): The path ID of the directory that will be seached recursively.
+        server (remote.Server): The remote server to download resources.
+        selector (Selector): A selector that defines the files to process.
+        priority (int): Priority of this task (tasks with lower priorities are scheduled first).
+        force (bool): Download the index file even if it is already present locally.
+        directory_doi (bool): Whether to dispatch :py:class:`Doi` messages while reading the index.
+    """
+
     def __init__(
         self,
         path_root: pathlib.Path,
@@ -290,6 +404,19 @@ class Index(remote.DownloadFile):
 
 
 class InstallFilesRecursive(task.Task):
+    """Downloads (and possibly decompresses) a directories' files recursively.
+
+    The actual action is controlledd by the selector aand may be different for different files. Child directories are installed recursively.
+
+    Args:
+        path_root (pathlib.Path): The root path to generate local file paths.
+        path_id (pathlib.PurePosixPath): The path ID of the directory that will be seached recursively.
+        server (remote.Server): The remote server to download resources.
+        selector (Selector): A selector that defines the files to process.
+        priority (int): Priority of this task (tasks with lower priorities are scheduled first).
+        force (bool): Download files even if they already present locally.
+    """
+
     def __init__(
         self,
         path_root: pathlib.Path,
@@ -434,14 +561,39 @@ class InstallFilesRecursive(task.Task):
 
 
 class ProcessFile(task.Task):
+    """Generic task for file processing.
+
+    Args:
+        file (path.File): The file (remote or local) to process.
+    """
+
     def __init__(self, file: path.File):
         self.file = file
 
 
 ProcessFileType = typing.TypeVar("ProcessFileType", bound=ProcessFile)
+"""Generic parameter representing the file type.
+
+Used by :py:class:`ProcessFilesRecursive`.
+"""
 
 
 class ProcessFilesRecursive(task.Task):
+    """Spawns a processing task for each file in the given directory.
+
+    Subdirectories are recursively searched as well.
+
+    Args:
+        path_root (pathlib.Path): The root path to generate local file paths.
+        path_id (pathlib.PurePosixPath): The path ID of the directory that will be scanned recursively.
+        server (remote.Server): The remote server used to download resources.
+        selector (Selector): A selector that defines the files to process.
+        process_file_class (typing.Type[ProcessFileType]): The class of the task to run on each selected file. Must be a subclass of :py:class:`ProcessFile`.
+        process_file_args (typing.Iterable[typing.Any]): Positional arguments passed to the constructor of `process_file_class`.
+        process_file_kwargs (typing.Mapping[str, typing.Any]): Keyword arguments passed to the constructor of `process_file_class`. The keyword argument `file` is automatically added by `ProcessFilesRecursive` after the positional arguments and before other keyword arguments.
+        priority (int): Priority of this task and all recursively created tasks (tasks with lower priorities are scheduled first).
+    """
+
     def __init__(
         self,
         path_root: pathlib.Path,
@@ -450,7 +602,6 @@ class ProcessFilesRecursive(task.Task):
         selector: Selector,
         process_file_class: typing.Type[ProcessFileType],
         process_file_args: typing.Iterable[typing.Any],
-        # ProcessFilesRecursive automatically adds the keyword argument 'file' before kwds
         process_file_kwargs: typing.Mapping[str, typing.Any],
         priority: int,
     ):
@@ -463,7 +614,7 @@ class ProcessFilesRecursive(task.Task):
         self.selector = selector
         self.priority = priority
 
-    def run(self, session: requests.Session, manager: task.Manager):
+    def run(self, session: requests.Session, manager: task.Manager) -> None:
         directory = path_directory.Directory(
             path_root=self.path_root,
             path_id=self.path_id,
@@ -503,80 +654,6 @@ class ProcessFilesRecursive(task.Task):
                     process_file_class=self.process_file_class,
                     process_file_args=self.process_file_args,
                     process_file_kwargs=self.process_file_kwargs,
-                    priority=self.priority,
-                ),
-                priority=self.priority,
-            )
-
-
-class CheckFile(task.Task):
-    def __init__(self, file: path.File, switch: formats.Switch):
-        self.file = file
-        self.switch = switch
-
-    def run(self, session: requests.Session, manager: task.Manager):
-        self.file.attach_session(session)
-        self.file.attach_manager(manager)
-        self.switch.handle_file(
-            file=self.file,
-            send_message=lambda message: manager.send_message(
-                check.Error(path_id=self.file.path_id, message=message)
-            ),
-        )
-
-
-class CheckLocalDirectoryRecursive(task.Task):
-    def __init__(
-        self,
-        path_root: pathlib.Path,
-        path_id: pathlib.PurePosixPath,
-        switch: formats.Switch,
-        priority: int,
-    ):
-        self.path_root = path_root
-        self.path_id = path_id
-        self.switch = switch
-        self.priority = priority
-
-    def run(self, session: requests.Session, manager: task.Manager):
-        directory = path_directory.Directory(
-            path_root=self.path_root,
-            path_id=self.path_id,
-            own_doi=None,
-            metadata={},
-            server=remote.NullServer(),
-            doi_and_metadata_loaded=False,
-        )
-        check.handle_directory(
-            directory=directory,
-            send_message=lambda message: manager.send_message(
-                check.Error(path_id=directory.path_id, message=message)
-            ),
-        )
-        index_data = json_index.load(directory.local_path / "-index.json")
-        for file in itertools.chain(
-            (
-                formats.file_from_dict(data=data, parent=directory)
-                for data in index_data["files"]
-            ),
-            (
-                path.File.from_dict(data=data, parent=directory)
-                for data in index_data["other_files"]
-            ),
-        ):
-            manager.schedule(
-                CheckFile(
-                    file=file,
-                    switch=self.switch,
-                ),
-                priority=self.priority,
-            )
-        for child_directory_name in index_data["directories"]:
-            manager.schedule(
-                CheckLocalDirectoryRecursive(
-                    path_root=self.path_root,
-                    path_id=self.path_id / child_directory_name,
-                    switch=self.switch,
                     priority=self.priority,
                 ),
                 priority=self.priority,

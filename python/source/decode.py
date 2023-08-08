@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import exception
 import pathlib
 import typing
 
@@ -11,14 +12,37 @@ from . import constants, task, utilities
 
 @dataclasses.dataclass
 class Progress:
+    """Represents decompression progress for a given resource."""
+
     path_id: pathlib.PurePosixPath
+    """Identifier of the resource.
+    """
+
     initial_bytes: int
+    """Number of bytes of the decompressed resource that were already decompressed when the current decoding process began.
+    """
+
     current_bytes: int
+    """Number of bytes of the decompressed resource that have been decompressed so far.
+    """
+
     final_bytes: int
+    """Total number of bytes of the decompressed resource.
+    """
+
     complete: bool
+    """Whether decoding of this resource is complete.
+    """
 
 
 class RemainingBytesError(Exception):
+    """Raised if the number of bytes in the decompressed resource is not a multiple of its word size.
+
+    Args:
+        word_size (int): The resource's word size.
+        buffer (bytes): The remaining bytes. Their length is larger than zero and smaller than the word size.
+    """
+
     def __init__(self, word_size: int, buffer: bytes):
         self.buffer = buffer
         super().__init__(
@@ -27,25 +51,69 @@ class RemainingBytesError(Exception):
 
 
 class Decoder:
+    """Abstract class for decoders. A decoder controls a decompression process."""
+
     def decompress(self, buffer: bytes) -> bytes:
+        """Consumes a buffer and produces decompressed bytes.
+
+        Args:
+            buffer (bytes): Compressed input bytes.
+
+        Returns:
+            bytes: Decompressed output bytes. Their length must be a multiple of the word size.
+        """
         raise NotImplementedError()
 
     def finish(self) -> tuple[bytes, bytes]:
+        """Tells the decoder that all input bytes have been read.
+
+        Returns:
+            tuple[bytes, bytes]: Decompressed output bytes, whose length must be a multiple of the word size, and remaining bytes, whose length must be striclty smaller than the word size. A non-zero number of remaining bytes usually indicates an issue (erroneous configuration or corrupted data).
+        """
         raise NotImplementedError()
 
 
 @dataclasses.dataclass(frozen=True)
 class Compression:
+    """Represents a compressed file's metadata."""
+
     suffix: str
+    """Suffix for files compressed with this format.
+
+    The suffix must include a leading dot, for instance ``".br"``.
+    """
+
     size: int
+    """Size of the compressed file in bytes.
+    """
+
     hash: str
+    """SHA3-224 (FIPS 202) hash of the compressed bytes.
+    """
 
     def decoder(self, word_size: int) -> Decoder:
+        """Creates a new decoder for this compression.
+
+        Args:
+            word_size (int): The resource's word size in bytes.
+
+        Returns:
+            Decoder: A decompression manager for this compression format.
+        """
         raise NotImplementedError()
 
 
 @dataclasses.dataclass(frozen=True)
 class NoneCompression(Compression):
+    """Placeholder format for uncompressed files.
+
+    This "compression" format passes the input bytes to the output without transforming them.
+    It may cut and stitch buffers to ensure that each buffer has a length that is a multiple of the word size.
+
+    Args:
+        word_size (int): The resource's word size in bytes.
+    """
+
     class Decoder(Decoder):
         def __init__(self, word_size: int):
             assert word_size > 0
@@ -96,6 +164,12 @@ class NoneCompression(Compression):
 
 @dataclasses.dataclass(frozen=True)
 class BrotliCompression(Compression):
+    """Implements Brotli decompression (https://github.com/google/brotli).
+
+    Args:
+        word_size (int): The resource's word size in bytes.
+    """
+
     class Decoder(NoneCompression.Decoder):
         def __init__(self, word_size: int):
             super().__init__(word_size=word_size)
@@ -118,6 +192,18 @@ class BrotliCompression(Compression):
 
 
 class DecompressFile(task.Task):
+    """Decompresses a local file and writes decoded bytes to another local file.
+
+    Args:
+        path_root (pathlib.Path): The root path to generate local file paths.
+        path_id (pathlib.PurePosixPath): The path ID of the file.
+        compression (Compression): The format of the compressed file.
+        expected_size (int): The size of the decompressed file in bytes, according to the index.
+        expected_hash (str): The hash of the decompressed file, according to the index.
+        word_size (int): The file's word size (the number of decoded bytes must be a multiple of this value).
+        keep (bool): Whether to keep the compressed file after a successful decompression.
+    """
+
     def __init__(
         self,
         path_root: pathlib.Path,
@@ -183,15 +269,11 @@ class DecompressFile(task.Task):
                     )
         size = decompress_path.stat().st_size
         if size != self.expected_size:
-            raise Exception(
-                f'bad size for "{self.path_id}" (expected "{self.expected_size}", got "{size}")'
-            )
+            raise exception.SizeMismatch(self.path_id, self.expected_size, size)
         digest = hash.hexdigest()
         if digest != self.expected_hash:
-            raise Exception(
-                f'bad hash for "{self.path_id}" (expected "{self.expected_hash}", got "{digest}")'
-            )
-        decompress_path.rename(self.path_root / self.path_id)
+            exception.HashMismatch(self.path_id, self.expected_hash, digest)
+        decompress_path.replace(self.path_root / self.path_id)
         if not self.keep:
             utilities.path_with_suffix(
                 self.path_root / self.path_id, self.compression.suffix
@@ -207,7 +289,22 @@ class DecompressFile(task.Task):
         )
 
 
-def compression_from_dict(data: dict[str, typing.Any], base_size: int, base_hash: str):
+def compression_from_dict(
+    data: dict[str, typing.Any], base_size: int, base_hash: str
+) -> Compression:
+    """Factory for comprssion formats.
+
+    Args:
+        data (dict[str, typing.Any]): Parsed compression object read from an index file.
+        base_size (int): Size of the uncompressed file in bytes, read from the index.
+        base_hash (str): Hash of the uncompressed file, read from the index.
+
+    Raises:
+        RuntimeError: if the compression format is unknown or not supported.
+
+    Returns:
+        Compression: The compressed file's metadata, can be used to create a decoder.
+    """
     if data["type"] == "none":
         return NoneCompression(suffix=data["suffix"], size=base_size, hash=base_hash)
     if data["type"] == "brotli":

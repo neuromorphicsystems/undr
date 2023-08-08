@@ -109,6 +109,7 @@ class InlineEncoder(json.JSONEncoder):
         inline = self.inline_encoder.encode(o)
         if len(inline) <= self.maximum_length - len(self.prefix):
             return inline
+        assert isinstance(self.indent, int)
         if isinstance(o, (list, tuple)):
             self.indent_level += 1
             self.prefix = " " * (self.indent * self.indent_level)

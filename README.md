@@ -11,6 +11,7 @@
         - [Download the datasets](#download-the-datasets)
         - [Generate a BibTex file](#generate-a-bibtex-file)
     - [Python module](#python-module)
+        - [Concepts](#concepts)
         - [Python APIs](#python-apis)
     - [Dataset format specification](#dataset-format-specification)
     - [Dataset mirrors](#dataset-mirrors)
@@ -20,6 +21,7 @@
             - [Upload a dataset](#upload-a-dataset)
         - [Download with existing CLI](#download-with-existing-cli)
     - [Build documentation](#build-documentation)
+- [compilation](#compilation)
 
 ## Getting Started
 
@@ -74,6 +76,13 @@ The UNDR project does not claim authorship of the datasets. Please use this file
 ```sh
 pip3 install undr
 ```
+
+### Concepts
+
+-   priority
+-   -index.json
+-   files
+-   other_files
 
 ### Python APIs
 
@@ -162,6 +171,18 @@ find . -iname '\*.br' | while read filename; do brotli -d -j "$filename"; done;
 ## Build documentation
 
 ```sh
-pip install -r documentation/requirements.txt
-sphinx-build documentation documentation/_build
+# setup
+python3 -m venv .venv
+source .venv/bin/activate
+python documentation/build.py
 ```
+
+pip install --upgrade pip setuptools
+pip install -r documentation/requirements.txt
+
+# compilation
+
+cd python
+pip install .
+cd ..
+sphinx-build documentation documentation/\_build

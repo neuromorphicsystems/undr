@@ -1,0 +1,13 @@
+- Ease-of-use and normalization encourage broader testing (researchers test their algorithms on more datasets).
+- Ease-of-use and normalization encourage prior art reviews (researchers try more existing algorithms on new datasets).
+- Large collections enable massive ML models.
+- A fundamental trade-off (flexibility for dataset producers, rigidity for dataset consumers).
+- Readily useful for:
+    - data prediction
+    - compression benchmarks
+    - statistical analysis
+    - pattern recognition (the file name is the ground truth)
+    - frame generation
+- Question of ground truth not addressed yet for other problems (in particular tracking).
+
+- Streaming: generally convenient, particularly important for Neuromorphic hardware

@@ -30,7 +30,7 @@ def check_positive(value: str):
     return value_as_int
 
 
-def add_common_arguments(parser: argparse.ArgumentParser) -> None:
+def add_common_arguments(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--configuration",
         "-c",
@@ -236,15 +236,9 @@ if __name__ == "__main__":
                     indexing_complete, status = index_status.push(message=message)
                     if indexing_complete and status is not None:
                         manager.schedule(
-                            task=json_index_tasks.CheckLocalDirectoryRecursive(
+                            task=check.CheckLocalDirectoryRecursive(
                                 path_root=path.parent,
                                 path_id=pathlib.PurePosixPath(path.name),
-                                switch=formats.Switch(
-                                    handle_aps=check.handle_aps,
-                                    handle_dvs=check.handle_dvs,
-                                    handle_imu=check.handle_imu,
-                                    handle_other=check.handle_other,
-                                ),
                                 priority=1,
                             ),
                             priority=1,

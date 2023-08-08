@@ -1,16 +1,25 @@
 from __future__ import annotations
 
+import builtins
 import errno
 import functools
 import json
 import pathlib
+import typing
 
 from . import constants, utilities
 
 schema = utilities.load_schema("-index_schema.json")
+"""JSON schema for -index files."""
 
 
 class InstallError(FileNotFoundError):
+    """Raised if the target path does not exist.
+
+    Args:
+        path (pathlib.Path): The path that does not exist.
+    """
+
     def __init__(self, path: pathlib.Path):
         super().__init__(errno.ENOENT, "", str(path))
 
@@ -21,9 +30,24 @@ class InstallError(FileNotFoundError):
 
 
 @functools.lru_cache(maxsize=constants.LRU_CACHE_MAXSIZE)
-def load(path: pathlib.Path):
+def load(path: pathlib.Path) -> dict[str, typing.Any]:
+    """Reads and validates a -index.json file.
+
+    This function caches the parsed contents of up to :py:attr:`undr.constants.LRU_CACHE_MAXSIZE` files.
+
+    Args:
+        path (pathlib.Path): The path of the file to read.
+
+    Raises:
+        InstallError: if the file does not exist.
+        [@DEV check type]: if validation fails.
+
+    Returns:
+        dict[str, typing.Any]: Parsed JSON file contents.
+    """
+
     try:
-        with open(path) as index_data_file:
+        with builtins.open(path) as index_data_file:
             index_data = json.load(index_data_file)
         schema.validate(index_data)
         return index_data
