@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import dataclasses
-import exception
 import hashlib
 import io
 import pathlib
 import typing
 
+import exception
 import requests
 
 from . import constants, task, utilities

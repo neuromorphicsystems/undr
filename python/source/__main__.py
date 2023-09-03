@@ -77,7 +77,8 @@ if __name__ == "__main__":
         "bibtex", help="Generate a BibTeX file referencing all the datasets"
     )
     bibtex_parser.add_argument(
-        "output", help="Path of the output file (for instance output.bib) or \"-\" to print to stdout"
+        "output",
+        help='Path of the output file (for instance output.bib) or "-" to print to stdout',
     )
     add_common_arguments(bibtex_parser)
     doctor_parser = subparsers.add_parser(

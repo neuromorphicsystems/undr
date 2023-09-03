@@ -1,6 +1,6 @@
 import pathlib
-import subprocess
 import shutil
+import subprocess
 import sys
 
 dirname = pathlib.Path(__file__).resolve().parent

@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import contextlib
 import dataclasses
-import exception
 import functools
 import math
 import operator
 import pathlib
 import typing
 
+import exception
 import requests
 
 from . import constants, decode, remote, task, utilities

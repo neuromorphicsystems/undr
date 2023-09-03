@@ -9,8 +9,8 @@ import json
 import pathlib
 import typing
 
-import requests
 import numpy
+import requests
 
 from . import (
     decode,

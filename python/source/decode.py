@@ -6,13 +6,12 @@ To add support for a new format, create and implement a derived class of :py:cla
 from __future__ import annotations
 
 import dataclasses
-import exception
 import pathlib
 import typing
 
 import requests
 
-from . import constants, task, utilities
+from . import constants, exception, task, utilities
 
 
 @dataclasses.dataclass
