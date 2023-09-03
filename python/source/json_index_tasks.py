@@ -11,17 +11,8 @@ import typing
 
 import requests
 
-from . import (
-    constants,
-    decode,
-    formats,
-    json_index,
-    path,
-    path_directory,
-    remote,
-    task,
-    utilities,
-)
+from . import (constants, decode, formats, json_index, path, path_directory,
+               remote, task, utilities)
 
 
 @dataclasses.dataclass

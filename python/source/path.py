@@ -10,10 +10,9 @@ import operator
 import pathlib
 import typing
 
-import exception
 import requests
 
-from . import constants, decode, remote, task, utilities
+from . import constants, decode, exception, remote, task, utilities
 
 if typing.TYPE_CHECKING:
     from . import path_directory

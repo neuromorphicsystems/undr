@@ -12,17 +12,8 @@ import typing
 import numpy
 import requests
 
-from . import (
-    decode,
-    formats,
-    json_index,
-    json_index_tasks,
-    path,
-    path_directory,
-    remote,
-    task,
-    utilities,
-)
+from . import (decode, formats, json_index, json_index_tasks, path,
+               path_directory, remote, task, utilities)
 
 
 @dataclasses.dataclass

@@ -13,21 +13,9 @@ import typing
 import requests
 import toml
 
-from . import (
-    bibtex,
-    constants,
-    display,
-    formats,
-    install_mode,
-    json_index,
-    json_index_tasks,
-    path,
-    path_directory,
-    persist,
-    remote,
-    task,
-    utilities,
-)
+from . import (bibtex, constants, display, formats, install_mode, json_index,
+               json_index_tasks, path, path_directory, persist, remote, task,
+               utilities)
 
 schema = utilities.load_schema("undr_schema.json")
 """JSON schema for TOML settings files."""

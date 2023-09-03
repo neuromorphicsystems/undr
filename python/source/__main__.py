@@ -8,17 +8,8 @@ import pkgutil
 import sys
 import typing
 
-from . import (
-    check,
-    configuration,
-    constants,
-    display,
-    formats,
-    install_mode,
-    json_index_tasks,
-    remote,
-    task,
-)
+from . import (check, configuration, constants, display, formats, install_mode,
+               json_index_tasks, remote, task)
 
 dirname = pathlib.Path(__file__).resolve().parent
 

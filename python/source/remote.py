@@ -8,10 +8,9 @@ import io
 import pathlib
 import typing
 
-import exception
 import requests
 
-from . import constants, task, utilities
+from . import constants, exception, task, utilities
 
 
 @dataclasses.dataclass

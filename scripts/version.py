@@ -1,8 +1,8 @@
 import json
 import pathlib
 import re
-import tomllib
 import sys
+import tomllib
 
 dirname = pathlib.Path(__file__).resolve().parent
 
