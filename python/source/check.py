@@ -257,7 +257,7 @@ def structure_recursive(path: pathlib.Path):
     """Rexucrively checks that the given path exists and that it has an UNDR structure (-index.json).
 
     Args:
-        path (pathlib.Path): The file system path to check.
+        path (pathlib.Path): The local file path to check.
 
     Raises:
         RuntimeError: if the path is not a directory or does not contain a -index.json file.
@@ -330,7 +330,7 @@ class CheckLocalDirectoryRecursive(task.Task):
     This can be used to make sure that a dataset has been properly downloaded or to check files before uploading a dataset to a server.
 
     Args:
-        path_root (pathlib.Path): The root path to generate local file paths.
+        path_root (pathlib.Path): The root path used to generate local file paths.
         path_id (pathlib.PurePosixPath): The path ID of the directory that will be scanned recursively.
         priority (int): Priority of this task and all recursively created tasks (tasks with lower priorities are scheduled first).
     """

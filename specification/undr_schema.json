@@ -6,7 +6,7 @@
     "type": "object",
     "properties": {
         "directory": {
-            "description": "Path to the download directory, relative to the parent of the configuration file",
+            "description": "Path of the download directory, relative to the parent of the configuration file",
             "type": "string"
         },
         "datasets": {

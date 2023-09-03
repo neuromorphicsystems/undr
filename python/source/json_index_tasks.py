@@ -36,7 +36,7 @@ class IndexLoaded:
 
 
 @dataclasses.dataclass
-class Value:
+class IndexProgress:
     """Represents download or process progress."""
 
     initial: int
@@ -50,7 +50,7 @@ class Value:
 
 @dataclasses.dataclass
 class DirectoryScanned:
-    """Reports information about a local directory."""
+    """Reports information on a local directory."""
 
     path_id: pathlib.PurePosixPath
     """Path ID of the directory.
@@ -74,17 +74,17 @@ class DirectoryScanned:
     This count does not include -index.json.
     """
 
-    index_bytes: Value
+    index_bytes: IndexProgress
     """Size of the index file (-index.json) in bytes.
     """
 
-    download_bytes: Value
+    download_bytes: IndexProgress
     """Total size of the compressed files in this directory, in bytes.
 
     This size does not include -index.json.
     """
 
-    process_bytes: Value
+    process_bytes: IndexProgress
     """Total size of the files in this directory, in bytes.
 
     This size does not include -index.json.
@@ -220,7 +220,7 @@ class Index(remote.DownloadFile):
     """Downloads an index file (-index.json).
 
     Args:
-        path_root (pathlib.Path): The root path to generate local file paths.
+        path_root (pathlib.Path): The root path used to generate local file paths.
         path_id (pathlib.PurePosixPath): The path ID of the directory that will be seached recursively.
         server (remote.Server): The remote server to download resources.
         selector (Selector): A selector that defines the files to process.
@@ -282,9 +282,9 @@ class Index(remote.DownloadFile):
             initial_download_count=0,
             initial_process_count=0,
             final_count=0,
-            index_bytes=Value(initial=0, final=0),
-            download_bytes=Value(initial=0, final=0),
-            process_bytes=Value(initial=0, final=0),
+            index_bytes=IndexProgress(initial=0, final=0),
+            download_bytes=IndexProgress(initial=0, final=0),
+            process_bytes=IndexProgress(initial=0, final=0),
         )
         if not self.force:
             if self.index_file.local_path.is_file():
@@ -409,7 +409,7 @@ class InstallFilesRecursive(task.Task):
     The actual action is controlledd by the selector aand may be different for different files. Child directories are installed recursively.
 
     Args:
-        path_root (pathlib.Path): The root path to generate local file paths.
+        path_root (pathlib.Path): The root path used to generate local file paths.
         path_id (pathlib.PurePosixPath): The path ID of the directory that will be seached recursively.
         server (remote.Server): The remote server to download resources.
         selector (Selector): A selector that defines the files to process.
@@ -584,7 +584,7 @@ class ProcessFilesRecursive(task.Task):
     Subdirectories are recursively searched as well.
 
     Args:
-        path_root (pathlib.Path): The root path to generate local file paths.
+        path_root (pathlib.Path): The root path used to generate local file paths.
         path_id (pathlib.PurePosixPath): The path ID of the directory that will be scanned recursively.
         server (remote.Server): The remote server used to download resources.
         selector (Selector): A selector that defines the files to process.

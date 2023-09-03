@@ -44,9 +44,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     install_requires=[
         "brotli>=1.0,<2",
-        "jsonschema-rs>=0.16",
-        "numpy>=1.24,<2",
-        "requests>=2.28,<3",
+        "jsonschema-rs>=0.17",
+        "numpy>=1.25,<2",
+        "requests>=2.31,<3",
         "toml>=0.10",
     ],
     classifiers=[

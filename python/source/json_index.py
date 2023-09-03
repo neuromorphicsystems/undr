@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import builtins
 import errno
 import functools
 import json
@@ -40,14 +39,14 @@ def load(path: pathlib.Path) -> dict[str, typing.Any]:
 
     Raises:
         InstallError: if the file does not exist.
-        [@DEV check type]: if validation fails.
+        jsonschema_rs.ValidationError: if validation fails.
 
     Returns:
         dict[str, typing.Any]: Parsed JSON file contents.
     """
 
     try:
-        with builtins.open(path) as index_data_file:
+        with open(path) as index_data_file:
             index_data = json.load(index_data_file)
         schema.validate(index_data)
         return index_data

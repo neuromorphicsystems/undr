@@ -58,7 +58,7 @@ if __name__ == "__main__":
                 priority=0,
             )
         for message in manager.messages():
-            if isinstance(message, undr.Exception):
+            if isinstance(message, undr.WorkerException):
                 raise message
             display.push(message)
             indexing_complete, status = indexes_statuses.push(message=message)

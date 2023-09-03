@@ -104,7 +104,7 @@ def progress_bar(width: int, progress: typing.Optional[tuple[float, float]]) -> 
 
 
 @dataclasses.dataclass
-class Value:
+class DisplayProgress:
     """Represents download or process progress."""
 
     initial_bytes: int
@@ -146,13 +146,13 @@ class Status:
     This number may increase as more index files are discovered while indexing.
     """
 
-    download: Value
+    download: DisplayProgress
     """Represents download progress.
 
     Ignored if the mode is :py:attr:`undr.install_mode.Mode.REMOTE`.
     """
 
-    process: Value
+    process: DisplayProgress
     """Represents process progress
 
     Ignored if the mode is :py:attr:`undr.install_mode.Mode.REMOTE` or :py:attr:`undr.install_mode.Mode.LOCAL`.
@@ -177,12 +177,12 @@ class Status:
             indexing=True,
             current_index_files=0,
             final_index_files=1,
-            download=Value(
+            download=DisplayProgress(
                 initial_bytes=0,
                 current_bytes=0,
                 final_bytes=0,
             ),
-            process=Value(
+            process=DisplayProgress(
                 initial_bytes=0,
                 current_bytes=0,
                 final_bytes=0,

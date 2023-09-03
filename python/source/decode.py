@@ -184,7 +184,7 @@ class BrotliCompression(Compression):
 
         def finish(self):
             if not self.decoder.is_finished():
-                raise Exception("the Brotli decoded expected more data")
+                raise Exception("the Brotli decoder expected more data")
             return super().finish()
 
     def decoder(self, word_size: int):
@@ -195,7 +195,7 @@ class DecompressFile(task.Task):
     """Decompresses a local file and writes decoded bytes to another local file.
 
     Args:
-        path_root (pathlib.Path): The root path to generate local file paths.
+        path_root (pathlib.Path): The root path used to generate local file paths.
         path_id (pathlib.PurePosixPath): The path ID of the file.
         compression (Compression): The format of the compressed file.
         expected_size (int): The size of the decompressed file in bytes, according to the index.

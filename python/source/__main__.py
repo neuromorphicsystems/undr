@@ -77,7 +77,7 @@ if __name__ == "__main__":
         "bibtex", help="Generate a BibTeX file referencing all the datasets"
     )
     bibtex_parser.add_argument(
-        "output", help="Path to output.bib or - to print to stdout"
+        "output", help="Path of the output file (for instance output.bib) or \"-\" to print to stdout"
     )
     add_common_arguments(bibtex_parser)
     doctor_parser = subparsers.add_parser(
@@ -89,7 +89,7 @@ if __name__ == "__main__":
         "check-conformance",
         help="Inspect a directory before uploading it to an UNDR server",
     )
-    check_conformance_parser.add_argument("path", help="Path to the local directory")
+    check_conformance_parser.add_argument("path", help="Path of the local directory")
     check_conformance_parser.add_argument(
         "--skip-format-index",
         "-s",
@@ -230,7 +230,7 @@ if __name__ == "__main__":
                     priority=0,
                 )
                 for message in manager.messages():
-                    if isinstance(message, task.Exception):
+                    if isinstance(message, task.WorkerException):
                         raise Exception(str(message.traceback_exception))
                     terminal_display.push(message)
                     indexing_complete, status = index_status.push(message=message)

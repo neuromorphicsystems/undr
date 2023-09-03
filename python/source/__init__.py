@@ -36,7 +36,7 @@ from .persist import ReadOnlyStore as ReadOnlyStore
 from .persist import Store as Store
 from .simple import default_datasets as default_datasets
 from .simple import install as install
-from .task import Exception as Exception
+from .task import WorkerException as WorkerException
 from .task import Manager as Manager
 from .task import ProcessManager as ProcessManager
 from .task import Task as Task

@@ -19,6 +19,7 @@ subprocess.check_call(
         "-r",
         str(dirname / "requirements.txt"),
     ],
+    cwd=dirname.parent,
 )
 
 shutil.rmtree(dirname / "_build", ignore_errors=True)
@@ -28,5 +29,6 @@ subprocess.check_call(
         str(dirname.parent / ".venv" / "bin" / "sphinx-build"),
         "documentation",
         str(dirname / "_build"),
-    ]
+    ],
+    cwd=dirname.parent,
 )

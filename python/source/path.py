@@ -59,7 +59,7 @@ class Path:
     """
 
     path_root: pathlib.Path
-    """Path to the root "datasets" directory used to generate local paths.
+    """Path of the root "datasets" directory used to generate local paths.
     """
 
     path_id: pathlib.PurePosixPath
@@ -85,7 +85,7 @@ class Path:
         This function always return a path, even if the local resource does not exist.
 
         Returns:
-            pathlib.Path: The path to the local resource.
+            pathlib.Path: The path of the local resource.
         """
         return self.path_root / self.path_id
 
@@ -216,10 +216,7 @@ class File(Path):
             Exception: if the hash is incorrect.
 
         Returns:
-            typing.Iterable[bytes]: @DEV how to document iterators?
-
-        Yields:
-            Iterator[typing.Iterable[bytes]]: @DEV how to document iterators?
+            typing.Iterable[bytes]: Iterator over the file's decompressed bytes.
         """
         assert word_size > 0
         if self.local_path.is_file():

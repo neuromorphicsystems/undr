@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 priority=0,
             )
         for message in manager.messages():
-            if isinstance(message, undr.Exception):
+            if isinstance(message, undr.WorkerException):
                 raise message
             if isinstance(message, undr.persist.Progress):
                 store.add(str(message.path_id))

@@ -12,31 +12,84 @@ import jsonschema_rs
 from . import constants
 
 
-def load_schema(name: str):
+def load_schema(name: str) -> jsonschema_rs.JSONSchema:
+    """Reads and parses a JSON schema bundled with UNDR.
+
+    Args:
+        name (str): Name of the schema.
+
+    Returns:
+        jsonschema_rs.JSONSchema: JSON schema validator.
+    """
     data = pkgutil.get_data("undr", name)
     assert data is not None
     return jsonschema_rs.JSONSchema(json.loads(data.decode()))
 
 
-def least_multiple_over_chunk_size(word_size: int):
-    return word_size * math.ceil(constants.CHUNK_SIZE / word_size)
+def least_multiple_over_chunk_size(word_size: int) -> int:
+    """Calculates the maximum number of bytes in a chunk that can be divided into full words.
+
+    For instance, for a chunks size of 100 bytes and a word size of 32 bytes, this function would return 96.
+
+    Args:
+        word_size (int): The word size in bytes. The chunk size is not a parameter since UNDR always uses :py:attr:`undr.constants.CHUNK_SIZE`.
+
+    Returns:
+        int: Maximum number of bytes in a chunk that can be divided into full words. This number is guaranteed to be a multiple of word_size. It may be zero.
+    """
+    return word_size * int(math.ceil(constants.CHUNK_SIZE / word_size))
 
 
 def path_with_suffix(path: pathlib.Path, suffix: str) -> pathlib.Path:
+    """Appends a suffix to a path and returns a new path.
+
+    Args:
+        path (pathlib.Path): Input path, not modified by this function.
+        suffix (str): The string to append to the path's last component.
+
+    Returns:
+        pathlib.Path: New path with the given suffix.
+    """
     return pathlib.Path(f"{path}{suffix}")
 
 
 def posix_path_with_suffix(
     path: pathlib.PurePosixPath, suffix: str
 ) -> pathlib.PurePosixPath:
+    """Appends a suffix to a POSIX path and returns a new path.
+
+    Similar to :py:func:`path_with_suffix` for POSIX paths.
+
+    Args:
+        path (pathlib.PurePosixPath): Input path, not modified by this function.
+        suffix (str): The string to append to the path's last component.
+
+    Returns:
+        pathlib.PurePosixPath: New path with the given suffix.
+    """
     return pathlib.PurePosixPath(f"{path}{suffix}")
 
 
 def new_hash() -> "hashlib._Hash":
+    """Creates a new byte hasher.
+
+    Returns:
+        hashlib._Hash: SHA3-224 (FIPS 202) hasher.
+    """
     return hashlib.sha3_224()
 
 
 def hash(chunks: typing.Iterable[bytes]) -> "hashlib._Hash":
+    """Consumes an iterable and calculates a hash.
+
+    Since this function consumes the hash, users should use :py:func:`new_hash` and call :py:meth:`hashlib._Hash.update` manually if they plan to do something else with the bytes.
+
+    Args:
+        chunks (typing.Iterable[bytes]): A bytes iterable.
+
+    Returns:
+        hashlib._Hash: SHA3-224 (FIPS 202) hasher. Use :py:meth:`hashlib._Hash.digest` or :py:meth:`hashlib._Hash.hexdigest` to read the hash value.
+    """
     hash_object = new_hash()
     for chunk in chunks:
         hash_object.update(chunk)
@@ -44,23 +97,28 @@ def hash(chunks: typing.Iterable[bytes]) -> "hashlib._Hash":
 
 
 def hash_file(path: pathlib.Path, chunk_size: int):
+    """Calculates a file's hash.
+
+    Args:
+        path (pathlib.Path): Path of the file to hash.
+        chunk_size (int): Chunk size in bytes, used to read the file.
+
+    Returns:
+        _type_: _description_
+    """
     with open(path, "rb") as input:
         return hash(iter(lambda: input.read(chunk_size), b""))
 
 
-def parse_size(size: str) -> int:
-    if size[-1] == "K":
-        return round(float(size[:-1]) * 1024)
-    if size[-1] == "M":
-        return round(float(size[:-1]) * (1024**2))
-    if size[-1] == "G":
-        return round(float(size[:-1]) * (1024**3))
-    if size[-1] == "T":
-        return round(float(size[:-1]) * (1024**4))
-    return round(float(size))
-
-
 def duration_to_string(duration: float) -> str:
+    """Generates a human-readable representation of a duration.
+
+    Args:
+        duration (float): Positive time delta in seconds.
+
+    Returns:
+        str: Human-redable representation.
+    """
     duration = round(duration)
     if duration < 180:
         return f'{"{:.0f}".format(duration)} s'
@@ -72,6 +130,14 @@ def duration_to_string(duration: float) -> str:
 
 
 def size_to_string(size: int) -> str:
+    """Generates a human-readable representation of a size.
+
+    Args:
+        size (float): Resource size in bytes.
+
+    Returns:
+        str: Human-redable representation.
+    """
     if size < 1000:
         return f'{"{:.0f}".format(size)} B'
     if size < 1000000:
@@ -84,6 +150,14 @@ def size_to_string(size: int) -> str:
 
 
 def speed_to_string(speed: int) -> str:
+    """Generates a human-readable representation of a speed.
+
+    Args:
+        speed (int): Download or process speed in bytes per second.
+
+    Returns:
+        str: Human-redable representation.
+    """
     if speed < 1000:
         return f'{"{:.0f}".format(speed)} B/s'
     if speed < 1000000:
@@ -93,48 +167,3 @@ def speed_to_string(speed: int) -> str:
     if speed < 1000000000000:
         return f'{"{:.2f}".format(speed / 1000000000)} GB/s'
     return f'{"{:.2f}".format(speed / 1000000000000)} TB/s'
-
-
-class InlineEncoder(json.JSONEncoder):
-    def __init__(
-        self, maximum_length: int, indent: int, *args: typing.Any, **kwargs: typing.Any
-    ):
-        super().__init__(*args, indent=indent, **kwargs)
-        self.inline_encoder = json.JSONEncoder(*args, indent=None, **kwargs)
-        self.maximum_length = maximum_length
-        self.prefix = ""
-        self.indent_level = 0
-
-    def encode(self, o: typing.Any):
-        inline = self.inline_encoder.encode(o)
-        if len(inline) <= self.maximum_length - len(self.prefix):
-            return inline
-        assert isinstance(self.indent, int)
-        if isinstance(o, (list, tuple)):
-            self.indent_level += 1
-            self.prefix = " " * (self.indent * self.indent_level)
-            items = tuple(
-                f"{self.prefix}{self.encode(item)}"
-                for item in typing.cast(list[typing.Any], o)
-            )
-            self.indent_level -= 1
-            self.prefix = " " * (self.indent * self.indent_level)
-            return "[\n{}\n{}]".format(",\n".join(items), self.prefix)
-        if isinstance(o, dict):
-            self.indent_level += 1
-            self.prefix = " " * (self.indent * self.indent_level)
-            entries: list[str] = []
-            for key, value in typing.cast(dict[str, typing.Any], o).items():
-                self.prefix = '{}"{}": '.format(
-                    " " * (self.indent * self.indent_level), key
-                )
-                entries.append(f"{self.prefix}{self.encode(value)}")
-            self.indent_level -= 1
-            self.prefix = " " * (self.indent * self.indent_level)
-            return "{{\n{}\n{}}}".format(",\n".join(entries), self.prefix)
-        return inline
-
-    def iterencode(
-        self, o: typing.Any, _one_shot: bool, **kwargs: typing.Any
-    ) -> typing.Iterator[str]:
-        yield self.encode(o)

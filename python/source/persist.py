@@ -23,7 +23,11 @@ class Progress:
 class ReadOnlyStore:
     """Stores the IDs of processed tasks.
 
-    This store provides a method to check whether a task has been performed but it cannot be modified. Users will probably prefer the writable :py:class:`Store`.
+    This store provides a method to check whether a task has been performed but it cannot be modified.
+    Most users will probably prefer the writable :py:class:`Store`.
+
+    Args:
+        path (typing.Union[str, os.PathLike]): Path of the SQLite database file with extension ".db".
     """
 
     def __init__(
@@ -60,8 +64,7 @@ class ReadOnlyStore:
         )
 
     def close(self):
-        """Closes the store's database.
-        """
+        """Closes the store's database."""
         self.cursor.close()
         self.connection.close()
 
@@ -96,13 +99,26 @@ class ReadOnlyStore:
 
 
 class Store(ReadOnlyStore):
+    """Stores the IDs of processed tasks.
+
+    Args:
+        path (typing.Union[str, os.PathLike]): Path of the SQLite database file with extension ".db".
+        commit_maximum_delay (float, optional): How often changes are commited to the disk, in seconds. Defaults to 0.1.
+        commit_maximum_inserts (int, optional): Maximum number of changes before commiting changes to the disk. Defaults to 100.
+    """
+
     class Reset:
+        """Message requesting a reset of the database (existing entries are dropped)."""
+
         pass
 
     class Commit:
+        """Message requesting a commit (changes are immediately persited to the disk)."""
+
         pass
 
     def target(self):
+        """Worker thread implementation."""
         thread_connection = sqlite3.connect(self.path)
         cursor = thread_connection.cursor()
         while self.running:
@@ -159,16 +175,26 @@ class Store(ReadOnlyStore):
         self.commit_barrier = threading.Barrier(2)
 
     def add(self, id: str):
+        """Adds a row to the database.
+
+        The action is ignored if the entry is already in the database.
+
+        Args:
+            id (str): Entry to store in the database.
+        """
         self.queue.append(id)
 
     def reset(self):
+        """Drops all entries from the database."""
         self.queue.append(Store.Reset())
 
     def commit(self):
+        """Immediately persists changes to the disk."""
         self.queue.append(Store.Commit())
         self.commit_barrier.wait()
 
     def close(self):
+        """Closes the store's database."""
         self.running = False
         self.thread.join()
         super().close()
