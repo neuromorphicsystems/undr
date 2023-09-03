@@ -1,3 +1,5 @@
+"""Binaary description of all formats using numpy dtypes."""
+
 from __future__ import annotations
 
 import numpy

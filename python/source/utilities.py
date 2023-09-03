@@ -1,3 +1,5 @@
+"""Data loading and number formatting functions."""
+
 from __future__ import annotations
 
 import hashlib

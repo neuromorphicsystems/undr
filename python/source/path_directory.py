@@ -1,3 +1,5 @@
+"""Local or remote directory."""
+
 from __future__ import annotations
 
 import dataclasses

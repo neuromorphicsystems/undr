@@ -1,3 +1,5 @@
+"""Implementation of operations based on index files (recursive download, recursive aaction dispatch...)."""
+
 from __future__ import annotations
 
 import dataclasses

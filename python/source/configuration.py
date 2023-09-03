@@ -1,3 +1,5 @@
+"""User-facing API to manipulate configuration files and trigger actions (download, decompress...)."""
+
 from __future__ import annotations
 
 import contextlib

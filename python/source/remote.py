@@ -1,3 +1,5 @@
+"""Low-level implementation of resource download."""
+
 from __future__ import annotations
 
 import dataclasses

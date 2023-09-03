@@ -1,3 +1,5 @@
+"""Constants used throughout the codebase."""
+
 CHUNK_SIZE: int = 65536
 """Buffer size in bytes for file reads."""
 

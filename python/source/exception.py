@@ -1,3 +1,8 @@
+"""Custom runtime exceptions.
+
+Direct calls to :py:class:`Exception` in other parts of the codebase indicate a logic error.
+"""
+
 import pathlib
 
 

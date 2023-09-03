@@ -1,3 +1,5 @@
+"""Implementation of datasets conformity tests (file structure, hashes, event coordinates...)."""
+
 from __future__ import annotations
 
 import collections

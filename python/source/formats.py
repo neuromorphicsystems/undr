@@ -1,3 +1,10 @@
+"""File formats supported by UNDR.
+
+File types that are not listed here can still be included, downloaded, decompressed, and checked with UNDR. However, they are listed as "other files" and UNDR does not attempt to parse or load them.
+
+To add a new file format, create and implement a derived class of :py:class:`undr.path.File` (see for instance :py:class:`ApsFile`) and add it to :py:func:`file_from_dict` and :py:class:`Switch`.
+"""
+
 from __future__ import annotations
 
 import dataclasses

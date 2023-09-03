@@ -2,9 +2,6 @@
 
 The functions in this module can be very convenient for one-off downloads and simple projects.
 Configuration files (undr.toml) are recommended for more complex projects.
-
-Returns:
-    _type_: _description_
 """
 
 from __future__ import annotations

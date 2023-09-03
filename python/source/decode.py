@@ -1,3 +1,8 @@
+"""Implementation of all supported compression formats.
+
+To add support for a new format, create and implement a derived class of :py:class:`Compression` (see for instance :py:class:`BrotliCompression`) and add it to :py:func:`compression_from_dict.`.
+"""
+
 from __future__ import annotations
 
 import dataclasses
