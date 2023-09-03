@@ -45,7 +45,7 @@ setuptools.setup(
     install_requires=[
         "brotli>=1.0,<2",
         "jsonschema-rs>=0.17",
-        "numpy>=1.25,<2",
+        "numpy>=1.22,<2",
         "requests>=2.31,<3",
         "toml>=0.10",
     ],
