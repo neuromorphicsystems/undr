@@ -5,11 +5,10 @@ import setuptools
 
 dirname = pathlib.Path(__file__).resolve().parent
 
-print("DEBUG sys.argv", sys.argv)
 if (
     not "-h" in sys.argv
     and not "--help" in sys.argv
-    and ("sdist" in sys.argv or "bdist_wheel" in sys.argv or "editable_wheel" in sys.argv)
+    and (dirname.parent / "specification" / "undr_schema.json").is_file()
 ):
     import shutil
 
