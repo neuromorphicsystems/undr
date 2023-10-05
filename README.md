@@ -165,8 +165,10 @@ Run `rmdsstore /path/to/dataset` before running `python3 -m undr check-conformit
 
 ### Download with existing CLI
 
+```sh
 wget --no-parent --recursive --level=inf http://localhost:5432/dvs09/
 find . -iname '\*.br' | while read filename; do brotli -d -j "$filename"; done;
+```
 
 ## Build documentation
 
