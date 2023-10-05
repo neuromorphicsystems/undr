@@ -19,7 +19,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: undr-sdist
-          path: dist/*.tar.gz
+          path: python/dist/*.tar.gz
   upload_pypi:
     name: Upload to PyPI
     runs-on: ubuntu-latest
