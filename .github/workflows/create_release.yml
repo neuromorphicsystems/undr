@@ -16,7 +16,7 @@ jobs:
           python-version: '3.11'
       - name: Release name
         id: release_name
-        run: printf "VALUE='v$(python scripts/version.py --maximum)'" >> $GITHUB_OUTPUT
+        run: printf "VALUE=$(python scripts/version.py --maximum)" >> $GITHUB_OUTPUT
       - name: Release body
         id: release_body
         run: |
