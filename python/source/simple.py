@@ -12,7 +12,10 @@ import pathlib
 import pkgutil
 import typing
 
-import toml
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 from . import configuration, constants, install_mode
 
@@ -33,7 +36,7 @@ def name_to_url() -> dict[str, str]:
     assert undr_default_bytes is not None
     return {
         dataset["name"]: dataset["url"]
-        for dataset in toml.loads(undr_default_bytes.decode())["datasets"]
+        for dataset in tomllib.loads(undr_default_bytes.decode())["datasets"]
     }
 
 

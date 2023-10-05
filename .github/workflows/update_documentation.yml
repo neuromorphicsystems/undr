@@ -17,8 +17,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install -r documentation/requirements.txt
-      - run: sphinx-build documentation documentation/_build
+      - run: python documentation/build.py
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}

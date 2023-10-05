@@ -46,7 +46,7 @@ setuptools.setup(
         "jsonschema-rs>=0.17",
         "numpy>=1.22,<2",
         "requests>=2.31,<3",
-        "toml>=0.10",
+        "tomli>=2.0.0; python_version<\"3.11\"",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

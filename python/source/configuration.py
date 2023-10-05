@@ -11,7 +11,11 @@ import pathlib
 import typing
 
 import requests
-import toml
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 from . import (bibtex, constants, display, formats, install_mode, json_index,
                json_index_tasks, path, path_directory, persist, remote, task,
@@ -724,8 +728,8 @@ def configuration_from_path(path: typing.Union[str, os.PathLike]) -> Configurati
         Configuration: the parsed TOML configuration.
     """
     path = pathlib.Path(path).resolve()
-    with open(path) as configuration_file:
-        configuration = toml.load(configuration_file)
+    with open(path, "rb") as configuration_file:
+        configuration = tomllib.load(configuration_file)
     schema.validate(configuration)
     names = set()
     for dataset in configuration["datasets"]:
