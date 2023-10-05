@@ -28,7 +28,7 @@ with open(dirname.parent / "app" / "src-tauri" / "Cargo.toml", "rb") as cargo_fi
     app_version_cargo = string_to_version(
         tomllib.load(cargo_file)["package"]["version"]
     )
-    if tomllib.load(cargo_file)["package"]["version"] != app_version:
+    if app_version_cargo != app_version:
         sys.stderr.write(
             f'mismatched versions in "app/src-tauri/tauri.conf.json" and "app/src-tauri/Cargo.toml" ({app_version} and {app_version_cargo})'
         )
