@@ -8,8 +8,17 @@ import pkgutil
 import sys
 import typing
 
-from . import (check, configuration, constants, display, formats, install_mode,
-               json_index_tasks, remote, task)
+from . import (
+    check,
+    configuration,
+    constants,
+    display,
+    formats,
+    install_mode,
+    json_index_tasks,
+    remote,
+    task,
+)
 
 dirname = pathlib.Path(__file__).resolve().parent
 
@@ -46,13 +55,13 @@ def add_common_arguments(parser: argparse.ArgumentParser):
     )
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description="Download UNDR datasets listed on a configuration file",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--log-directory", help="write log files to this directory")
-    subparsers = parser.add_subparsers(dest="command")
+    subparsers = parser.add_subparsers(dest="command", required=True)
     init_parser = subparsers.add_parser(
         "init", help="Generate a default undr.toml file"
     )
@@ -250,3 +259,7 @@ if __name__ == "__main__":
             print(display.format_info("No errors detected"))
         else:
             print(display.format_error(conformance_error))
+
+
+if __name__ == "__main__":
+    main()

@@ -17,9 +17,21 @@ try:
 except ModuleNotFoundError:
     import tomli as tomllib
 
-from . import (bibtex, constants, display, formats, install_mode, json_index,
-               json_index_tasks, path, path_directory, persist, remote, task,
-               utilities)
+from . import (
+    bibtex,
+    constants,
+    display,
+    formats,
+    install_mode,
+    json_index,
+    json_index_tasks,
+    path,
+    path_directory,
+    persist,
+    remote,
+    task,
+    utilities,
+)
 
 schema = utilities.load_schema("undr_schema.json")
 """JSON schema for TOML settings files."""
@@ -348,7 +360,7 @@ class Configuration:
             selector (json_index_tasks.Selector): The selector used to index the dataset.
 
         Returns:
-            IndexesStatuses: Index status for enaabled datasets, in the same order as the configuration file.
+            IndexesStatuses: Index status for enabled datasets, in the same order as the configuration file.
         """
         return IndexesStatuses(
             name_to_status={
@@ -722,7 +734,7 @@ def configuration_from_path(path: typing.Union[str, os.PathLike]) -> Configurati
         path (typing.Union[str, os.PathLike]): Configuration file path.
 
     Raises:
-        RuntimeError: if two datasets have the same name in the configuraation.
+        RuntimeError: if two datasets have the same name in the configuration.
 
     Returns:
         Configuration: the parsed TOML configuration.

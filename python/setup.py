@@ -46,7 +46,7 @@ setuptools.setup(
         "jsonschema-rs>=0.17",
         "numpy>=1.22,<2",
         "requests>=2.31,<3",
-        "tomli>=2.0.0; python_version<\"3.11\"",
+        'tomli>=2.0.0; python_version<"3.11"',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -55,4 +55,9 @@ setuptools.setup(
     ],
     packages=["undr"],
     package_data={"": ["*.json", "*.toml"]},
+    entry_points={
+        "console_scripts": [
+            "undr = undr.__main__:main",
+        ]
+    },
 )

@@ -1,4 +1,4 @@
-"""Implementation of operations based on index files (recursive download, recursive aaction dispatch...)."""
+"""Implementation of operations based on index files (recursive download, recursive action dispatch...)."""
 
 from __future__ import annotations
 
@@ -11,8 +11,17 @@ import typing
 
 import requests
 
-from . import (constants, decode, formats, json_index, path, path_directory,
-               remote, task, utilities)
+from . import (
+    constants,
+    decode,
+    formats,
+    json_index,
+    path,
+    path_directory,
+    remote,
+    task,
+    utilities,
+)
 
 
 @dataclasses.dataclass
@@ -384,7 +393,7 @@ class Index(remote.DownloadFile):
                             )
                             if (
                                 # in process mode, files are not persisted to the disk
-                                # data is downloaded (or read from the disk), decompressed if necessaary,
+                                # data is downloaded (or read from the disk), decompressed if necessary,
                                 # and processed in chunks
                                 # for simplicity, partially persisted downloads are ignored and re-downloaded from scratch
                                 action != Selector.Action.PROCESS
@@ -399,7 +408,7 @@ class Index(remote.DownloadFile):
 class InstallFilesRecursive(task.Task):
     """Downloads (and possibly decompresses) a directories' files recursively.
 
-    The actual action is controlledd by the selector aand may be different for different files. Child directories are installed recursively.
+    The actual action is controlled by the selector and may be different for different files. Child directories are installed recursively.
 
     Args:
         path_root (pathlib.Path): The root path used to generate local file paths.
