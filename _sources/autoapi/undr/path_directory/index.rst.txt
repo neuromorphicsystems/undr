@@ -1,0 +1,67 @@
+
+
+
+
+:py:mod:`undr.path_directory`
+=============================
+
+.. py:module:: undr.path_directory
+
+.. autoapi-nested-parse::
+   Local or remote directory.
+
+
+
+
+Overview
+--------
+Classes
+~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`Directory <undr.path_directory.Directory>`
+      - A file or directory in a dataset.
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: Directory
+
+
+   Bases: :py:obj:`undr.path.Path`
+
+   A file or directory in a dataset.
+
+   A path can point to a local resource or represent a remote resource.
+
+   .. py:attribute:: doi_and_metadata_loaded
+      :type: bool
+
+      
+
+   .. py:method:: __getattribute__(__name: str)
+
+      Return getattr(self, name).
+
+
+   .. py:method:: __truediv__(other: str) -> undr.path.Path
+
+      Concatenates this path with a string to create a new path.
+
+      :param other: Suffix to append to this path.
+      :type other: str
+
+      :returns: The concatenated result.
+      :rtype: Path
+
+
+   .. py:method:: iter(recursive: bool = False) -> Iterable[undr.path.Path]
+
+
+

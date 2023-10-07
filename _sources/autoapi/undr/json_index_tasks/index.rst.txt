@@ -1,0 +1,368 @@
+
+
+
+
+:py:mod:`undr.json_index_tasks`
+===============================
+
+.. py:module:: undr.json_index_tasks
+
+.. autoapi-nested-parse::
+   Implementation of operations based on index files (recursive download, recursive action dispatch...).
+
+
+
+
+Overview
+--------
+Classes
+~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`DirectoryScanned <undr.json_index_tasks.DirectoryScanned>`
+      - Reports information on a local directory.
+    * - :py:obj:`Doi <undr.json_index_tasks.Doi>`
+      - Message dispatched when a DOI is found in the index.
+    * - :py:obj:`Index <undr.json_index_tasks.Index>`
+      - Downloads an index file (-index.json).
+    * - :py:obj:`IndexLoaded <undr.json_index_tasks.IndexLoaded>`
+      - Message indicating that the given index file has been loaded.
+    * - :py:obj:`IndexProgress <undr.json_index_tasks.IndexProgress>`
+      - Represents download or process progress.
+    * - :py:obj:`InstallFilesRecursive <undr.json_index_tasks.InstallFilesRecursive>`
+      - Downloads (and possibly decompresses) a directories' files recursively.
+    * - :py:obj:`ProcessFile <undr.json_index_tasks.ProcessFile>`
+      - Generic task for file processing.
+    * - :py:obj:`ProcessFilesRecursive <undr.json_index_tasks.ProcessFilesRecursive>`
+      - Spawns a processing task for each file in the given directory.
+    * - :py:obj:`Selector <undr.json_index_tasks.Selector>`
+      - Delegate called to pick an action for each file.
+    * - :py:obj:`UncompressedDecodeProgress <undr.json_index_tasks.UncompressedDecodeProgress>`
+      - Dummy task that repoorts progress on "decompression" for uncompressed resources.
+
+
+
+Attributes
+~~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`ProcessFileType <undr.json_index_tasks.ProcessFileType>`
+      - Generic parameter representing the file type.
+
+
+Module Contents
+---------------
+
+.. py:class:: DirectoryScanned
+
+
+   Reports information on a local directory.
+
+   .. py:attribute:: download_bytes
+      :type: IndexProgress
+
+      Total size of the compressed files in this directory, in bytes.
+
+      This size does not include -index.json.
+
+   .. py:attribute:: final_count
+      :type: int
+
+      Total number of files in this directory ("files" and "other_files").
+
+      This count does not include -index.json.
+
+   .. py:attribute:: index_bytes
+      :type: IndexProgress
+
+      Size of the index file (-index.json) in bytes.
+
+   .. py:attribute:: initial_download_count
+      :type: int
+
+      Number of files already downloaded when the action started ("files" and "other_files").
+
+      This count does not include -index.json.
+
+   .. py:attribute:: initial_process_count
+      :type: int
+
+      Number of files already processed when the action started ("files" and "other_files").
+
+      This count does not include -index.json.
+
+   .. py:attribute:: path_id
+      :type: pathlib.PurePosixPath
+
+      Path ID of the directory.
+
+   .. py:attribute:: process_bytes
+      :type: IndexProgress
+
+      Total size of the files in this directory, in bytes.
+
+      This size does not include -index.json.
+
+
+.. py:class:: Doi
+
+
+   Message dispatched when a DOI is found in the index.
+
+   .. py:attribute:: path_id
+      :type: pathlib.PurePosixPath
+
+      Path ID of the associated resource.
+
+   .. py:attribute:: value
+      :type: str
+
+      Digital object identifier (DOI) string starting with ``10.``.
+
+
+.. py:class:: Index(path_root: pathlib.Path, path_id: pathlib.PurePosixPath, server: undr.remote.Server, selector: Selector, priority: int, force: bool, directory_doi: bool)
+
+
+   Bases: :py:obj:`undr.remote.DownloadFile`
+
+   Downloads an index file (-index.json).
+
+   :param path_root: The root path used to generate local file paths.
+   :type path_root: pathlib.Path
+   :param path_id: The path ID of the directory that will be seached recursively.
+   :type path_id: pathlib.PurePosixPath
+   :param server: The remote server to download resources.
+   :type server: remote.Server
+   :param selector: A selector that defines the files to process.
+   :type selector: Selector
+   :param priority: Priority of this task (tasks with lower priorities are scheduled first).
+   :type priority: int
+   :param force: Download the index file even if it is already present locally.
+   :type force: bool
+   :param directory_doi: Whether to dispatch :py:class:`Doi` messages while reading the index.
+   :type directory_doi: bool
+
+   .. py:method:: run(session: requests.Session, manager: undr.task.Manager)
+
+
+
+.. py:class:: IndexLoaded
+
+
+   Message indicating that the given index file has been loaded.
+
+   .. py:attribute:: children
+      :type: int
+
+      Number of subdirectories that will subsequently be loaded.
+
+   .. py:attribute:: path_id
+      :type: pathlib.PurePosixPath
+
+      Path ID of the directory whose index has been loaded.
+
+
+.. py:class:: IndexProgress
+
+
+   Represents download or process progress.
+
+   .. py:attribute:: final
+      :type: int
+
+      Total number of bytes to download or process.
+
+   .. py:attribute:: initial
+      :type: int
+
+      Number of bytes already downloaded or processed when the action started.
+
+
+.. py:class:: InstallFilesRecursive(path_root: pathlib.Path, path_id: pathlib.PurePosixPath, server: undr.remote.Server, selector: Selector, priority: int, force: bool)
+
+
+   Bases: :py:obj:`undr.task.Task`
+
+   Downloads (and possibly decompresses) a directories' files recursively.
+
+   The actual action is controlled by the selector and may be different for different files. Child directories are installed recursively.
+
+   :param path_root: The root path used to generate local file paths.
+   :type path_root: pathlib.Path
+   :param path_id: The path ID of the directory that will be seached recursively.
+   :type path_id: pathlib.PurePosixPath
+   :param server: The remote server to download resources.
+   :type server: remote.Server
+   :param selector: A selector that defines the files to process.
+   :type selector: Selector
+   :param priority: Priority of this task (tasks with lower priorities are scheduled first).
+   :type priority: int
+   :param force: Download files even if they already present locally.
+   :type force: bool
+
+   .. py:method:: run(session: requests.Session, manager: undr.task.Manager)
+
+
+
+.. py:class:: ProcessFile(file: undr.path.File)
+
+
+   Bases: :py:obj:`undr.task.Task`
+
+   Generic task for file processing.
+
+   :param file: The file (remote or local) to process.
+   :type file: path.File
+
+
+.. py:data:: ProcessFileType
+
+   Generic parameter representing the file type.
+
+   Used by :py:class:`ProcessFilesRecursive`.
+
+.. py:class:: ProcessFilesRecursive(path_root: pathlib.Path, path_id: pathlib.PurePosixPath, server: undr.remote.Server, selector: Selector, process_file_class: Type[ProcessFileType], process_file_args: Iterable[Any], process_file_kwargs: Mapping[str, Any], priority: int)
+
+
+   Bases: :py:obj:`undr.task.Task`
+
+   Spawns a processing task for each file in the given directory.
+
+   Subdirectories are recursively searched as well.
+
+   :param path_root: The root path used to generate local file paths.
+   :type path_root: pathlib.Path
+   :param path_id: The path ID of the directory that will be scanned recursively.
+   :type path_id: pathlib.PurePosixPath
+   :param server: The remote server used to download resources.
+   :type server: remote.Server
+   :param selector: A selector that defines the files to process.
+   :type selector: Selector
+   :param process_file_class: The class of the task to run on each selected file. Must be a subclass of :py:class:`ProcessFile`.
+   :type process_file_class: typing.Type[ProcessFileType]
+   :param process_file_args: Positional arguments passed to the constructor of `process_file_class`.
+   :type process_file_args: typing.Iterable[typing.Any]
+   :param process_file_kwargs: Keyword arguments passed to the constructor of `process_file_class`. The keyword argument `file` is automatically added by `ProcessFilesRecursive` after the positional arguments and before other keyword arguments.
+   :type process_file_kwargs: typing.Mapping[str, typing.Any]
+   :param priority: Priority of this task and all recursively created tasks (tasks with lower priorities are scheduled first).
+   :type priority: int
+
+   .. py:method:: run(session: requests.Session, manager: undr.task.Manager) -> None
+
+
+
+.. py:class:: Selector
+
+
+   Delegate called to pick an action for each file.
+
+   Selectors are used during the indexing phase to calculate the number of bytes to download and/or process,
+   and during the processing phase to choose the action to perform.
+
+   .. py:class:: Action(*args, **kwds)
+
+
+      Bases: :py:obj:`enum.Enum`
+
+      Specifies the operation to perform for a given file.
+
+      The action also determines whether the file's bytes should be
+      accounted for during the indexing phase.
+      This is useful to report non-zero progress after resuming a job,
+      but skip the actual processing.
+
+      .. py:attribute:: DECOMPRESS
+         :value: 5
+
+         Downloads, decompresses, and reports.
+
+      .. py:attribute:: DOI
+         :value: 1
+
+         Skips this file, does not report it, but publishes own DOIs.
+
+      .. py:attribute:: DOWNLOAD
+         :value: 4
+
+         Downloads and reports.
+
+      .. py:attribute:: DOWNLOAD_SKIP
+         :value: 3
+
+         Skips operations on this file but reports it as downloaded.
+
+      .. py:attribute:: IGNORE
+         :value: 0
+
+         Skips this file and does not report it.
+
+      .. py:attribute:: PROCESS
+         :value: 6
+
+         Downloads, decompresses, processes, and reports.
+
+      .. py:attribute:: SKIP
+         :value: 2
+
+         Skips this file but reports it as downloaded and processed.
+
+
+   .. py:attribute:: INSTALL_IGNORE_ACTIONS
+
+      The set of actions that ignore the file for reporting purposes.
+
+   .. py:attribute:: REPORT_DOWNLOAD_ACTIONS
+
+      The set of actions that (at least) download the file.
+
+   .. py:attribute:: REPORT_PROCESS_ACTIONS
+
+      The set of actions that download and process the file.
+
+   .. py:attribute:: SKIP_ACTIONS
+
+      The set of actions that skip all operations on the file.
+
+   .. py:method:: action(file: undr.path.File) -> Selector
+
+      Returns the action to apply to the given file.
+
+      Called by :py:class:`Index`, :py:class:`InstallFilesRecursive` and :py:class:`ProcessFilesRecursive`.
+      The default implementation returns `Selector.Action.PROCESS`.
+
+
+   .. py:method:: scan_filesystem(directory: undr.path_directory.Directory) -> bool
+
+      Whether to scan the filesystem.
+
+      Called by :py:class:`Index` to decide whether it needs to scan the file system.
+      This function may return False if :py:func:`action` returns one of the following for every file in the directory:
+
+      - :py:attr:`Selector.Action.IGNORE`
+      - :py:attr:`Selector.Action.DOI`
+      - :py:attr:`Selector.Action.SKIP`
+      - :py:attr:`Selector.Action.DOWNLOAD_SKIP`
+
+
+
+.. py:class:: UncompressedDecodeProgress(path_id: pathlib.PurePosixPath, size: int)
+
+
+   Bases: :py:obj:`undr.task.Task`
+
+   Dummy task that repoorts progress on "decompression" for uncompressed resources.
+
+   Resources that are not compressed are directly downloaded in raw format.
+   The conversion from "local" to "raw" (decompression) requires no further action for such resources.
+   This action dispatches decompression progress as if they were compressed, to simplify the architecture of progress trackers.
+
+   .. py:method:: run(session: requests.Session, manager: undr.task.Manager)
+
+
+

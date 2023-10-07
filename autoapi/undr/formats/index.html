@@ -1,0 +1,635 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="undr.install_mode" href="../install_mode/index.html" /><link rel="prev" title="undr.exception" href="../exception/index.html" />
+
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>undr.formats - UNDR documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=4a2923de" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">UNDR  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">UNDR  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of undr</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../bibtex/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.bibtex</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../check/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.check</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.configuration</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../constants/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.constants</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decode/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.decode</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../display/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.display</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exception/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.exception</span></code></a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.formats</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install_mode/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.install_mode</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../json_index/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.json_index</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../json_index_tasks/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.json_index_tasks</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../path/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.path</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../path_directory/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.path_directory</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../persist/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.persist</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../raw/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.raw</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../remote/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.remote</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../simple/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.simple</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../task/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.task</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.utilities</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../version/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.version</span></code></a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/neuromorphicsystems/undr">GitHub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pypi.org/project/undr/">PyPI</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://crates.io/crates/undr">crates.io</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-undr.formats">
+<span id="undr-formats"></span><h1><a class="reference internal" href="#module-undr.formats" title="undr.formats"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.formats</span></code></a><a class="headerlink" href="#module-undr.formats" title="Link to this heading">#</a></h1>
+<p>File formats supported by UNDR.</p>
+<p>File types that are not listed here can still be included, downloaded, decompressed, and checked with UNDR. However, they are listed as “other files” and UNDR does not attempt to parse or load them.</p>
+<p>To add a new file format, create and implement a derived class of <a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">undr.path.File</span></code></a> (see for instance <a class="reference internal" href="#undr.formats.ApsFile" title="undr.formats.ApsFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApsFile</span></code></a>) and add it to <a class="reference internal" href="#undr.formats.file_from_dict" title="undr.formats.file_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">file_from_dict()</span></code></a> and <a class="reference internal" href="#undr.formats.Switch" title="undr.formats.Switch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Switch</span></code></a>.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading">#</a></h3>
+<div class="table-wrapper colwidths-auto autoapi-summary docutils container">
+<table class="autoapi-summary docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#undr.formats.ApsFile" title="undr.formats.ApsFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ApsFile</span></code></a></p></td>
+<td><p>A file that contains luminance (grey levels) frames.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#undr.formats.DvsFile" title="undr.formats.DvsFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DvsFile</span></code></a></p></td>
+<td><p>A file that contains DVS (polarity) events.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#undr.formats.ImuFile" title="undr.formats.ImuFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImuFile</span></code></a></p></td>
+<td><p>A file that contains IMU events.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#undr.formats.Switch" title="undr.formats.Switch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Switch</span></code></a></p></td>
+<td><p>Calls specialized file handlers while iterating a dataset.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h3>
+<div class="table-wrapper colwidths-auto autoapi-summary docutils container">
+<table class="autoapi-summary docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#undr.formats.file_from_dict" title="undr.formats.file_from_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">file_from_dict</span></code></a></p></td>
+<td><p>Creates a file object from a dictionary, typically loaded from an index file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">#</a></h3>
+<div class="table-wrapper colwidths-auto autoapi-summary docutils container">
+<table class="autoapi-summary docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#undr.formats.SendMessage" title="undr.formats.SendMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SendMessage</span></code></a></p></td>
+<td><p>Callback channel for messages generated by a file handler during data iteration.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.formats.ApsFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.formats.</span></span><span class="sig-name descname"><span class="pre">ApsFile</span></span><a class="headerlink" href="#undr.formats.ApsFile" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undr.path.File</span></code></a></p>
+<p>A file that contains luminance (grey levels) frames.</p>
+<p>Active-pixel sensors (APS) describe, strictly speaking, any sensor with pixels that use MOSFET amplifiers.
+However, the term is commonly used to refer to the integrating pixels found in non-CCD conventional cameras.
+In the context of Neuromorphic Engineering, APS is used to describe DAVIS frames.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.formats.ApsFile.height">
+<span class="sig-name descname"><span class="pre">height</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#undr.formats.ApsFile.height" title="Link to this definition">#</a></dt>
+<dd><p>Frame height (y direction) in pixels.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.formats.ApsFile.width">
+<span class="sig-name descname"><span class="pre">width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#undr.formats.ApsFile.width" title="Link to this definition">#</a></dt>
+<dd><p>Frame width (x direction) in pixels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.formats.ApsFile.packets">
+<span class="sig-name descname"><span class="pre">packets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#undr.formats.ApsFile.packets" title="Link to this definition">#</a></dt>
+<dd><p>Iterates over the file data.</p>
+<p>This function streams the file from the remote server if it is not available locally, and decompresses the file in memory if it is locally available but compressed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Iterator over the file’s data converted into numpy arrays with dtype <a class="reference internal" href="../raw/index.html#undr.raw.aps_dtype" title="undr.raw.aps_dtype"><code class="xref py py-func docutils literal notranslate"><span class="pre">undr.raw.aps_dtype()</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.12)"><em>Iterable</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)">numpy.ndarray</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.formats.ApsFile.word_size">
+<span class="sig-name descname"><span class="pre">word_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#undr.formats.ApsFile.word_size" title="Link to this definition">#</a></dt>
+<dd><p>The size of an entry in this file, in bytes.</p>
+<p>This can be used to ensure that entries (events, frames…) are not split while reading.
+A decoded file’s size in bytes must be a multiple of the value returned by this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of bytes used by each entry.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.formats.DvsFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.formats.</span></span><span class="sig-name descname"><span class="pre">DvsFile</span></span><a class="headerlink" href="#undr.formats.DvsFile" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undr.path.File</span></code></a></p>
+<p>A file that contains DVS (polarity) events.</p>
+<p>Dynamic Vision Sensor events, often called polarity events,
+contain a timestamp, pixel coordinates, and a polarity (ON or OFF)
+that indicates whether luminance increased or decreased.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.formats.DvsFile.height">
+<span class="sig-name descname"><span class="pre">height</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#undr.formats.DvsFile.height" title="Link to this definition">#</a></dt>
+<dd><p>Frame height (y direction) in pixels.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.formats.DvsFile.width">
+<span class="sig-name descname"><span class="pre">width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#undr.formats.DvsFile.width" title="Link to this definition">#</a></dt>
+<dd><p>Frame width (x direction) in pixels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.formats.DvsFile.packets">
+<span class="sig-name descname"><span class="pre">packets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#undr.formats.DvsFile.packets" title="Link to this definition">#</a></dt>
+<dd><p>Iterates over the file data.</p>
+<p>This function streams the file from the remote server if it is not available locally, and decompresses the file in memory if it is locally available but compressed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Iterator over the file’s data converted into numpy arrays with dtype <a class="reference internal" href="../raw/index.html#undr.raw.DVS_DTYPE" title="undr.raw.DVS_DTYPE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">undr.raw.DVS_DTYPE</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.12)"><em>Iterable</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)">numpy.ndarray</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.formats.DvsFile.word_size">
+<span class="sig-name descname"><span class="pre">word_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#undr.formats.DvsFile.word_size" title="Link to this definition">#</a></dt>
+<dd><p>The size of an entry in this file, in bytes.</p>
+<p>This can be used to ensure that entries (events, frames…) are not split while reading.
+A decoded file’s size in bytes must be a multiple of the value returned by this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of bytes used by each entry.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.formats.ImuFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.formats.</span></span><span class="sig-name descname"><span class="pre">ImuFile</span></span><a class="headerlink" href="#undr.formats.ImuFile" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undr.path.File</span></code></a></p>
+<p>A file that contains IMU events.</p>
+<p>Inertial Measurement Unit (IMU) events are produced by an accelerometer / gyroscope / magnetometer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.formats.ImuFile.packets">
+<span class="sig-name descname"><span class="pre">packets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#undr.formats.ImuFile.packets" title="Link to this definition">#</a></dt>
+<dd><p>Iterates over the file data.</p>
+<p>This function streams the file from the remote server if it is not available locally, and decompresses the file in memory if it is locally available but compressed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Iterator over the file’s data converted into numpy arrays with dtype <a class="reference internal" href="../raw/index.html#undr.raw.IMU_DTYPE" title="undr.raw.IMU_DTYPE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">undr.raw.IMU_DTYPE</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.12)"><em>Iterable</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)">numpy.ndarray</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.formats.ImuFile.word_size">
+<span class="sig-name descname"><span class="pre">word_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#undr.formats.ImuFile.word_size" title="Link to this definition">#</a></dt>
+<dd><p>The size of an entry in this file, in bytes.</p>
+<p>This can be used to ensure that entries (events, frames…) are not split while reading.
+A decoded file’s size in bytes must be a multiple of the value returned by this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of bytes used by each entry.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="undr.formats.SendMessage">
+<span class="sig-prename descclassname"><span class="pre">undr.formats.</span></span><span class="sig-name descname"><span class="pre">SendMessage</span></span><a class="headerlink" href="#undr.formats.SendMessage" title="Link to this definition">#</a></dt>
+<dd><p>Callback channel for messages generated by a file handler during data iteration.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.formats.Switch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.formats.</span></span><span class="sig-name descname"><span class="pre">Switch</span></span><a class="headerlink" href="#undr.formats.Switch" title="Link to this definition">#</a></dt>
+<dd><p>Calls specialized file handlers while iterating a dataset.</p>
+<p>If a handler is None, the corresponding files are ignored by the iterator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle_aps</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><em>Optional</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference internal" href="#undr.formats.ApsFile" title="undr.formats.ApsFile"><em>ApsFile</em></a><em>, </em><em>SendMessage</em><em>]</em><em>, </em><em>None</em><em>]</em><em>]</em>) – Handler for APS files.</p></li>
+<li><p><strong>handle_dvs</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><em>Optional</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference internal" href="#undr.formats.DvsFile" title="undr.formats.DvsFile"><em>DvsFile</em></a><em>, </em><em>SendMessage</em><em>]</em><em>, </em><em>None</em><em>]</em><em>]</em>) – Handler for DVS files.</p></li>
+<li><p><strong>handle_imu</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><em>Optional</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference internal" href="#undr.formats.ImuFile" title="undr.formats.ImuFile"><em>ImuFile</em></a><em>, </em><em>SendMessage</em><em>]</em><em>, </em><em>None</em><em>]</em><em>]</em>) – Handler for IMU files.</p></li>
+<li><p><strong>handle_other</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><em>Optional</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><em>path.File</em></a><em>, </em><em>SendMessage</em><em>]</em><em>, </em><em>None</em><em>]</em><em>]</em>) – Handler for other files.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.formats.Switch.handle_aps">
+<span class="sig-name descname"><span class="pre">handle_aps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#undr.formats.ApsFile" title="undr.formats.ApsFile"><span class="pre">ApsFile</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">SendMessage</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="headerlink" href="#undr.formats.Switch.handle_aps" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.formats.Switch.handle_dvs">
+<span class="sig-name descname"><span class="pre">handle_dvs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#undr.formats.DvsFile" title="undr.formats.DvsFile"><span class="pre">DvsFile</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">SendMessage</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="headerlink" href="#undr.formats.Switch.handle_dvs" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.formats.Switch.handle_imu">
+<span class="sig-name descname"><span class="pre">handle_imu</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#undr.formats.ImuFile" title="undr.formats.ImuFile"><span class="pre">ImuFile</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">SendMessage</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="headerlink" href="#undr.formats.Switch.handle_imu" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.formats.Switch.handle_other">
+<span class="sig-name descname"><span class="pre">handle_other</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><span class="pre">undr.path.File</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">SendMessage</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="headerlink" href="#undr.formats.Switch.handle_other" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.formats.Switch.enabled_types">
+<span class="sig-name descname"><span class="pre">enabled_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.12)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#undr.formats.Switch.enabled_types" title="Link to this definition">#</a></dt>
+<dd><p>Lists the file types that have a non-None handler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The set of file classes that will be handled.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.12)">set</a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><em>Any</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.formats.Switch.handle_file">
+<span class="sig-name descname"><span class="pre">handle_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><span class="pre">undr.path.File</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">send_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SendMessage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#undr.formats.Switch.handle_file" title="Link to this definition">#</a></dt>
+<dd><p>Calls the specialized file handler for the file, if the handler is non-None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> (<a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><em>path.File</em></a>) – The file to process.</p></li>
+<li><p><strong>send_message</strong> (<em>SendMessage</em>) – Callback channel for messages.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.12)"><strong>RuntimeError</strong></a> – if the file type is not supported by this function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="undr.formats.file_from_dict">
+<span class="sig-prename descclassname"><span class="pre">undr.formats.</span></span><span class="sig-name descname"><span class="pre">file_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../path_directory/index.html#undr.path_directory.Directory" title="undr.path_directory.Directory"><span class="pre">undr.path_directory.Directory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><span class="pre">undr.path.File</span></a></span></span><a class="headerlink" href="#undr.formats.file_from_dict" title="Link to this definition">#</a></dt>
+<dd><p>Creates a file object from a dictionary, typically loaded from an index file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><em>Any</em></a><em>]</em>) – Dictionary describing the file and its properties.</p></li>
+<li><p><strong>parent</strong> (<a class="reference internal" href="../path_directory/index.html#undr.path_directory.Directory" title="undr.path_directory.Directory"><em>path_directory.Directory</em></a>) – Parent directory of the file, used to generate the file system path.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.12)"><strong>RuntimeError</strong></a> – if the file type is not supported by this function.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A specialized file object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File">path.File</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../install_mode/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.install_mode</span></code></div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../exception/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.exception</span></code></div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; Alexandre Marcireau, ICNS
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.formats</span></code></a><ul>
+<li><a class="reference internal" href="#overview">Overview</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#undr.formats.ApsFile"><code class="docutils literal notranslate"><span class="pre">ApsFile</span></code></a><ul>
+<li><a class="reference internal" href="#undr.formats.ApsFile.height"><code class="docutils literal notranslate"><span class="pre">ApsFile.height</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.ApsFile.width"><code class="docutils literal notranslate"><span class="pre">ApsFile.width</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.ApsFile.packets"><code class="docutils literal notranslate"><span class="pre">ApsFile.packets()</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.ApsFile.word_size"><code class="docutils literal notranslate"><span class="pre">ApsFile.word_size()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.formats.DvsFile"><code class="docutils literal notranslate"><span class="pre">DvsFile</span></code></a><ul>
+<li><a class="reference internal" href="#undr.formats.DvsFile.height"><code class="docutils literal notranslate"><span class="pre">DvsFile.height</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.DvsFile.width"><code class="docutils literal notranslate"><span class="pre">DvsFile.width</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.DvsFile.packets"><code class="docutils literal notranslate"><span class="pre">DvsFile.packets()</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.DvsFile.word_size"><code class="docutils literal notranslate"><span class="pre">DvsFile.word_size()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.formats.ImuFile"><code class="docutils literal notranslate"><span class="pre">ImuFile</span></code></a><ul>
+<li><a class="reference internal" href="#undr.formats.ImuFile.packets"><code class="docutils literal notranslate"><span class="pre">ImuFile.packets()</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.ImuFile.word_size"><code class="docutils literal notranslate"><span class="pre">ImuFile.word_size()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.formats.SendMessage"><code class="docutils literal notranslate"><span class="pre">SendMessage</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.Switch"><code class="docutils literal notranslate"><span class="pre">Switch</span></code></a><ul>
+<li><a class="reference internal" href="#undr.formats.Switch.handle_aps"><code class="docutils literal notranslate"><span class="pre">Switch.handle_aps</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.Switch.handle_dvs"><code class="docutils literal notranslate"><span class="pre">Switch.handle_dvs</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.Switch.handle_imu"><code class="docutils literal notranslate"><span class="pre">Switch.handle_imu</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.Switch.handle_other"><code class="docutils literal notranslate"><span class="pre">Switch.handle_other</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.Switch.enabled_types"><code class="docutils literal notranslate"><span class="pre">Switch.enabled_types()</span></code></a></li>
+<li><a class="reference internal" href="#undr.formats.Switch.handle_file"><code class="docutils literal notranslate"><span class="pre">Switch.handle_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.formats.file_from_dict"><code class="docutils literal notranslate"><span class="pre">file_from_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
+    </body>
+</html>

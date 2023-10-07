@@ -1,0 +1,184 @@
+
+
+
+
+:py:mod:`undr.check`
+====================
+
+.. py:module:: undr.check
+
+.. autoapi-nested-parse::
+   Implementation of datasets conformity tests (file structure, hashes, event coordinates...).
+
+
+
+
+Overview
+--------
+Classes
+~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`CheckFile <undr.check.CheckFile>`
+      - Uses a switch to process files and wraps messages into :py:class:`undr.check.Error`.
+    * - :py:obj:`CheckLocalDirectoryRecursive <undr.check.CheckLocalDirectoryRecursive>`
+      - Dispatches check actions to validate the invariants of local files.
+    * - :py:obj:`Error <undr.check.Error>`
+      - Reports invariant violations while checking data files.
+
+
+Functions
+~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`format_index_recursive <undr.check.format_index_recursive>`
+      - Validates the given index and formats its content.
+    * - :py:obj:`handle_aps <undr.check.handle_aps>`
+      - Checks the invariants of an APS file.
+    * - :py:obj:`handle_directory <undr.check.handle_directory>`
+      - Checks that system files are listed in the index, and vice-versa.
+    * - :py:obj:`handle_dvs <undr.check.handle_dvs>`
+      - Checks the invariants of a DVS file.
+    * - :py:obj:`handle_imu <undr.check.handle_imu>`
+      - Checks the invariants of an IMU file.
+    * - :py:obj:`handle_other <undr.check.handle_other>`
+      - Checks the invariants of an "other" file.
+    * - :py:obj:`structure_recursive <undr.check.structure_recursive>`
+      - Rexucrively checks that the given path exists and that it has an UNDR structure (-index.json).
+
+
+
+Module Contents
+---------------
+
+.. py:class:: CheckFile(file: undr.path.File, switch: undr.formats.Switch)
+
+
+   Bases: :py:obj:`undr.json_index_tasks.ProcessFile`
+
+   Uses a switch to process files and wraps messages into :py:class:`undr.check.Error`.
+
+   :param file: The file to process.
+   :type file: path.File
+   :param switch: Switch that maps file types to actions.
+   :type switch: formats.Switch
+
+   .. py:method:: run(session: requests.Session, manager: undr.task.Manager)
+
+
+
+.. py:class:: CheckLocalDirectoryRecursive(path_root: pathlib.Path, path_id: pathlib.PurePosixPath, priority: int)
+
+
+   Bases: :py:obj:`undr.task.Task`
+
+   Dispatches check actions to validate the invariants of local files.
+
+   This can be used to make sure that a dataset has been properly downloaded or to check files before uploading a dataset to a server.
+
+   :param path_root: The root path used to generate local file paths.
+   :type path_root: pathlib.Path
+   :param path_id: The path ID of the directory that will be scanned recursively.
+   :type path_id: pathlib.PurePosixPath
+   :param priority: Priority of this task and all recursively created tasks (tasks with lower priorities are scheduled first).
+   :type priority: int
+
+   .. py:method:: run(session: requests.Session, manager: undr.task.Manager)
+
+
+
+.. py:class:: Error
+
+
+   Reports invariant violations while checking data files.
+
+   .. py:attribute:: message
+      :type: str
+
+      Description of the problem.
+
+   .. py:attribute:: path_id
+      :type: pathlib.PurePosixPath
+
+      Identifier of the problematic resource.
+
+
+.. py:function:: format_index_recursive(path: pathlib.Path, handle_path: Callable[[pathlib.Path], None])
+
+   Validates the given index and formats its content.
+
+   :param path: Path of the index's parent directory.
+   :type path: pathlib.Path
+   :param handle_path: Called if the index was reformatted.
+   :type handle_path: typing.Callable[[pathlib.Path], None]
+
+
+.. py:function:: handle_aps(file: undr.formats.ApsFile, send_message: undr.formats.SendMessage)
+
+   Checks the invariants of an APS file.
+
+   :param file: The file to check.
+   :type file: formats.ApsFile
+   :param send_message: Callback channel for errors.
+   :type send_message: formats.SendMessage
+
+
+.. py:function:: handle_directory(directory: undr.path_directory.Directory, send_message: undr.formats.SendMessage)
+
+   Checks that system files are listed in the index, and vice-versa.
+
+   :param directory: The directory to check.
+   :type directory: path_directory.Directory
+   :param send_message: Callback channel for errors.
+   :type send_message: formats.SendMessage
+
+
+.. py:function:: handle_dvs(file: undr.formats.DvsFile, send_message: undr.formats.SendMessage)
+
+   Checks the invariants of a DVS file.
+
+   :param file: The file to check.
+   :type file: formats.DvsFile
+   :param send_message: Callback channel for errors.
+   :type send_message: formats.SendMessage
+
+
+.. py:function:: handle_imu(file: undr.formats.ImuFile, send_message: undr.formats.SendMessage)
+
+   Checks the invariants of an IMU file.
+
+   :param file: The file to check.
+   :type file: formats.ImuFile
+   :param send_message: Callback channel for errors.
+   :type send_message: formats.SendMessage
+
+
+.. py:function:: handle_other(file: undr.path.File, send_message: undr.formats.SendMessage)
+
+   Checks the invariants of an "other" file.
+
+   This function simply consumes the file bytes.
+   This guarantees that the file can be read and that the index contains the right hash and number of bytes.
+
+   :param file: The file to check.
+   :type file: formats.ImuFile
+   :param send_message: Callback channel for errors.
+   :type send_message: formats.SendMessage
+
+
+.. py:function:: structure_recursive(path: pathlib.Path)
+
+   Rexucrively checks that the given path exists and that it has an UNDR structure (-index.json).
+
+   :param path: The local file path to check.
+   :type path: pathlib.Path
+
+   :raises RuntimeError: if the path is not a directory or does not contain a -index.json file.
+
+

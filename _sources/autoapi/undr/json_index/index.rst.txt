@@ -1,0 +1,79 @@
+
+
+
+
+:py:mod:`undr.json_index`
+=========================
+
+.. py:module:: undr.json_index
+
+.. autoapi-nested-parse::
+   Basic index files parsing.
+
+
+
+
+Overview
+--------
+
+Functions
+~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`load <undr.json_index.load>`
+      - Reads and validates a -index.json file.
+
+
+Attributes
+~~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`schema <undr.json_index.schema>`
+      - JSON schema for -index files.
+
+
+Module Contents
+---------------
+
+.. py:exception:: InstallError(path: pathlib.Path)
+
+
+   Bases: :py:obj:`FileNotFoundError`
+
+   Raised if the target path does not exist.
+
+   :param path: The path that does not exist.
+   :type path: pathlib.Path
+
+   .. py:method:: __str__() -> str
+
+      Return str(self).
+
+
+
+.. py:function:: load(path: pathlib.Path) -> dict[str, Any]
+
+   Reads and validates a -index.json file.
+
+   This function caches the parsed contents of up to :py:attr:`undr.constants.LRU_CACHE_MAXSIZE` files.
+
+   :param path: The path of the file to read.
+   :type path: pathlib.Path
+
+   :raises InstallError: if the file does not exist.
+   :raises jsonschema_rs.ValidationError: if validation fails.
+
+   :returns: Parsed JSON file contents.
+   :rtype: dict[str, typing.Any]
+
+
+.. py:data:: schema
+
+   JSON schema for -index files.
+

@@ -1,0 +1,183 @@
+
+
+
+
+:py:mod:`undr.persist`
+======================
+
+.. py:module:: undr.persist
+
+.. autoapi-nested-parse::
+   Progress storage utility.
+
+
+
+
+Overview
+--------
+Classes
+~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`Progress <undr.persist.Progress>`
+      - Message that indicates that the given resource has been persisted.
+    * - :py:obj:`ReadOnlyStore <undr.persist.ReadOnlyStore>`
+      - Stores the IDs of processed tasks.
+    * - :py:obj:`Store <undr.persist.Store>`
+      - Stores the IDs of processed tasks.
+
+
+
+Attributes
+~~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`test_ids <undr.persist.test_ids>`
+      - 
+
+
+Module Contents
+---------------
+
+.. py:class:: Progress
+
+
+   Message that indicates that the given resource has been persisted.
+
+   .. py:attribute:: path_id
+      :type: pathlib.PurePosixPath
+
+      The resource's unique path ID.
+
+
+.. py:class:: ReadOnlyStore(path: Union[str, os.PathLike])
+
+
+   Stores the IDs of processed tasks.
+
+   This store provides a method to check whether a task has been performed but it cannot be modified.
+   Most users will probably prefer the writable :py:class:`Store`.
+
+   :param path: Path of the SQLite database file with extension ".db".
+   :type path: typing.Union[str, os.PathLike]
+
+   .. py:method:: __contains__(id: str)
+
+      Whether the given ID has been processed.
+
+      :param id: The ID to check.
+      :type id: str
+
+      :returns: True if the file is in the store, which means that it has been processed.
+      :rtype: bool
+
+
+   .. py:method:: __enter__()
+
+      Enables the use of the "with" statement.
+
+      :returns: A store context that calls :py:meth:`close` on exit.
+      :rtype: Display
+
+
+   .. py:method:: __exit__(type: Optional[Type[BaseException]], value: Optional[BaseException], traceback: Optional[types.TracebackType])
+
+      Enables the use of the "with" statement.
+
+      :param type: None if the context exits without an exception, and the raised exception's class otherwise.
+      :type type: typing.Optional[typing.Type[BaseException]]
+      :param value: None if the context exits without an exception, and the raised exception otherwise.
+      :type value: typing.Optional[BaseException]
+      :param traceback: None if the context exits without an exception, and the raised exception's traceback otherwise.
+      :type traceback: typing.Optional[types.TracebackType]
+
+
+   .. py:method:: __getstate__()
+
+      Helper for pickle.
+
+
+   .. py:method:: __setstate__(state: pathlib.Path)
+
+
+   .. py:method:: close()
+
+      Closes the store's database.
+
+
+
+.. py:class:: Store(path: Union[str, os.PathLike], commit_maximum_delay: float = 0.1, commit_maximum_inserts: int = 100)
+
+
+   Bases: :py:obj:`ReadOnlyStore`
+
+   Stores the IDs of processed tasks.
+
+   :param path: Path of the SQLite database file with extension ".db".
+   :type path: typing.Union[str, os.PathLike]
+   :param commit_maximum_delay: How often changes are commited to the disk, in seconds. Defaults to 0.1.
+   :type commit_maximum_delay: float, optional
+   :param commit_maximum_inserts: Maximum number of changes before commiting changes to the disk. Defaults to 100.
+   :type commit_maximum_inserts: int, optional
+
+   .. py:class:: Commit
+
+
+      Message requesting a commit (changes are immediately persited to the disk).
+
+
+   .. py:class:: Reset
+
+
+      Message requesting a reset of the database (existing entries are dropped).
+
+
+   .. py:method:: __getstate__()
+
+      Helper for pickle.
+
+
+   .. py:method:: __setstate__(state: Tuple[pathlib.Path, int, int])
+
+
+   .. py:method:: add(id: str)
+
+      Adds a row to the database.
+
+      The action is ignored if the entry is already in the database.
+
+      :param id: Entry to store in the database.
+      :type id: str
+
+
+   .. py:method:: close()
+
+      Closes the store's database.
+
+
+   .. py:method:: commit()
+
+      Immediately persists changes to the disk.
+
+
+   .. py:method:: reset()
+
+      Drops all entries from the database.
+
+
+   .. py:method:: target()
+
+      Worker thread implementation.
+
+
+
+.. py:data:: test_ids
+
+   
+

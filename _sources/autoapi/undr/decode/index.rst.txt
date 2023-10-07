@@ -1,0 +1,305 @@
+
+
+
+
+:py:mod:`undr.decode`
+=====================
+
+.. py:module:: undr.decode
+
+.. autoapi-nested-parse::
+   Implementation of all supported compression formats.
+
+   To add support for a new format, create and implement a derived class of :py:class:`Compression` (see for instance :py:class:`BrotliCompression`) and add it to :py:func:`compression_from_dict.`.
+
+
+
+
+Overview
+--------
+Classes
+~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`BrotliCompression <undr.decode.BrotliCompression>`
+      - Implements Brotli decompression (https://github.com/google/brotli).
+    * - :py:obj:`Compression <undr.decode.Compression>`
+      - Represents a compressed file's metadata.
+    * - :py:obj:`Decoder <undr.decode.Decoder>`
+      - Abstract class for decoders. A decoder controls a decompression process.
+    * - :py:obj:`DecompressFile <undr.decode.DecompressFile>`
+      - Decompresses a local file and writes decoded bytes to another local file.
+    * - :py:obj:`NoneCompression <undr.decode.NoneCompression>`
+      - Placeholder format for uncompressed files.
+    * - :py:obj:`Progress <undr.decode.Progress>`
+      - Represents decompression progress for a given resource.
+
+
+Functions
+~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`compression_from_dict <undr.decode.compression_from_dict>`
+      - Factory for comprssion formats.
+
+
+
+Module Contents
+---------------
+
+.. py:class:: BrotliCompression
+
+
+   Bases: :py:obj:`Compression`
+
+   Implements Brotli decompression (https://github.com/google/brotli).
+
+   :param word_size: The resource's word size in bytes.
+   :type word_size: int
+
+   .. py:class:: Decoder(word_size: int)
+
+
+      Bases: :py:obj:`NoneCompression`
+
+      Abstract class for decoders. A decoder controls a decompression process.
+
+      .. py:method:: decompress(buffer: bytes)
+
+         Consumes a buffer and produces decompressed bytes.
+
+         :param buffer: Compressed input bytes.
+         :type buffer: bytes
+
+         :returns: Decompressed output bytes. Their length must be a multiple of the word size.
+         :rtype: bytes
+
+
+      .. py:method:: finish()
+
+         Tells the decoder that all input bytes have been read.
+
+         :returns: Decompressed output bytes, whose length must be a multiple of the word size, and remaining bytes, whose length must be striclty smaller than the word size. A non-zero number of remaining bytes usually indicates an issue (erroneous configuration or corrupted data).
+         :rtype: tuple[bytes, bytes]
+
+
+
+   .. py:method:: decoder(word_size: int)
+
+      Creates a new decoder for this compression.
+
+      :param word_size: The resource's word size in bytes.
+      :type word_size: int
+
+      :returns: A decompression manager for this compression format.
+      :rtype: Decoder
+
+
+
+.. py:class:: Compression
+
+
+   Represents a compressed file's metadata.
+
+   .. py:attribute:: hash
+      :type: str
+
+      SHA3-224 (FIPS 202) hash of the compressed bytes.
+
+   .. py:attribute:: size
+      :type: int
+
+      Size of the compressed file in bytes.
+
+   .. py:attribute:: suffix
+      :type: str
+
+      Suffix for files compressed with this format.
+
+      The suffix must include a leading dot, for instance ``".br"``.
+
+   .. py:method:: decoder(word_size: int) -> Decoder
+      :abstractmethod:
+
+      Creates a new decoder for this compression.
+
+      :param word_size: The resource's word size in bytes.
+      :type word_size: int
+
+      :returns: A decompression manager for this compression format.
+      :rtype: Decoder
+
+
+
+.. py:class:: Decoder
+
+
+   Abstract class for decoders. A decoder controls a decompression process.
+
+   .. py:method:: decompress(buffer: bytes) -> bytes
+      :abstractmethod:
+
+      Consumes a buffer and produces decompressed bytes.
+
+      :param buffer: Compressed input bytes.
+      :type buffer: bytes
+
+      :returns: Decompressed output bytes. Their length must be a multiple of the word size.
+      :rtype: bytes
+
+
+   .. py:method:: finish() -> tuple[bytes, bytes]
+      :abstractmethod:
+
+      Tells the decoder that all input bytes have been read.
+
+      :returns: Decompressed output bytes, whose length must be a multiple of the word size, and remaining bytes, whose length must be striclty smaller than the word size. A non-zero number of remaining bytes usually indicates an issue (erroneous configuration or corrupted data).
+      :rtype: tuple[bytes, bytes]
+
+
+
+.. py:class:: DecompressFile(path_root: pathlib.Path, path_id: pathlib.PurePosixPath, compression: Compression, expected_size: int, expected_hash: str, word_size: int, keep: bool)
+
+
+   Bases: :py:obj:`undr.task.Task`
+
+   Decompresses a local file and writes decoded bytes to another local file.
+
+   :param path_root: The root path used to generate local file paths.
+   :type path_root: pathlib.Path
+   :param path_id: The path ID of the file.
+   :type path_id: pathlib.PurePosixPath
+   :param compression: The format of the compressed file.
+   :type compression: Compression
+   :param expected_size: The size of the decompressed file in bytes, according to the index.
+   :type expected_size: int
+   :param expected_hash: The hash of the decompressed file, according to the index.
+   :type expected_hash: str
+   :param word_size: The file's word size (the number of decoded bytes must be a multiple of this value).
+   :type word_size: int
+   :param keep: Whether to keep the compressed file after a successful decompression.
+   :type keep: bool
+
+   .. py:method:: run(session: requests.Session, manager: undr.task.Manager)
+
+
+
+.. py:class:: NoneCompression
+
+
+   Bases: :py:obj:`Compression`
+
+   Placeholder format for uncompressed files.
+
+   This "compression" format passes the input bytes to the output without transforming them.
+   It may cut and stitch buffers to ensure that each buffer has a length that is a multiple of the word size.
+
+   :param word_size: The resource's word size in bytes.
+   :type word_size: int
+
+   .. py:class:: Decoder(word_size: int)
+
+
+      Bases: :py:obj:`Decoder`
+
+      Abstract class for decoders. A decoder controls a decompression process.
+
+      .. py:method:: decompress(buffer: bytes)
+
+         Consumes a buffer and produces decompressed bytes.
+
+         :param buffer: Compressed input bytes.
+         :type buffer: bytes
+
+         :returns: Decompressed output bytes. Their length must be a multiple of the word size.
+         :rtype: bytes
+
+
+      .. py:method:: finish()
+
+         Tells the decoder that all input bytes have been read.
+
+         :returns: Decompressed output bytes, whose length must be a multiple of the word size, and remaining bytes, whose length must be striclty smaller than the word size. A non-zero number of remaining bytes usually indicates an issue (erroneous configuration or corrupted data).
+         :rtype: tuple[bytes, bytes]
+
+
+
+   .. py:method:: decoder(word_size: int)
+
+      Creates a new decoder for this compression.
+
+      :param word_size: The resource's word size in bytes.
+      :type word_size: int
+
+      :returns: A decompression manager for this compression format.
+      :rtype: Decoder
+
+
+
+.. py:class:: Progress
+
+
+   Represents decompression progress for a given resource.
+
+   .. py:attribute:: complete
+      :type: bool
+
+      Whether decoding of this resource is complete.
+
+   .. py:attribute:: current_bytes
+      :type: int
+
+      Number of bytes of the decompressed resource that have been decompressed so far.
+
+   .. py:attribute:: final_bytes
+      :type: int
+
+      Total number of bytes of the decompressed resource.
+
+   .. py:attribute:: initial_bytes
+      :type: int
+
+      Number of bytes of the decompressed resource that were already decompressed when the current decoding process began.
+
+   .. py:attribute:: path_id
+      :type: pathlib.PurePosixPath
+
+      Identifier of the resource.
+
+
+.. py:exception:: RemainingBytesError(word_size: int, buffer: bytes)
+
+
+   Bases: :py:obj:`Exception`
+
+   Raised if the number of bytes in the decompressed resource is not a multiple of its word size.
+
+   :param word_size: The resource's word size.
+   :type word_size: int
+   :param buffer: The remaining bytes. Their length is larger than zero and smaller than the word size.
+   :type buffer: bytes
+
+
+.. py:function:: compression_from_dict(data: dict[str, Any], base_size: int, base_hash: str) -> Compression
+
+   Factory for comprssion formats.
+
+   :param data: Parsed compression object read from an index file.
+   :type data: dict[str, typing.Any]
+   :param base_size: Size of the uncompressed file in bytes, read from the index.
+   :type base_size: int
+   :param base_hash: Hash of the uncompressed file, read from the index.
+   :type base_hash: str
+
+   :raises RuntimeError: if the compression format is unknown or not supported.
+
+   :returns: The compressed file's metadata, can be used to create a decoder.
+   :rtype: Compression
+
+

@@ -1,0 +1,89 @@
+
+
+
+
+:py:mod:`undr.simple`
+=====================
+
+.. py:module:: undr.simple
+
+.. autoapi-nested-parse::
+   High-level functions to install datasets without using a configuration file.
+
+   The functions in this module can be very convenient for one-off downloads and simple projects.
+   Configuration files (undr.toml) are recommended for more complex projects.
+
+
+
+
+Overview
+--------
+
+Functions
+~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`default_datasets <undr.simple.default_datasets>`
+      - Generates a list of the default datasets' names.
+    * - :py:obj:`install <undr.simple.install>`
+      - Downloads (and optionally decompresses) a dataset.
+    * - :py:obj:`name_to_url <undr.simple.name_to_url>`
+      - Generates a dictionary of the default datasets' names and URLs.
+
+
+
+Module Contents
+---------------
+
+.. py:function:: default_datasets() -> list[str]
+
+   Generates a list of the default datasets' names.
+
+   This function calls :py:func:`name_to_url` and has the same caveats regarding caching.
+
+   :returns: The names of the default datasets.
+   :rtype: list[str]
+
+
+.. py:function:: install(name: str, url: Optional[str] = None, timeout: float = constants.DEFAULT_TIMEOUT, mode: Union[str, undr.install_mode.Mode] = install_mode.Mode.LOCAL, directory: Union[str, pathlib.Path] = 'datasets', show_display: bool = True, workers: int = multiprocessing.cpu_count() * 2, force: bool = False, log_directory: Optional[pathlib.Path] = None)
+
+   Downloads (and optionally decompresses) a dataset.
+
+   See :py:class:`undr.install_mode.Mode` for details on the different installation strategies.
+
+   :param name: Name of the dataset to install. Unless url is provided, it must be one of the keys returned by :py:func:`name_to_url`.
+   :type name: str
+   :param url: URL of the dataset. Defaults to None.
+   :type url: typing.Optional[str], optional
+   :param timeout: Request timeout in seconds. Defaults to :py:attr:`undr.constants.DEFAULT_TIMEOUT`.
+   :type timeout: float, optional
+   :param mode: Installation strategy. Defaults to :py:attr:`undr.install_mode.Mode.LOCAL`.
+   :type mode: typing.Union[str, install_mode.Mode], optional
+   :param directory: Path of the local directory to store datasets. Defaults to "datasets".
+   :type directory: typing.Union[str, pathlib.Path], optional
+   :param show_display: Whether to show a progress bar. Defaults to True.
+   :type show_display: bool, optional
+   :param workers: Number of parallel workers (threads). Defaults to twice :py:func:`multiprocessing.cpu_count`
+   :type workers: int, optional
+   :param force: Whether to re-download files even if they are already present locally. Defaults to False.
+   :type force: bool, optional
+   :param log_directory: Directory to store log files. Logs are not generated if this is None. Defaults to None.
+   :type log_directory: typing.Optional[pathlib.Path], optional
+
+
+.. py:function:: name_to_url() -> dict[str, str]
+
+   Generates a dictionary of the default datasets' names and URLs.
+
+   The first call to this function parses the configuration file bundled with UNDR and caches the result.
+   Subsequent calls return the cached value immediately.
+   Hence, modifying the returned dictionary also modifies the returned value of all subsequent calls, until the Python interpreter restarts.
+   Users who plan to modify the returned value may want to call ``name_to_url().copy()`` to avoid this problem.
+
+   :returns: Dictionary whose keys are dataset names and whose values are matching dataset URLs.
+   :rtype: dict[str, str]
+
+

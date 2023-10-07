@@ -1,0 +1,275 @@
+
+
+
+
+:py:mod:`undr.remote`
+=====================
+
+.. py:module:: undr.remote
+
+.. autoapi-nested-parse::
+   Low-level implementation of resource download.
+
+
+
+
+Overview
+--------
+Classes
+~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`Download <undr.remote.Download>`
+      - Retrieves data from a remote server.
+    * - :py:obj:`DownloadFile <undr.remote.DownloadFile>`
+      - Retrieves data from a remote server and saves it to a file.
+    * - :py:obj:`NullServer <undr.remote.NullServer>`
+      - A placeholder server that raises an exception when used.
+    * - :py:obj:`Progress <undr.remote.Progress>`
+      - Message that reports download progress.
+    * - :py:obj:`Server <undr.remote.Server>`
+      - Represents a remote server.
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: Download(path_id: pathlib.PurePosixPath, suffix: Optional[str], server: Server, stream: bool)
+
+
+   Bases: :py:obj:`undr.task.Task`
+
+   Retrieves data from a remote server.
+
+   This is an abstract task that calls its methods (lifecycle callbacks) as follows:
+
+   - :py:meth:`on_begin` is called before contacting the server.
+     This function can be used to create write resources and must return an offset in bytes.
+     Download resumes from that offset if it is non-zero.
+     If the offset is negative, the task assumes that the download is complete and it calls :py:meth:`on_end` immediately.
+   - :py:meth:`on_range_failed` is called if :py:meth:`on_begin` returned a non-zero offset and the server
+     rejects the range request (HTTP 206). It can be used to clean up 'append' resources and replace them
+     with 'write' resources. The actual download starts after :py:meth:`on_range_failed` as if :py:meth:`on_begin` returned 0.
+   - :py:meth:`on_response_ready` is called when the response is ready for iteration.
+     The subclass must call :py:meth:`requests.Response.close` after reading the response (and probably :py:meth:`on_end`).
+
+   This lifecycle allows users to yield on response chunks (see :py:meth:`undr.path.File._chunks` for an example).
+
+   :param path_id: The resource's unique path id.
+   :type path_id: pathlib.PurePosixPath
+   :param suffix: Added to the file name while it is being downloaded.
+   :type suffix: typing.Optional[str]
+   :param server: The remote server.
+   :type server: Server
+   :param stream: Whether to download the file in chunks (slightly slower for small files, reduces memory usage for large files).
+   :type stream: bool
+
+   .. py:method:: on_begin(manager: undr.task.Manager) -> int
+      :abstractmethod:
+
+      Called before contacting the server.
+
+      This function must return an offset in bytes.
+
+      - 0 indicates that the file is not downloaded yet.
+      - Positive values indicate the number of bytes already downloaded.
+      - Negative values indicate that the download is already complete and must be skipped.
+
+      :param manager: The task manager for reporting updates.
+      :type manager: task.Manager
+
+      :returns: Number of bytes already downloaded.
+      :rtype: int
+
+
+   .. py:method:: on_end(manager: undr.task.Manager) -> None
+      :abstractmethod:
+
+      Called when the download task completes.
+
+      This function is called automatically if the byte offset
+      returned by :py:meth:`on_begin` is nagative.
+      Implementations should call it after consuming the response in :py:meth:`on_response_ready`.
+
+      :param manager: The task manager for reporting updates.
+      :type manager: task.Manager
+
+
+   .. py:method:: on_range_failed(manager: undr.task.Manager) -> None
+      :abstractmethod:
+
+      Called if the HTTP range call fails.
+
+      The HTTP range request asks the serve to resumes download at
+      a given byte offset. It used when :py:meth:`on_begin` returns a non-zero value.
+      Range is not always supported by the server. This function should reset counters
+      and ready the local file system for a standard (full) download.
+
+      :param manager: The task manager for reporting updates.
+      :type manager: task.Manager
+
+
+   .. py:method:: on_response_ready(response: requests.Response, manager: undr.task.Manager) -> None
+      :abstractmethod:
+
+      Called when the HTTP response object is ready.
+
+      The reponse object can be used to download the remote file.
+
+      :param response: HTTP response object.
+      :type response: requests.Response
+      :param manager: The task manager for reporting updates.
+      :type manager: task.Manager
+
+
+   .. py:method:: run(session: requests.Session, manager: undr.task.Manager)
+
+
+   .. py:method:: url() -> str
+
+      Returns the file's remote URL.
+
+      :returns: File URL on the server.
+      :rtype: str
+
+
+
+.. py:class:: DownloadFile(path_root: pathlib.Path, path_id: pathlib.PurePosixPath, suffix: Optional[str], server: Server, force: bool, expected_size: Optional[int], expected_hash: Optional[str])
+
+
+   Bases: :py:obj:`Download`
+
+   Retrieves data from a remote server and saves it to a file.
+
+   .. py:method:: on_begin(manager: undr.task.Manager) -> int
+
+      Opens the local file before starting the download.
+
+      If the file exists, this function opens it in append mode
+      and returns its size in bytes.
+
+      :param manager: The task manager for reporting updates.
+      :type manager: task.Manager
+
+      :returns: Number of bytes already downloaded.
+      :rtype: int
+
+
+   .. py:method:: on_end(manager: undr.task.Manager)
+
+      Checks the hash and closes the file.
+
+      :param manager: The task manager for reporting updates.
+      :type manager: task.Manager
+
+      :raises exception.HashMismatch: if the provided and effective hashes are different.
+      :raises exception.SizeMismatch: if the provided and effective sizes are different.
+
+
+   .. py:method:: on_range_failed(manager: undr.task.Manager)
+
+      Re-opens the file in write mode.
+
+      :param manager: The task manager for reporting updates.
+      :type manager: task.Manager
+
+
+   .. py:method:: on_response_ready(response: requests.Response, manager: undr.task.Manager) -> None
+
+      Iterates over the file chunks and writes them to the file.
+
+      :param response: HTTP response object.
+      :type response: requests.Response
+      :param manager: The task manager for reporting updates.
+      :type manager: task.Manager
+
+
+
+.. py:class:: NullServer
+
+
+   Bases: :py:obj:`Server`
+
+   A placeholder server that raises an exception when used.
+
+   Some functions and classes require a server to download resources that are no available locally.
+   If the resources are known to be local, this server can be used to detect download attempts.
+
+   .. py:method:: path_id_to_url(path_id: pathlib.PurePosixPath)
+      :abstractmethod:
+
+      Calculates a resource URL from its path ID.
+
+      :param path_id: The resource's path ID, including the dataset name.
+      :type path_id: pathlib.PurePosixPath
+
+      :returns: The resource's remote URL.
+      :rtype: str
+
+
+
+.. py:class:: Progress
+
+
+   Message that reports download progress.
+
+   .. py:attribute:: complete
+      :type: bool
+
+      Whether this resource has been completely downloaded.
+
+   .. py:attribute:: current_bytes
+      :type: int
+
+      Number of bytes of the remote resource that have been downloaded so far.
+
+   .. py:attribute:: final_bytes
+      :type: int
+
+      Total number of bytes of the remote resource.
+
+   .. py:attribute:: initial_bytes
+      :type: int
+
+      Number of bytes of the remote resource that were already downloaded when the current download began.
+
+   .. py:attribute:: path_id
+      :type: pathlib.PurePosixPath
+
+      Path ID of the associated resource
+
+
+.. py:class:: Server
+
+
+   Represents a remote server.
+
+   .. py:attribute:: timeout
+      :type: float
+
+      Timeout in seconds for requests to this server.
+
+   .. py:attribute:: url
+      :type: str
+
+      The server's base URL.
+
+      Resources URL are calculated by appending the file's path ID to the server URL. A slash is inserted before the path ID if the server's URL does not end with one.
+
+   .. py:method:: path_id_to_url(path_id: pathlib.PurePosixPath) -> str
+
+      Calculates a resource URL from its path ID.
+
+      :param path_id: The resource's path ID, including the dataset name.
+      :type path_id: pathlib.PurePosixPath
+
+      :returns: The resource's remote URL.
+      :rtype: str
+
+
+

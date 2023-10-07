@@ -1,0 +1,170 @@
+
+
+
+
+:py:mod:`undr.utilities`
+========================
+
+.. py:module:: undr.utilities
+
+.. autoapi-nested-parse::
+   Data loading and number formatting functions.
+
+
+
+
+Overview
+--------
+
+Functions
+~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`duration_to_string <undr.utilities.duration_to_string>`
+      - Generates a human-readable representation of a duration.
+    * - :py:obj:`hash <undr.utilities.hash>`
+      - Consumes an iterable and calculates a hash.
+    * - :py:obj:`hash_file <undr.utilities.hash_file>`
+      - Calculates a file's hash.
+    * - :py:obj:`least_multiple_over_chunk_size <undr.utilities.least_multiple_over_chunk_size>`
+      - Calculates the maximum number of bytes in a chunk that can be divided into full words.
+    * - :py:obj:`load_schema <undr.utilities.load_schema>`
+      - Reads and parses a JSON schema bundled with UNDR.
+    * - :py:obj:`new_hash <undr.utilities.new_hash>`
+      - Creates a new byte hasher.
+    * - :py:obj:`path_with_suffix <undr.utilities.path_with_suffix>`
+      - Appends a suffix to a path and returns a new path.
+    * - :py:obj:`posix_path_with_suffix <undr.utilities.posix_path_with_suffix>`
+      - Appends a suffix to a POSIX path and returns a new path.
+    * - :py:obj:`size_to_string <undr.utilities.size_to_string>`
+      - Generates a human-readable representation of a size.
+    * - :py:obj:`speed_to_string <undr.utilities.speed_to_string>`
+      - Generates a human-readable representation of a speed.
+
+
+
+Module Contents
+---------------
+
+.. py:function:: duration_to_string(duration: float) -> str
+
+   Generates a human-readable representation of a duration.
+
+   :param duration: Positive time delta in seconds.
+   :type duration: float
+
+   :returns: Human-redable representation.
+   :rtype: str
+
+
+.. py:function:: hash(chunks: Iterable[bytes]) -> hashlib._Hash
+
+   Consumes an iterable and calculates a hash.
+
+   Since this function consumes the hash, users should use :py:func:`new_hash` and call :py:meth:`hashlib._Hash.update` manually if they plan to do something else with the bytes.
+
+   :param chunks: A bytes iterable.
+   :type chunks: typing.Iterable[bytes]
+
+   :returns: SHA3-224 (FIPS 202) hasher. Use :py:meth:`hashlib._Hash.digest` or :py:meth:`hashlib._Hash.hexdigest` to read the hash value.
+   :rtype: hashlib._Hash
+
+
+.. py:function:: hash_file(path: pathlib.Path, chunk_size: int)
+
+   Calculates a file's hash.
+
+   :param path: Path of the file to hash.
+   :type path: pathlib.Path
+   :param chunk_size: Chunk size in bytes, used to read the file.
+   :type chunk_size: int
+
+   :returns: _description_
+   :rtype: _type_
+
+
+.. py:function:: least_multiple_over_chunk_size(word_size: int) -> int
+
+   Calculates the maximum number of bytes in a chunk that can be divided into full words.
+
+   For instance, for a chunks size of 100 bytes and a word size of 32 bytes, this function would return 96.
+
+   :param word_size: The word size in bytes. The chunk size is not a parameter since UNDR always uses :py:attr:`undr.constants.CHUNK_SIZE`.
+   :type word_size: int
+
+   :returns: Maximum number of bytes in a chunk that can be divided into full words. This number is guaranteed to be a multiple of word_size. It may be zero.
+   :rtype: int
+
+
+.. py:function:: load_schema(name: str) -> jsonschema_rs.JSONSchema
+
+   Reads and parses a JSON schema bundled with UNDR.
+
+   :param name: Name of the schema.
+   :type name: str
+
+   :returns: JSON schema validator.
+   :rtype: jsonschema_rs.JSONSchema
+
+
+.. py:function:: new_hash() -> hashlib._Hash
+
+   Creates a new byte hasher.
+
+   :returns: SHA3-224 (FIPS 202) hasher.
+   :rtype: hashlib._Hash
+
+
+.. py:function:: path_with_suffix(path: pathlib.Path, suffix: str) -> pathlib.Path
+
+   Appends a suffix to a path and returns a new path.
+
+   :param path: Input path, not modified by this function.
+   :type path: pathlib.Path
+   :param suffix: The string to append to the path's last component.
+   :type suffix: str
+
+   :returns: New path with the given suffix.
+   :rtype: pathlib.Path
+
+
+.. py:function:: posix_path_with_suffix(path: pathlib.PurePosixPath, suffix: str) -> pathlib.PurePosixPath
+
+   Appends a suffix to a POSIX path and returns a new path.
+
+   Similar to :py:func:`path_with_suffix` for POSIX paths.
+
+   :param path: Input path, not modified by this function.
+   :type path: pathlib.PurePosixPath
+   :param suffix: The string to append to the path's last component.
+   :type suffix: str
+
+   :returns: New path with the given suffix.
+   :rtype: pathlib.PurePosixPath
+
+
+.. py:function:: size_to_string(size: int) -> str
+
+   Generates a human-readable representation of a size.
+
+   :param size: Resource size in bytes.
+   :type size: float
+
+   :returns: Human-redable representation.
+   :rtype: str
+
+
+.. py:function:: speed_to_string(speed: int) -> str
+
+   Generates a human-readable representation of a speed.
+
+   :param speed: Download or process speed in bytes per second.
+   :type speed: int
+
+   :returns: Human-redable representation.
+   :rtype: str
+
+

@@ -1,0 +1,462 @@
+
+
+
+
+:py:mod:`undr.task`
+===================
+
+.. py:module:: undr.task
+
+.. autoapi-nested-parse::
+   Multi-process task management.
+
+
+
+
+Overview
+--------
+Classes
+~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`Chain <undr.task.Chain>`
+      - A sequence of tasks that must run sequentially.
+    * - :py:obj:`CloseRequest <undr.task.CloseRequest>`
+      - Special task used to request a worker thread shutdown.
+    * - :py:obj:`Manager <undr.task.Manager>`
+      - Schedules and keeps track of tasks.
+    * - :py:obj:`NullManager <undr.task.NullManager>`
+      - Manager placeholder that ignores messages and raises errors if one attemps to use it to schedule more tasks.
+    * - :py:obj:`ProcessManager <undr.task.ProcessManager>`
+      - Implements a manager that controls a pool of worker processes.
+    * - :py:obj:`Task <undr.task.Task>`
+      - A processing task to be performed by a worker.
+
+
+Functions
+~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`receive_bytes <undr.task.receive_bytes>`
+      - Reads TCP bytes until enough are received to generate a full a type and a raw message.
+    * - :py:obj:`receive_message <undr.task.receive_message>`
+      - Reads TCP bytes until enough are received to generate a full a type and message.
+    * - :py:obj:`receive_type <undr.task.receive_type>`
+      - Reads TCP bytes bytes until an acknowledge type is received.
+    * - :py:obj:`send_bytes <undr.task.send_bytes>`
+      - Packs and sends the bytes of a type and message.
+    * - :py:obj:`send_message <undr.task.send_message>`
+      - Packs and sends the bytes of a type and an unencoded message.
+    * - :py:obj:`send_type <undr.task.send_type>`
+      - Packs and sends the bytes of a type that does not require a message.
+
+
+
+Module Contents
+---------------
+
+.. py:class:: Chain(tasks: Sequence[Task])
+
+
+   Bases: :py:obj:`Task`
+
+   A sequence of tasks that must run sequentially.
+
+   :param Task: The list of tasks to run sequentially in the given order.
+   :type Task: typing.Sequence[Task]
+
+   .. py:method:: run(session: requests.Session, manager: Manager)
+
+
+
+.. py:class:: CloseRequest
+
+
+   Special task used to request a worker thread shutdown.
+
+
+.. py:class:: Manager
+
+
+   Schedules and keeps track of tasks.
+
+   This is an abtract class, use of one of its implementations such as :py:class:`ProcessManager` to create objects.
+
+   .. py:method:: schedule(task: Task, priority: int = 1) -> None
+      :abstractmethod:
+
+      Runs a task with the given priority.
+
+      Tasks with lower priorities are scheduled first. The maximum priority level depends on the implementation. At least two levels, 0 (highest priority) and 1, must be supported by all implementations.
+
+      :param task: The task that this manager must run (possibly on a different thread).
+      :type task: Task
+      :param priority: Priority level. Defaults to 1.
+      :type priority: int, optional
+
+
+   .. py:method:: send_message(message: Any) -> None
+      :abstractmethod:
+
+      Queues a message in the manager's "inbox".
+
+      A manager is responsible for collecting messages from all tasks, which are potentially running on different threads or processes, and serving thse messages in a single-threaded fashion to a reader.
+
+      This function is meant to be called by tasks, which have access to the manager in their :py:meth:`Task.run` function.
+
+      :param message: Any object. Currently implemeted managers require the message to be compatible with the :py:mod:`pickle` module.
+      :type message: typing.Any
+
+
+
+.. py:class:: NullManager
+
+
+   Bases: :py:obj:`Manager`
+
+   Manager placeholder that ignores messages and raises errors if one attemps to use it to schedule more tasks.
+
+   This manager can be used with one-off tasks whose progress need not be monitored and which do not generate more tasks.
+
+   .. py:method:: send_message(message: Any)
+
+      Queues a message in the manager's "inbox".
+
+      A manager is responsible for collecting messages from all tasks, which are potentially running on different threads or processes, and serving thse messages in a single-threaded fashion to a reader.
+
+      This function is meant to be called by tasks, which have access to the manager in their :py:meth:`Task.run` function.
+
+      :param message: Any object. Currently implemeted managers require the message to be compatible with the :py:mod:`pickle` module.
+      :type message: typing.Any
+
+
+
+.. py:class:: ProcessManager(workers: int = multiprocessing.cpu_count() * 2, priority_levels: int = 2, log_directory: Optional[pathlib.Path] = None)
+
+
+   Bases: :py:obj:`Manager`
+
+   Implements a manager that controls a pool of worker processes.
+
+   This class is similar to :py:class:`multiprocessing.pool.Pool` but it has better support for user-initiated shutdowns (sigint / CTRL-C) and worker-initiated shutdowns (exceptions). It also supports priorities levels.
+
+   Whenever a worker is idle, the manager scans its (the manager's) task queues in order of priority until it finds a non-empty queue, and sends the first task from that queue to the worker. Hence, tasks with lower priorities are scheduled first. However, since a task may asynchronously spawn more tasks with arbitrary priority levels, there is no guarantee that all tasks with priority 0 spawned by a program overall are executed before all tasks with priority 1. In particular, tasks are never cancelled, even if a task with a lower priority level (i.e. more urgent) becomes available while a worker is already running a task with a higher priority level (i.e. less urgent).
+
+   :param workers: Number of parallel workers (threads). Defaults to twice :py:func:`multiprocessing.cpu_count`.
+   :type workers: int, optional
+   :param priority_levels: Number of priority queues. Defaults to 2.
+   :type priority_levels: int, optional
+   :param log_directory: Directory to store log files. Logs are not generated if this is None. Defaults to None.
+   :type log_directory: typing.Optional[pathlib.Path], optional
+
+   .. py:class:: ClosePolicy(*args, **kwds)
+
+
+      Bases: :py:obj:`enum.Enum`
+
+      Strategy used to terminate worker threads.
+
+      .. py:attribute:: CANCEL
+         :value: 1
+
+         Shutdown threads without consuming buffered messages.
+
+         This should be used to stop thread workers after user-initiated cancellation (CTRL-C).
+
+      .. py:attribute:: JOIN
+         :value: 0
+
+         Consume all messages and shutdown threads.
+
+         This should be used to wait for the end of the program normally.
+
+      .. py:attribute:: KILL
+         :value: 2
+
+         Kill threads without consuming buffered messages.
+
+         This should be used after a thread raises an error, to stop the remaning worker threads.
+
+
+   .. py:class:: Proxy(server_port: int)
+
+
+      Bases: :py:obj:`Manager`
+
+      Manager interface that can be sent to workers.
+
+      Since :py:class:`ProcessManager` implements a custom message passing system and owns message queues, it cannot be shared between processes. Worker processes require a handle to the manager to send messages and schedule new tasks. However, the handle does not have to be the actual manager, it is merely a means to pass around the two fuctions of its public API. This proxy prentends to be the manager but forwards messages to the actual manager using TCP. See :py:func:`send_bytes` for a description of message encoding.
+
+      :param server_port: Port of the manager's TCP server used to send messages between workers and the manager.
+      :type server_port: int
+
+      .. py:method:: acknowledge_and_next_task() -> Union[None, Task, CloseRequest]
+
+         Called by a worker to indicate that they completed the current task and are asking for a new one.
+
+         :returns: None if there are no tasks waiting (but more tasks may become available in the future), a :py:class:`Task` instance if the manager returned a task for this worker, and :py:class:`CloseRequest` must shutdown.
+         :rtype: typing.Union[None, Task, CloseRequest]
+
+
+      .. py:method:: next_task() -> Union[None, Task, CloseRequest]
+
+         Called by a worker to receive the next task.
+
+         :returns: None if there are no tasks waiting (but more tasks may become available in the future), a :py:class:`Task` instance if the manager returned a task for this worker, and :py:class:`CloseRequest` must shutdown.
+         :rtype: typing.Union[None, Task, CloseRequest]
+
+
+      .. py:method:: schedule(task: Task, priority: int = 1)
+
+         Runs a task with the given priority.
+
+         Tasks with lower priorities are scheduled first. The maximum priority level depends on the implementation. At least two levels, 0 (highest priority) and 1, must be supported by all implementations.
+
+         :param task: The task that this manager must run (possibly on a different thread).
+         :type task: Task
+         :param priority: Priority level. Defaults to 1.
+         :type priority: int, optional
+
+
+      .. py:method:: send_message(message: Any)
+
+         Queues a message in the manager's "inbox".
+
+         A manager is responsible for collecting messages from all tasks, which are potentially running on different threads or processes, and serving thse messages in a single-threaded fashion to a reader.
+
+         This function is meant to be called by tasks, which have access to the manager in their :py:meth:`Task.run` function.
+
+         :param message: Any object. Currently implemeted managers require the message to be compatible with the :py:mod:`pickle` module.
+         :type message: typing.Any
+
+
+      .. py:method:: setup()
+
+         Called by each worker to create the TCP connection with the actual manager.
+
+
+
+   .. py:class:: RequestHandler(request, client_address, server)
+
+
+      Bases: :py:obj:`socketserver.BaseRequestHandler`
+
+      Processes TCP requests for the actual manager (TCP server).
+
+      .. py:method:: handle()
+
+         Processes a TCP request.
+
+         See :py:func:`send_bytes` for a description of message encoding.
+
+
+
+   .. py:method:: __enter__()
+
+      Enables the use of the "with" statement.
+
+      :returns: A process manager context that calls :py:meth:`close` on exit.
+      :rtype: ProcessManager
+
+
+   .. py:method:: __exit__(type: Optional[Type[BaseException]], value: Optional[BaseException], traceback: Optional[types.TracebackType])
+
+      Enables the use of the "with" statement.
+
+      This function calls :py:meth:`close` with the policy :py:attr:`ProcessManager.ClosePolicy.CANCEL` if there is no active exception (typically caused by a soft cancellation) and with the policy :py:attr:`ProcessManager.ClosePolicy.KILL` if there is an active exception.
+
+      :param type: None if the context exits without an exception, and the raised exception's class otherwise.
+      :type type: typing.Optional[typing.Type[BaseException]]
+      :param value: None if the context exits without an exception, and the raised exception otherwise.
+      :type value: typing.Optional[BaseException]
+      :param traceback: None if the context exits without an exception, and the raised exception's traceback otherwise.
+      :type traceback: typing.Optional[types.TracebackType]
+
+
+   .. py:method:: close(policy: ProcessManager)
+
+      Terminates the manager.
+
+      Depending on  the value of policy, this function will return almost immediately or block until all the tasks complete. See :py:class:`ProcessManager.ClosePolicy` for details.
+
+      :param policy: Termination policy for the manager and its workers.
+      :type policy: ProcessManager.ClosePolicy
+
+
+   .. py:method:: messages() -> Iterable[Any]
+
+      Iterates over the messages sent by all workers until all the tasks are complete.
+
+      The thread that iterates over the messages has access to the manager and may use it to schedule new tasks.
+
+      :returns: Iterator over messages from all workers.
+      :rtype: typing.Iterable[typing.Any]
+
+
+   .. py:method:: schedule(task: Task, priority: int = 1)
+
+      Runs a task with the given priority.
+
+      Tasks with lower priorities are scheduled first. The maximum priority level depends on the implementation. At least two levels, 0 (highest priority) and 1, must be supported by all implementations.
+
+      :param task: The task that this manager must run (possibly on a different thread).
+      :type task: Task
+      :param priority: Priority level. Defaults to 1.
+      :type priority: int, optional
+
+
+   .. py:method:: send_message(message: Any)
+
+      Queues a message in the manager's "inbox".
+
+      A manager is responsible for collecting messages from all tasks, which are potentially running on different threads or processes, and serving thse messages in a single-threaded fashion to a reader.
+
+      This function is meant to be called by tasks, which have access to the manager in their :py:meth:`Task.run` function.
+
+      :param message: Any object. Currently implemeted managers require the message to be compatible with the :py:mod:`pickle` module.
+      :type message: typing.Any
+
+
+   .. py:method:: serve()
+
+      Server thread implementation.
+
+
+   .. py:method:: target(proxy: ProcessManager, log_directory: Optional[pathlib.Path])
+      :staticmethod:
+
+      Worker thread implementation.
+
+      :param proxy: The manager proxy to request tasks, spawn new tasks, and send messages.
+      :type proxy: ProcessManager.Proxy
+      :param log_directory: Directory to store log files. Logs are not generated if this is None.
+      :type log_directory: typing.Optional[pathlib.Path]
+
+
+
+.. py:class:: Task
+
+
+   A processing task to be performed by a worker.
+
+   .. py:method:: __repr__() -> str
+
+      Return repr(self).
+
+
+   .. py:method:: run(session: requests.Session, manager: Manager)
+      :abstractmethod:
+
+
+
+.. py:exception:: WorkerException(traceback_exception: traceback.TracebackException)
+
+
+   Bases: :py:obj:`Exception`
+
+   An exception wrapper than can be sent across threads.
+
+   This exception captures the stack trace of the thread that raised it to improve error reporting.
+
+   :param traceback_exception: Traceback of the orignal exception, can be obtained with :py:meth:`traceback.TracebackException.from_exception`.
+   :type traceback_exception: traceback.TracebackException
+
+   .. py:method:: __str__()
+
+      Return str(self).
+
+
+
+.. py:function:: receive_bytes(client: socket.socket) -> tuple[bytes, bytes]
+
+   Reads TCP bytes until enough are received to generate a full a type and a raw message.
+
+   :param client: TCP client used to send messages between workers and the manager.
+   :type client: socket.socket
+
+   :returns: The type's bytes and the raw message's bytes.
+   :rtype: tuple[bytes, bytes]
+
+
+.. py:function:: receive_message(client: socket.socket, unpickle: bool = True) -> tuple[bytes, Any]
+
+   Reads TCP bytes until enough are received to generate a full a type and message.
+
+   :param client: TCP client used to send messages between workers and the manager.
+   :type client: socket.socket
+   :param unpickle: Whether to pass the message bytes to :py:func:`pickle.loads`. Defaults to True.
+   :type unpickle: bool, optional
+
+   :returns: The type's bytes and the decoded message. The type's bytes and the raw message's bytes are returned instead if unpickle is False.
+   :rtype: tuple[bytes, typing.Any]
+
+
+.. py:function:: receive_type(client: socket.socket, expected_type: bytes)
+
+   Reads TCP bytes bytes until an acknowledge type is received.
+
+   :param client: TCP client used to send messages between workers and the manager.
+   :type client: socket.socket
+   :param expected_type: The execpted acknowledge type.
+   :type expected_type: bytes
+
+
+.. py:function:: send_bytes(client: socket.socket, type: bytes, message: bytes)
+
+   Packs and sends the bytes of a type and message.
+
+   This message encoding scheme is used internally by :py:class:`ProcessManager`.
+
+   :param client: TCP client used to send messages between workers and the manager.
+   :type client: socket.socket
+   :param type: Encoded type bytes. See :py:func:`send_bytes` for a description of type encoding.
+   :type type: bytes
+   :param message: Pickled message bytes.
+   :type message: bytes
+
+
+.. py:function:: send_message(client: socket.socket, type: bytes, message: Any)
+
+   Packs and sends the bytes of a type and an unencoded message.
+
+   This message encoding scheme is used internally by :py:class:`ProcessManager`.
+
+   :param client: TCP client used to send messages between workers and the manager.
+   :type client: socket.socket
+   :param type: Encoded type bytes. See :py:func:`send_bytes` for a description of type encoding.
+   :type type: bytes
+   :param message: Any object compatible with the :py:mod:`pickle` module.
+   :type message: typing.Any
+
+
+.. py:function:: send_type(client: socket.socket, type: bytes)
+
+   Packs and sends the bytes of a type that does not require a message.
+
+   Types encode the following information.
+
+   Messages sent by a worker to the manager.
+
+   - ``b"n"``: Reports that the worker started a task, must not have an attached message.
+   - ``b"t"``: Reports that the worker completed a task and is idle, must not have an attached message.
+   - ``b"m"`` Generic message that must be forwarded to the "inbox", must have an attached message
+   - ``>= 0x80``: Tells the manager to spawn a new task (a worker may do this multiple times per task). The new task priority is ``type - 0x80``. This scheme supports up to 128 priority levels. The current implementation uses 2 by default.
+
+   Messages sent by the manager to a worker.
+
+   - ``b"t"``: Tells the worker to start a new task, must have an attached message. The task may be an instance of :py:class:`CloseRequest`, which tells the worker to shutdown.
+   - ``b"m"``: Acknowledges a generic message (message to worker ``b"m"`` request).
+   - ``b"s"``: Acknowledges a task message (message to worker ``>= 0x80``  request).
+
+   :param client: TCP client used to send messages between workers and the manager.
+   :type client: socket.socket
+   :param type: Encoded type bytes.
+   :type type: bytes
+
+

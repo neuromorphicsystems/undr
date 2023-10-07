@@ -1,0 +1,432 @@
+
+
+
+
+:py:mod:`undr.display`
+======================
+
+.. py:module:: undr.display
+
+.. autoapi-nested-parse::
+   Terminal progress bar.
+
+
+
+
+Overview
+--------
+Classes
+~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`Display <undr.display.Display>`
+      - Display collects update messages and shows progress in a terminal.
+    * - :py:obj:`DisplayProgress <undr.display.DisplayProgress>`
+      - Represents download or process progress.
+    * - :py:obj:`Speedometer <undr.display.Speedometer>`
+      - Measures speed with multiple samples and a sliding window.
+    * - :py:obj:`Status <undr.display.Status>`
+      - Keeps track of download and process progress for a dataset.
+    * - :py:obj:`Tag <undr.display.Tag>`
+      - Label and icon representing an action in a terminal.
+
+
+Functions
+~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`format_bold <undr.display.format_bold>`
+      - Surrounds the message with ANSI escape characters for bold formatting.
+    * - :py:obj:`format_dim <undr.display.format_dim>`
+      - Surrounds the message with ANSI escape characters for dim formatting.
+    * - :py:obj:`format_error <undr.display.format_error>`
+      - Adds a red cross mark in front of the message.
+    * - :py:obj:`format_info <undr.display.format_info>`
+      - Adds a kangaroo icon in front of the message.
+    * - :py:obj:`progress_bar <undr.display.progress_bar>`
+      - Generates a progress bar compatible with terminals.
+    * - :py:obj:`speeds <undr.display.speeds>`
+      - Calculates the total speed for multiple datasets.
+
+
+Attributes
+~~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`ANSI_COLORS_ENABLED <undr.display.ANSI_COLORS_ENABLED>`
+      - 
+
+
+Module Contents
+---------------
+
+.. py:data:: ANSI_COLORS_ENABLED
+
+   
+
+.. py:class:: Display(statuses: list[Status], output_interval: float, download_speed_samples: int, process_speed_samples: int, download_tag: Tag, process_tag: Tag)
+
+
+   Display collects update messages and shows progress in a terminal.
+
+   :param statuses: Initial statuses for all datasets.
+   :type statuses: list[Status]
+   :param output_interval: Time between refreshes in seconds.
+   :type output_interval: float
+   :param download_speed_samples: Size of the sliding window for download speed calculations.
+   :type download_speed_samples: int
+   :param process_speed_samples: Size of the sliding window for process speed calculations.
+   :type process_speed_samples: int
+   :param download_tag: Label and icon for the download action.
+   :type download_tag: Tag
+   :param process_tag: Label and icon for the process action.
+   :type process_tag: Tag
+
+   .. py:method:: __enter__() -> Display
+
+      Enables the use of the "with" statement.
+
+      :returns: A display context that calls :py:meth:`close` on exit.
+      :rtype: Display
+
+
+   .. py:method:: __exit__(type: Optional[Type[BaseException]], value: Optional[BaseException], traceback: Optional[types.TracebackType])
+
+      Enables the use of the "with" statement.
+
+      :param type: None if the context exits without an exception, and the raised exception's class otherwise.
+      :type type: typing.Optional[typing.Type[BaseException]]
+      :param value: None if the context exits without an exception, and the raised exception otherwise.
+      :type value: typing.Optional[BaseException]
+      :param traceback: None if the context exits without an exception, and the raised exception's traceback otherwise.
+      :type traceback: typing.Optional[types.TracebackType]
+
+
+   .. py:method:: close()
+
+      Terminates the worker thread.
+
+      This function is called automatically if display is used as a context manager.
+
+
+   .. py:method:: messages(statuses: list[Status]) -> list[Status]
+
+      Consumes messages until the queue is empty.
+
+      This function consumes messages until the queue is empty, not closed. More messages are likely to be queued after this function returns.
+
+      :param statuses: Current statuses, will be modified in-place. Use :py:func:`copy.deepcopy` to preserve the original list.
+      :type statuses: list[Status]
+
+      :raises RuntimeError: if a message in the queue is not :py:class:`undr.decode.Progress`, :py:class:`undr.remote.Progress`, :py:class:`undr.json_index_tasks.IndexLoaded` or :py:class:`undr.json_index_tasks.DirectoryScanned`.
+
+      :returns: Updated statuses.
+      :rtype: list[Status]
+
+
+   .. py:method:: output(statuses: list[Status], average: bool, download_speed: float, process_speed: float)
+
+      Called by the worker to generate the terminal text.
+
+      :param statuses: Current datasets statuses.
+      :type statuses: list[Status]
+      :param average: Whether the provided speeds are averages, typically used after all the actions are complete.
+      :type average: bool
+      :param download_speed: Current or average download speed in bytes per second.
+      :type download_speed: float
+      :param process_speed: Current or average process speed in bytes per second.
+      :type process_speed: float
+
+
+   .. py:method:: push(message: Any)
+
+      Processes update messages.
+
+      Ignores messages that are not :py:class:`undr.decode.Progress`, :py:class:`undr.remote.Progress`, :py:class:`undr.json_index_tasks.IndexLoaded` or :py:class:`undr.json_index_tasks.DirectoryScanned`.
+
+      :param message: Message from a worker.
+      :type message: typing.Any
+
+
+   .. py:method:: target()
+
+      Worker thread implementation.
+
+
+   .. py:method:: time_left(statuses: list[Status], download_speed: float, process_speed: float) -> Optional[float]
+
+      Estimates the time left to complete the download and process actions.
+
+      :param statuses: Current datasets statuses.
+      :type statuses: list[Status]
+      :param download_speed: Current speed in bytes per second.
+      :type download_speed: float
+      :param process_speed: Current speed in bytes per second.
+      :type process_speed: float
+
+      :returns: Estimated time left in second or None if at least one dataset is still being indexed or if the download and process speeds are zero.
+      :rtype: typing.Optional[float]
+
+
+
+.. py:class:: DisplayProgress
+
+
+   Represents download or process progress.
+
+   .. py:attribute:: current_bytes
+      :type: int
+
+      Number of bytes currently downloaded or processed.
+
+   .. py:attribute:: final_bytes
+      :type: int
+
+      Total number of bytes to download or process.
+
+   .. py:attribute:: initial_bytes
+      :type: int
+
+      Number of bytes already downloaded or processed when the action started.
+
+
+.. py:class:: Speedometer(maximum_samples: int)
+
+
+   Measures speed with multiple samples and a sliding window.
+
+   :param maximum_samples: Number of samples. Fewer samples are used for the first few speed estimations, until that number is reached.
+   :type maximum_samples: int
+
+   .. py:method:: __repr__() -> str
+
+      Return repr(self).
+
+
+   .. py:method:: add_sample(sample: float)
+
+      Passes a new sample to the speedometer.
+
+      :param sample: Speed sample in bytes per second.
+      :type sample: float
+
+
+   .. py:method:: value() -> float
+
+      Current speed value in bytes per second.
+
+      :returns: Mean value of the samples.
+      :rtype: float
+
+
+
+.. py:class:: Status
+
+
+   Keeps track of download and process progress for a dataset.
+
+   .. py:attribute:: current_index_files
+      :type: int
+
+      Number of index files downloaded so far.
+
+   .. py:attribute:: download
+      :type: DisplayProgress
+
+      Represents download progress.
+
+      Ignored if the mode is :py:attr:`undr.install_mode.Mode.REMOTE`.
+
+   .. py:attribute:: final_index_files
+      :type: int
+
+      Total number of index files.
+
+      This number may increase as more index files are discovered while indexing.
+
+   .. py:attribute:: indexing
+      :type: bool
+
+      Whether the dataset has been indexed.
+
+   .. py:attribute:: mode
+      :type: undr.install_mode.Mode
+
+      Dataset installation mode.
+
+   .. py:attribute:: path_id
+      :type: pathlib.PurePosixPath
+
+      Path ID of the dataset's base directory.
+
+   .. py:attribute:: process
+      :type: DisplayProgress
+
+      Represents process progress
+
+      Ignored if the mode is :py:attr:`undr.install_mode.Mode.REMOTE` or :py:attr:`undr.install_mode.Mode.LOCAL`.
+
+   .. py:method:: complete() -> bool
+
+      Checks whether actions are complete for this dataset.
+
+      :returns: Whether all actions are complete.
+      :rtype: bool
+
+
+   .. py:method:: from_path_id_and_mode(path_id: pathlib.PurePosixPath, dataset_mode: undr.install_mode.Mode)
+      :classmethod:
+
+      Initializes a status from a path ID and a mode.
+
+      :param path_id: The dataset's base directory.
+      :type path_id: pathlib.PurePosixPath
+      :param dataset_mode: The installation mode.
+      :type dataset_mode: install_mode.Mode
+
+      :returns: Default initial status.
+      :rtype: Status
+
+
+   .. py:method:: is_parent_of(path_id: pathlib.PurePosixPath) -> bool
+
+      Checks whether the dataset represented by this status is a parent of the given resource.
+
+      This can be used to assign messages from a given resource to the right dataset.
+
+      :param path_id: The path ID of the resource that may be a child of this dataset.
+      :type path_id: pathlib.PurePosixPath
+
+      :returns: Whether this dataset is a parent of the resource.
+      :rtype: bool
+
+
+   .. py:method:: label() -> str
+
+      Returns the dataset's name.
+
+
+   .. py:method:: progress_and_representation(download_tag: Tag, process_tag: Tag) -> tuple[Optional[tuple[float, float]], str]
+
+      Returns download and process progress in bytes and a string representation of these values.
+
+      :param download_tag: Icon and label for the download action.
+      :type download_tag: Tag
+      :param process_tag: Icon and label for the process action.
+      :type process_tag: Tag
+
+      :returns: The first entry is None if the dataset is being indexed. Otherwise, the first entry is the progress in bytes. The second entry is the string representation of progress, which is always not None.
+      :rtype: tuple[tuple[float, float], str]
+
+
+   .. py:method:: speeds(previous_status: Status, interval: float) -> tuple[float, float]
+
+      Calculates download and process speeds.
+
+      :param previous_status: Past status used to calculate progress variation.
+      :type previous_status: Status
+      :param interval: Time since the previous status in seconds.
+      :type interval: float
+
+      :returns: download speed and process speed in bytes per second.
+      :rtype: tuple[float, float]
+
+
+
+.. py:class:: Tag
+
+
+   Label and icon representing an action in a terminal.
+
+   .. py:attribute:: icon
+      :type: str
+
+      The action's icon, typically a single non-ASCII UTF-8 character.
+
+   .. py:attribute:: label
+      :type: str
+
+      The action label.
+
+
+.. py:function:: format_bold(message: str) -> str
+
+   Surrounds the message with ANSI escape characters for bold formatting.
+
+   :param message: A message to be displayed in a terminal.
+   :type message: str
+
+   :returns: The message surrounded with ANSI escape characters, or the original message if the environment variable ``ANSI_COLORS_DISABLED`` is set.
+   :rtype: str
+
+
+.. py:function:: format_dim(message: str) -> str
+
+   Surrounds the message with ANSI escape characters for dim formatting.
+
+   :param message: A message to be displayed in a terminal.
+   :type message: str
+
+   :returns: The message surrounded with ANSI escape characters, or the original message if the environment variable ``ANSI_COLORS_DISABLED`` is set.
+   :rtype: str
+
+
+.. py:function:: format_error(message: str) -> str
+
+   Adds a red cross mark in front of the message.
+
+   :param message: A message to be displayed in a terminal.
+   :type message: str
+
+   :returns: The message with a prefix.
+   :rtype: str
+
+
+.. py:function:: format_info(message: str) -> str
+
+   Adds a kangaroo icon in front of the message.
+
+   :param message: A message to be displayed in a terminal.
+   :type message: str
+
+   :returns: The message with a prefix.
+   :rtype: str
+
+
+.. py:function:: progress_bar(width: int, progress: Optional[tuple[float, float]]) -> str
+
+   Generates a progress bar compatible with terminals.
+
+   :param width: The progress bar width in characters.
+   :type width: int
+   :param progress: None yields an indeterminate progress bar, a tuple returns a two-levels progress bar (bottom and top). The tuple values must be in the range ``[0, 1]``. Use the same value twice to generate a simple (one-level) progress bar.
+   :type progress: typing.Optional[tuple[float, float]]
+
+   :returns: The progress bar as a string, without line breaks.
+   :rtype: str
+
+
+.. py:function:: speeds(previous_statuses: list[Status], statuses: list[Status], interval: float) -> tuple[float, float]
+
+   Calculates the total speed for multiple datasets.
+
+   :param previous_statuses: Past statuses used to calculate progress variation.
+   :type previous_statuses: list[Status]
+   :param statuses: Current statuses, must be the same length as `previous_statuses`.
+   :type statuses: list[Status]
+   :param interval: Time since the previous statuses in seconds.
+   :type interval: float
+
+   :returns: Overall download speed and process speed in bytes per second.
+   :rtype: tuple[float, float]
+
+

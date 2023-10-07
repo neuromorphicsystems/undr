@@ -1,0 +1,51 @@
+
+
+
+
+:py:mod:`undr.bibtex`
+=====================
+
+.. py:module:: undr.bibtex
+
+.. autoapi-nested-parse::
+   BibTeX downloading and parsing.
+
+
+
+
+Overview
+--------
+
+Functions
+~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`from_doi <undr.bibtex.from_doi>`
+      - Downloads and formats BibTeX from https://dx.doi.org/.
+
+
+
+Module Contents
+---------------
+
+.. py:function:: from_doi(doi: str, pretty: bool, timeout: float) -> str
+
+   Downloads and formats BibTeX from https://dx.doi.org/.
+
+   :param doi: Digital object identifier (DOI) string starting with ``10.``.
+   :type doi: str
+   :param pretty: Whether to correct line breaks and indents.
+                  Otherwise, this function returns the raw reponse from https://dx.doi.org/.
+   :type pretty: bool
+   :param timeout: Request timeout in seconds.
+   :type timeout: float
+
+   :raises requests.exceptions.HTTPError: if a network error occurs (unreachable server, timeout...).
+
+   :returns: BibTeX entry for the given DOI.
+   :rtype: str
+
+

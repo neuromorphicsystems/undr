@@ -1,0 +1,103 @@
+
+
+
+
+:py:mod:`undr.constants`
+========================
+
+.. py:module:: undr.constants
+
+.. autoapi-nested-parse::
+   Constants used throughout the codebase.
+
+
+
+
+Overview
+--------
+
+
+Attributes
+~~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`CHUNK_SIZE <undr.constants.CHUNK_SIZE>`
+      - Buffer size in bytes for file reads.
+    * - :py:obj:`CONSUMER_POLL_PERIOD <undr.constants.CONSUMER_POLL_PERIOD>`
+      - Sleep duration for msssage readers.
+    * - :py:obj:`DECOMPRESS_SUFFIX <undr.constants.DECOMPRESS_SUFFIX>`
+      - Suffix indicating that a file is being decompressed.
+    * - :py:obj:`DEFAULT_TIMEOUT <undr.constants.DEFAULT_TIMEOUT>`
+      - Server timeout, can be overriden in settings TOML files.
+    * - :py:obj:`DOWNLOAD_SUFFIX <undr.constants.DOWNLOAD_SUFFIX>`
+      - Suffix indicating that a file is being downloaded.
+    * - :py:obj:`LRU_CACHE_MAXSIZE <undr.constants.LRU_CACHE_MAXSIZE>`
+      - Number of index files cached by the load function.
+    * - :py:obj:`SPEED_SAMPLES <undr.constants.SPEED_SAMPLES>`
+      - Number of samples used to smooth the speed measurement (sliding window).
+    * - :py:obj:`STREAM_CHUNK_THRESHOLD <undr.constants.STREAM_CHUNK_THRESHOLD>`
+      - Below this number, files are download in one chunk instead of several to boost performance.
+    * - :py:obj:`WORKER_POLL_PERIOD <undr.constants.WORKER_POLL_PERIOD>`
+      - Sleep duration for wworkers when the task queue is empty.
+
+
+Module Contents
+---------------
+
+.. py:data:: CHUNK_SIZE
+   :type: int
+   :value: 65536
+
+   Buffer size in bytes for file reads.
+
+.. py:data:: CONSUMER_POLL_PERIOD
+   :type: float
+   :value: 0.1
+
+   Sleep duration for msssage readers.
+
+.. py:data:: DECOMPRESS_SUFFIX
+   :type: str
+   :value: '.decompress'
+
+   Suffix indicating that a file is being decompressed.
+
+.. py:data:: DEFAULT_TIMEOUT
+   :type: float
+   :value: 60.0
+
+   Server timeout, can be overriden in settings TOML files.
+
+.. py:data:: DOWNLOAD_SUFFIX
+   :type: str
+   :value: '.download'
+
+   Suffix indicating that a file is being downloaded.
+
+.. py:data:: LRU_CACHE_MAXSIZE
+   :type: int
+   :value: 128
+
+   Number of index files cached by the load function.
+
+.. py:data:: SPEED_SAMPLES
+   :type: int
+   :value: 30
+
+   Number of samples used to smooth the speed measurement (sliding window).
+
+.. py:data:: STREAM_CHUNK_THRESHOLD
+   :type: int
+   :value: 64
+
+   Below this number, files are download in one chunk instead of several to boost performance.
+
+.. py:data:: WORKER_POLL_PERIOD
+   :type: float
+   :value: 0.02
+
+   Sleep duration for wworkers when the task queue is empty.
+

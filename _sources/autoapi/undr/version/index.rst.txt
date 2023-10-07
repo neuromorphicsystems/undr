@@ -1,0 +1,35 @@
+
+
+
+
+:py:mod:`undr.version`
+======================
+
+.. py:module:: undr.version
+
+
+
+
+Overview
+--------
+
+
+Attributes
+~~~~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`__version__ <undr.version.__version__>`
+      - UNDR's version, conforms to Semantic Versioning 2.0.0.
+
+
+Module Contents
+---------------
+
+.. py:data:: __version__
+   :value: '1.0.1'
+
+   UNDR's version, conforms to Semantic Versioning 2.0.0.
+

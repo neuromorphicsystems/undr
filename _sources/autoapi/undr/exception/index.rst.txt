@@ -1,0 +1,53 @@
+
+
+
+
+:py:mod:`undr.exception`
+========================
+
+.. py:module:: undr.exception
+
+.. autoapi-nested-parse::
+   Custom runtime exceptions.
+
+   Direct calls to :py:class:`Exception` in other parts of the codebase indicate a logic error.
+
+
+
+
+Overview
+--------
+
+Module Contents
+---------------
+
+.. py:exception:: HashMismatch(path_id: pathlib.PurePosixPath, expected_hash: str, hash: str)
+
+
+   Bases: :py:obj:`Exception`
+
+   Raised if the hash read from the index is different from the hash calculated from the file bytes.
+
+   :param path_id: The path ID of the resource with a hash mismatch.
+   :type path_id: pathlib.PurePosixPath
+   :param expected_hash: The hash read from the index.
+   :type expected_hash: str
+   :param hash: The hash calculated from the bytes effectively processed.
+   :type hash: str
+
+
+.. py:exception:: SizeMismatch(path_id: pathlib.PurePosixPath, expected_size: int, size: int)
+
+
+   Bases: :py:obj:`Exception`
+
+   Raised if the size read from the index is different from number of bytes in the decompressed file.
+
+   :param path_id: The path ID of the resource with a size mismatch.
+   :type path_id: pathlib.PurePosixPath
+   :param expected_size: The size read from the index.
+   :type expected_size: int
+   :param size: The effective decompressed size in bytes.
+   :type size: int
+
+

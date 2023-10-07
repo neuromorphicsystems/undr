@@ -1,0 +1,279 @@
+
+
+
+
+:py:mod:`undr.path`
+===================
+
+.. py:module:: undr.path
+
+.. autoapi-nested-parse::
+   Local or remote file.
+
+
+
+
+Overview
+--------
+Classes
+~~~~~~~
+.. list-table::
+    :header-rows: 0
+    :widths: auto
+    :class: autoapi-summary
+
+    * - :py:obj:`Download <undr.path.Download>`
+      - Downloads a remote file.
+    * - :py:obj:`File <undr.path.File>`
+      - Represents a local or remote file.
+    * - :py:obj:`Path <undr.path.Path>`
+      - A file or directory in a dataset.
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: Download(path_id: pathlib.PurePosixPath, suffix: Optional[str], server: undr.remote.Server, stream: bool)
+
+
+   Bases: :py:obj:`undr.remote.Download`
+
+   Downloads a remote file.
+
+   This task is never used with a scheduler. Its run function is called by :py:meth:`File.chunks` to recycle the download logic implemented in py:class:`undr.remote.Download`.
+
+   :param path_id: The resource's unique path id.
+   :type path_id: pathlib.PurePosixPath
+   :param suffix: Added to the file name while it is being downloaded.
+   :type suffix: typing.Optional[str]
+   :param server: The remote server.
+   :type server: Server
+   :param stream: Whether to download the file in chunks (slightly slower for small files, reduces memory usage for large files).
+   :type stream: bool
+
+   .. py:method:: on_begin(manager: undr.task.Manager) -> int
+
+      Called before contacting the server.
+
+      This function must return an offset in bytes.
+
+      - 0 indicates that the file is not downloaded yet.
+      - Positive values indicate the number of bytes already downloaded.
+      - Negative values indicate that the download is already complete and must be skipped.
+
+      :param manager: The task manager for reporting updates.
+      :type manager: task.Manager
+
+      :returns: Number of bytes already downloaded.
+      :rtype: int
+
+
+   .. py:method:: on_response_ready(response: requests.Response, manager: undr.task.Manager)
+
+      Called when the HTTP response object is ready.
+
+      The reponse object can be used to download the remote file.
+
+      :param response: HTTP response object.
+      :type response: requests.Response
+      :param manager: The task manager for reporting updates.
+      :type manager: task.Manager
+
+
+
+.. py:class:: File
+
+
+   Bases: :py:obj:`Path`
+
+   Represents a local or remote file.
+
+   .. py:attribute:: compressions
+      :type: tuple[undr.decode.Compression, Ellipsis]
+
+      List of compressions available on the server.
+
+   .. py:attribute:: hash
+      :type: str
+
+      The decompressed file hash (SHA3-224).
+
+   .. py:attribute:: manager
+      :type: undr.task.Manager
+
+      Can be called to schedule new tasks and report updates.
+
+   .. py:attribute:: session
+      :type: Optional[requests.Session]
+
+      An open session that can be used to download resources.
+
+   .. py:attribute:: size
+      :type: int
+
+      The decompressed file size in bytes.
+
+   .. py:method:: __truediv__(other: str) -> Path
+
+      Concatenates this path with a string to create a new path.
+
+      :param other: Suffix to append to this path.
+      :type other: str
+
+      :returns: The concatenated result.
+      :rtype: Path
+
+
+   .. py:method:: _chunks(word_size: int) -> Iterable[bytes]
+
+      Returns an iterator over the file's decompressed bytes.
+
+      Users should prefer :py:func:`chunks` since files know their word size.
+
+      :param word_size: size of an entry (events, frames...) in the file.
+      :type word_size: int
+
+      :raises decode.RemainingBytesError: if the total file size is not a multiple of `word_size`.
+      :raises Exception: if the hash is incorrect.
+
+      :returns: Iterator over the file's decompressed bytes.
+      :rtype: typing.Iterable[bytes]
+
+
+   .. py:method:: attach_manager(manager: Optional[undr.task.Manager])
+
+      Binds a manager to this file.
+
+      The file sends all subsequent updates (download and processing) to the manager.
+
+      :param manager: The manager to use to keep track of progress.
+      :type manager: typing.Optional[task.Manager]
+
+
+   .. py:method:: attach_session(session: Optional[requests.Session])
+
+      Binds a session to this file.
+
+      The session is used for all subsequent downloads.
+
+      :param session: An open session to use for downloads.
+      :type session: typing.Optional[requests.Session]
+
+
+   .. py:method:: attributes_from_dict(data: dict[str, Any], parent: undr.path_directory.Directory) -> dict[str, Any]
+      :staticmethod:
+
+      Converts -index.json data to a dict of this class's arguments.
+
+      The returned dict can be used to initialise an instance of this class.
+
+      :param data: Parsed JSON data.
+      :type data: dict[str, typing.Any]
+      :param parent: The file's parent directory.
+      :type parent: path_directory.Directory
+
+      :returns: Data that can be used to initialize this class.
+      :rtype: dict[str, typing.Any]
+
+
+   .. py:method:: best_compression() -> undr.decode.Compression
+
+      Returns the best compression supported by the remote server for this file.
+
+      Best is defined here as "smallest encoded size".
+
+      :returns: Compression format that yields the smallest version of this file.
+      :rtype: decode.Compression
+
+
+   .. py:method:: chunks() -> Iterable[bytes]
+
+      Returns an iterator over the file's decompressed bytes.
+
+      :returns: Iterator over the decompressed file's bytes. The size of the chunks may vary.
+      :rtype: typing.Iterable[bytes]
+
+
+   .. py:method:: from_dict(data: dict[str, Any], parent: undr.path_directory.Directory)
+      :classmethod:
+
+      Conerts -index.json data to an instance of this class.
+
+      :param data: Parsed JSON data.
+      :type data: dict[str, typing.Any]
+      :param parent: The file's parent directory.
+      :type parent: path_directory.Directory
+
+      :returns: The file represented by the given data.
+      :rtype: File
+
+
+   .. py:method:: word_size() -> int
+
+      The size of an entry in this file, in bytes.
+
+      This can be used to ensure that entries (events, frames...) are not split while reading.
+      A decoded file's size in bytes must be a multiple of the value returned by this function.
+
+      :returns: Number of bytes used by each entry.
+      :rtype: int
+
+
+
+.. py:class:: Path
+
+
+   A file or directory in a dataset.
+
+   A path can point to a local resource or represent a remote resource.
+
+   .. py:attribute:: metadata
+      :type: dict[str, Any]
+
+      Any data not strictly required to decode the file (stored in -index.json).
+
+   .. py:attribute:: own_doi
+      :type: Optional[str]
+
+      This resource's DOI, used by all its children unless they have their own DOI.
+
+   .. py:attribute:: path_id
+      :type: pathlib.PurePosixPath
+
+      A POSIX path uniquely identifying the resource (including its dataset).
+
+   .. py:attribute:: path_root
+      :type: pathlib.Path
+
+      Path of the root "datasets" directory used to generate local paths.
+
+   .. py:attribute:: server
+      :type: undr.remote.Server
+
+      The resource's remote server, used to download data if it is not available locally.
+
+   .. py:method:: __truediv__(other: str) -> Path
+      :abstractmethod:
+
+      Concatenates this path with a string to create a new path.
+
+      :param other: Suffix to append to this path.
+      :type other: str
+
+      :returns: The concatenated result.
+      :rtype: Path
+
+
+   .. py:method:: local_path() -> pathlib.Path
+
+      Returns the local file path.
+
+      This function always return a path, even if the local resource does not exist.
+
+      :returns: The path of the local resource.
+      :rtype: pathlib.Path
+
+
+

@@ -1,0 +1,753 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="undr.path" href="../path/index.html" /><link rel="prev" title="undr.json_index" href="../json_index/index.html" />
+
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>undr.json_index_tasks - UNDR documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=4a2923de" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">UNDR  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">UNDR  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of undr</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../bibtex/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.bibtex</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../check/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.check</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.configuration</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../constants/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.constants</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decode/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.decode</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../display/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.display</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exception/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.exception</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../formats/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.formats</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install_mode/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.install_mode</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../json_index/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.json_index</span></code></a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.json_index_tasks</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../path/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.path</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../path_directory/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.path_directory</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../persist/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.persist</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../raw/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.raw</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../remote/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.remote</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../simple/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.simple</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../task/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.task</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.utilities</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../version/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.version</span></code></a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/neuromorphicsystems/undr">GitHub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pypi.org/project/undr/">PyPI</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://crates.io/crates/undr">crates.io</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-undr.json_index_tasks">
+<span id="undr-json-index-tasks"></span><h1><a class="reference internal" href="#module-undr.json_index_tasks" title="undr.json_index_tasks"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.json_index_tasks</span></code></a><a class="headerlink" href="#module-undr.json_index_tasks" title="Link to this heading">#</a></h1>
+<p>Implementation of operations based on index files (recursive download, recursive action dispatch…).</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading">#</a></h3>
+<div class="table-wrapper colwidths-auto autoapi-summary docutils container">
+<table class="autoapi-summary docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#undr.json_index_tasks.DirectoryScanned" title="undr.json_index_tasks.DirectoryScanned"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DirectoryScanned</span></code></a></p></td>
+<td><p>Reports information on a local directory.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#undr.json_index_tasks.Doi" title="undr.json_index_tasks.Doi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Doi</span></code></a></p></td>
+<td><p>Message dispatched when a DOI is found in the index.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#undr.json_index_tasks.Index" title="undr.json_index_tasks.Index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Index</span></code></a></p></td>
+<td><p>Downloads an index file (-index.json).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#undr.json_index_tasks.IndexLoaded" title="undr.json_index_tasks.IndexLoaded"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IndexLoaded</span></code></a></p></td>
+<td><p>Message indicating that the given index file has been loaded.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#undr.json_index_tasks.IndexProgress" title="undr.json_index_tasks.IndexProgress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IndexProgress</span></code></a></p></td>
+<td><p>Represents download or process progress.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#undr.json_index_tasks.InstallFilesRecursive" title="undr.json_index_tasks.InstallFilesRecursive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InstallFilesRecursive</span></code></a></p></td>
+<td><p>Downloads (and possibly decompresses) a directories’ files recursively.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#undr.json_index_tasks.ProcessFile" title="undr.json_index_tasks.ProcessFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProcessFile</span></code></a></p></td>
+<td><p>Generic task for file processing.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#undr.json_index_tasks.ProcessFilesRecursive" title="undr.json_index_tasks.ProcessFilesRecursive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProcessFilesRecursive</span></code></a></p></td>
+<td><p>Spawns a processing task for each file in the given directory.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#undr.json_index_tasks.Selector" title="undr.json_index_tasks.Selector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Selector</span></code></a></p></td>
+<td><p>Delegate called to pick an action for each file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#undr.json_index_tasks.UncompressedDecodeProgress" title="undr.json_index_tasks.UncompressedDecodeProgress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UncompressedDecodeProgress</span></code></a></p></td>
+<td><p>Dummy task that repoorts progress on “decompression” for uncompressed resources.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">#</a></h3>
+<div class="table-wrapper colwidths-auto autoapi-summary docutils container">
+<table class="autoapi-summary docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#undr.json_index_tasks.ProcessFileType" title="undr.json_index_tasks.ProcessFileType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProcessFileType</span></code></a></p></td>
+<td><p>Generic parameter representing the file type.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.DirectoryScanned">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">DirectoryScanned</span></span><a class="headerlink" href="#undr.json_index_tasks.DirectoryScanned" title="Link to this definition">#</a></dt>
+<dd><p>Reports information on a local directory.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.DirectoryScanned.download_bytes">
+<span class="sig-name descname"><span class="pre">download_bytes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#undr.json_index_tasks.IndexProgress" title="undr.json_index_tasks.IndexProgress"><span class="pre">IndexProgress</span></a></em><a class="headerlink" href="#undr.json_index_tasks.DirectoryScanned.download_bytes" title="Link to this definition">#</a></dt>
+<dd><p>Total size of the compressed files in this directory, in bytes.</p>
+<p>This size does not include -index.json.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.DirectoryScanned.final_count">
+<span class="sig-name descname"><span class="pre">final_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#undr.json_index_tasks.DirectoryScanned.final_count" title="Link to this definition">#</a></dt>
+<dd><p>Total number of files in this directory (“files” and “other_files”).</p>
+<p>This count does not include -index.json.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.DirectoryScanned.index_bytes">
+<span class="sig-name descname"><span class="pre">index_bytes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#undr.json_index_tasks.IndexProgress" title="undr.json_index_tasks.IndexProgress"><span class="pre">IndexProgress</span></a></em><a class="headerlink" href="#undr.json_index_tasks.DirectoryScanned.index_bytes" title="Link to this definition">#</a></dt>
+<dd><p>Size of the index file (-index.json) in bytes.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.DirectoryScanned.initial_download_count">
+<span class="sig-name descname"><span class="pre">initial_download_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#undr.json_index_tasks.DirectoryScanned.initial_download_count" title="Link to this definition">#</a></dt>
+<dd><p>Number of files already downloaded when the action started (“files” and “other_files”).</p>
+<p>This count does not include -index.json.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.DirectoryScanned.initial_process_count">
+<span class="sig-name descname"><span class="pre">initial_process_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#undr.json_index_tasks.DirectoryScanned.initial_process_count" title="Link to this definition">#</a></dt>
+<dd><p>Number of files already processed when the action started (“files” and “other_files”).</p>
+<p>This count does not include -index.json.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.DirectoryScanned.path_id">
+<span class="sig-name descname"><span class="pre">path_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePosixPath" title="(in Python v3.12)"><span class="pre">pathlib.PurePosixPath</span></a></em><a class="headerlink" href="#undr.json_index_tasks.DirectoryScanned.path_id" title="Link to this definition">#</a></dt>
+<dd><p>Path ID of the directory.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.DirectoryScanned.process_bytes">
+<span class="sig-name descname"><span class="pre">process_bytes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#undr.json_index_tasks.IndexProgress" title="undr.json_index_tasks.IndexProgress"><span class="pre">IndexProgress</span></a></em><a class="headerlink" href="#undr.json_index_tasks.DirectoryScanned.process_bytes" title="Link to this definition">#</a></dt>
+<dd><p>Total size of the files in this directory, in bytes.</p>
+<p>This size does not include -index.json.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Doi">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">Doi</span></span><a class="headerlink" href="#undr.json_index_tasks.Doi" title="Link to this definition">#</a></dt>
+<dd><p>Message dispatched when a DOI is found in the index.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Doi.path_id">
+<span class="sig-name descname"><span class="pre">path_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePosixPath" title="(in Python v3.12)"><span class="pre">pathlib.PurePosixPath</span></a></em><a class="headerlink" href="#undr.json_index_tasks.Doi.path_id" title="Link to this definition">#</a></dt>
+<dd><p>Path ID of the associated resource.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Doi.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="headerlink" href="#undr.json_index_tasks.Doi.value" title="Link to this definition">#</a></dt>
+<dd><p>Digital object identifier (DOI) string starting with <code class="docutils literal notranslate"><span class="pre">10.</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Index">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">Index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePosixPath" title="(in Python v3.12)"><span class="pre">pathlib.PurePosixPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../remote/index.html#undr.remote.Server" title="undr.remote.Server"><span class="pre">undr.remote.Server</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#undr.json_index_tasks.Selector" title="undr.json_index_tasks.Selector"><span class="pre">Selector</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory_doi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#undr.json_index_tasks.Index" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../remote/index.html#undr.remote.DownloadFile" title="undr.remote.DownloadFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undr.remote.DownloadFile</span></code></a></p>
+<p>Downloads an index file (-index.json).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><em>pathlib.Path</em></a>) – The root path used to generate local file paths.</p></li>
+<li><p><strong>path_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePosixPath" title="(in Python v3.12)"><em>pathlib.PurePosixPath</em></a>) – The path ID of the directory that will be seached recursively.</p></li>
+<li><p><strong>server</strong> (<a class="reference internal" href="../remote/index.html#undr.remote.Server" title="undr.remote.Server"><em>remote.Server</em></a>) – The remote server to download resources.</p></li>
+<li><p><strong>selector</strong> (<a class="reference internal" href="#undr.json_index_tasks.Selector" title="undr.json_index_tasks.Selector"><em>Selector</em></a>) – A selector that defines the files to process.</p></li>
+<li><p><strong>priority</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – Priority of this task (tasks with lower priorities are scheduled first).</p></li>
+<li><p><strong>force</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Download the index file even if it is already present locally.</p></li>
+<li><p><strong>directory_doi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Whether to dispatch <a class="reference internal" href="#undr.json_index_tasks.Doi" title="undr.json_index_tasks.Doi"><code class="xref py py-class docutils literal notranslate"><span class="pre">Doi</span></code></a> messages while reading the index.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Index.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://requests.readthedocs.io/en/latest/api/#requests.Session" title="(in Requests v2.31.0)"><span class="pre">requests.Session</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../task/index.html#undr.task.Manager" title="undr.task.Manager"><span class="pre">undr.task.Manager</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#undr.json_index_tasks.Index.run" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.IndexLoaded">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">IndexLoaded</span></span><a class="headerlink" href="#undr.json_index_tasks.IndexLoaded" title="Link to this definition">#</a></dt>
+<dd><p>Message indicating that the given index file has been loaded.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.IndexLoaded.children">
+<span class="sig-name descname"><span class="pre">children</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#undr.json_index_tasks.IndexLoaded.children" title="Link to this definition">#</a></dt>
+<dd><p>Number of subdirectories that will subsequently be loaded.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.IndexLoaded.path_id">
+<span class="sig-name descname"><span class="pre">path_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePosixPath" title="(in Python v3.12)"><span class="pre">pathlib.PurePosixPath</span></a></em><a class="headerlink" href="#undr.json_index_tasks.IndexLoaded.path_id" title="Link to this definition">#</a></dt>
+<dd><p>Path ID of the directory whose index has been loaded.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.IndexProgress">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">IndexProgress</span></span><a class="headerlink" href="#undr.json_index_tasks.IndexProgress" title="Link to this definition">#</a></dt>
+<dd><p>Represents download or process progress.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.IndexProgress.final">
+<span class="sig-name descname"><span class="pre">final</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#undr.json_index_tasks.IndexProgress.final" title="Link to this definition">#</a></dt>
+<dd><p>Total number of bytes to download or process.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.IndexProgress.initial">
+<span class="sig-name descname"><span class="pre">initial</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#undr.json_index_tasks.IndexProgress.initial" title="Link to this definition">#</a></dt>
+<dd><p>Number of bytes already downloaded or processed when the action started.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.InstallFilesRecursive">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">InstallFilesRecursive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePosixPath" title="(in Python v3.12)"><span class="pre">pathlib.PurePosixPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../remote/index.html#undr.remote.Server" title="undr.remote.Server"><span class="pre">undr.remote.Server</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#undr.json_index_tasks.Selector" title="undr.json_index_tasks.Selector"><span class="pre">Selector</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#undr.json_index_tasks.InstallFilesRecursive" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../task/index.html#undr.task.Task" title="undr.task.Task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undr.task.Task</span></code></a></p>
+<p>Downloads (and possibly decompresses) a directories’ files recursively.</p>
+<p>The actual action is controlled by the selector and may be different for different files. Child directories are installed recursively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><em>pathlib.Path</em></a>) – The root path used to generate local file paths.</p></li>
+<li><p><strong>path_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePosixPath" title="(in Python v3.12)"><em>pathlib.PurePosixPath</em></a>) – The path ID of the directory that will be seached recursively.</p></li>
+<li><p><strong>server</strong> (<a class="reference internal" href="../remote/index.html#undr.remote.Server" title="undr.remote.Server"><em>remote.Server</em></a>) – The remote server to download resources.</p></li>
+<li><p><strong>selector</strong> (<a class="reference internal" href="#undr.json_index_tasks.Selector" title="undr.json_index_tasks.Selector"><em>Selector</em></a>) – A selector that defines the files to process.</p></li>
+<li><p><strong>priority</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – Priority of this task (tasks with lower priorities are scheduled first).</p></li>
+<li><p><strong>force</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Download files even if they already present locally.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.json_index_tasks.InstallFilesRecursive.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://requests.readthedocs.io/en/latest/api/#requests.Session" title="(in Requests v2.31.0)"><span class="pre">requests.Session</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../task/index.html#undr.task.Manager" title="undr.task.Manager"><span class="pre">undr.task.Manager</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#undr.json_index_tasks.InstallFilesRecursive.run" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.ProcessFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">ProcessFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><span class="pre">undr.path.File</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#undr.json_index_tasks.ProcessFile" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../task/index.html#undr.task.Task" title="undr.task.Task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undr.task.Task</span></code></a></p>
+<p>Generic task for file processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><em>path.File</em></a>) – The file (remote or local) to process.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="undr.json_index_tasks.ProcessFileType">
+<span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">ProcessFileType</span></span><a class="headerlink" href="#undr.json_index_tasks.ProcessFileType" title="Link to this definition">#</a></dt>
+<dd><p>Generic parameter representing the file type.</p>
+<p>Used by <a class="reference internal" href="#undr.json_index_tasks.ProcessFilesRecursive" title="undr.json_index_tasks.ProcessFilesRecursive"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessFilesRecursive</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.ProcessFilesRecursive">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">ProcessFilesRecursive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePosixPath" title="(in Python v3.12)"><span class="pre">pathlib.PurePosixPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../remote/index.html#undr.remote.Server" title="undr.remote.Server"><span class="pre">undr.remote.Server</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#undr.json_index_tasks.Selector" title="undr.json_index_tasks.Selector"><span class="pre">Selector</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_file_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">ProcessFileType</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_file_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_file_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#undr.json_index_tasks.ProcessFilesRecursive" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../task/index.html#undr.task.Task" title="undr.task.Task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undr.task.Task</span></code></a></p>
+<p>Spawns a processing task for each file in the given directory.</p>
+<p>Subdirectories are recursively searched as well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><em>pathlib.Path</em></a>) – The root path used to generate local file paths.</p></li>
+<li><p><strong>path_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePosixPath" title="(in Python v3.12)"><em>pathlib.PurePosixPath</em></a>) – The path ID of the directory that will be scanned recursively.</p></li>
+<li><p><strong>server</strong> (<a class="reference internal" href="../remote/index.html#undr.remote.Server" title="undr.remote.Server"><em>remote.Server</em></a>) – The remote server used to download resources.</p></li>
+<li><p><strong>selector</strong> (<a class="reference internal" href="#undr.json_index_tasks.Selector" title="undr.json_index_tasks.Selector"><em>Selector</em></a>) – A selector that defines the files to process.</p></li>
+<li><p><strong>process_file_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.12)"><em>Type</em></a><em>[</em><em>ProcessFileType</em><em>]</em>) – The class of the task to run on each selected file. Must be a subclass of <a class="reference internal" href="#undr.json_index_tasks.ProcessFile" title="undr.json_index_tasks.ProcessFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessFile</span></code></a>.</p></li>
+<li><p><strong>process_file_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.12)"><em>Iterable</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><em>Any</em></a><em>]</em>) – Positional arguments passed to the constructor of <cite>process_file_class</cite>.</p></li>
+<li><p><strong>process_file_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.12)"><em>Mapping</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><em>Any</em></a><em>]</em>) – Keyword arguments passed to the constructor of <cite>process_file_class</cite>. The keyword argument <cite>file</cite> is automatically added by <cite>ProcessFilesRecursive</cite> after the positional arguments and before other keyword arguments.</p></li>
+<li><p><strong>priority</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – Priority of this task and all recursively created tasks (tasks with lower priorities are scheduled first).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.json_index_tasks.ProcessFilesRecursive.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://requests.readthedocs.io/en/latest/api/#requests.Session" title="(in Requests v2.31.0)"><span class="pre">requests.Session</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../task/index.html#undr.task.Manager" title="undr.task.Manager"><span class="pre">undr.task.Manager</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#undr.json_index_tasks.ProcessFilesRecursive.run" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">Selector</span></span><a class="headerlink" href="#undr.json_index_tasks.Selector" title="Link to this definition">#</a></dt>
+<dd><p>Delegate called to pick an action for each file.</p>
+<p>Selectors are used during the indexing phase to calculate the number of bytes to download and/or process,
+and during the processing phase to choose the action to perform.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.Action">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#undr.json_index_tasks.Selector.Action" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>Specifies the operation to perform for a given file.</p>
+<p>The action also determines whether the file’s bytes should be
+accounted for during the indexing phase.
+This is useful to report non-zero progress after resuming a job,
+but skip the actual processing.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.Action.DECOMPRESS">
+<span class="sig-name descname"><span class="pre">DECOMPRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#undr.json_index_tasks.Selector.Action.DECOMPRESS" title="Link to this definition">#</a></dt>
+<dd><p>Downloads, decompresses, and reports.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.Action.DOI">
+<span class="sig-name descname"><span class="pre">DOI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#undr.json_index_tasks.Selector.Action.DOI" title="Link to this definition">#</a></dt>
+<dd><p>Skips this file, does not report it, but publishes own DOIs.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.Action.DOWNLOAD">
+<span class="sig-name descname"><span class="pre">DOWNLOAD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#undr.json_index_tasks.Selector.Action.DOWNLOAD" title="Link to this definition">#</a></dt>
+<dd><p>Downloads and reports.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.Action.DOWNLOAD_SKIP">
+<span class="sig-name descname"><span class="pre">DOWNLOAD_SKIP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#undr.json_index_tasks.Selector.Action.DOWNLOAD_SKIP" title="Link to this definition">#</a></dt>
+<dd><p>Skips operations on this file but reports it as downloaded.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.Action.IGNORE">
+<span class="sig-name descname"><span class="pre">IGNORE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#undr.json_index_tasks.Selector.Action.IGNORE" title="Link to this definition">#</a></dt>
+<dd><p>Skips this file and does not report it.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.Action.PROCESS">
+<span class="sig-name descname"><span class="pre">PROCESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#undr.json_index_tasks.Selector.Action.PROCESS" title="Link to this definition">#</a></dt>
+<dd><p>Downloads, decompresses, processes, and reports.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.Action.SKIP">
+<span class="sig-name descname"><span class="pre">SKIP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#undr.json_index_tasks.Selector.Action.SKIP" title="Link to this definition">#</a></dt>
+<dd><p>Skips this file but reports it as downloaded and processed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.INSTALL_IGNORE_ACTIONS">
+<span class="sig-name descname"><span class="pre">INSTALL_IGNORE_ACTIONS</span></span><a class="headerlink" href="#undr.json_index_tasks.Selector.INSTALL_IGNORE_ACTIONS" title="Link to this definition">#</a></dt>
+<dd><p>The set of actions that ignore the file for reporting purposes.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.REPORT_DOWNLOAD_ACTIONS">
+<span class="sig-name descname"><span class="pre">REPORT_DOWNLOAD_ACTIONS</span></span><a class="headerlink" href="#undr.json_index_tasks.Selector.REPORT_DOWNLOAD_ACTIONS" title="Link to this definition">#</a></dt>
+<dd><p>The set of actions that (at least) download the file.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.REPORT_PROCESS_ACTIONS">
+<span class="sig-name descname"><span class="pre">REPORT_PROCESS_ACTIONS</span></span><a class="headerlink" href="#undr.json_index_tasks.Selector.REPORT_PROCESS_ACTIONS" title="Link to this definition">#</a></dt>
+<dd><p>The set of actions that download and process the file.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.SKIP_ACTIONS">
+<span class="sig-name descname"><span class="pre">SKIP_ACTIONS</span></span><a class="headerlink" href="#undr.json_index_tasks.Selector.SKIP_ACTIONS" title="Link to this definition">#</a></dt>
+<dd><p>The set of actions that skip all operations on the file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.action">
+<span class="sig-name descname"><span class="pre">action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../path/index.html#undr.path.File" title="undr.path.File"><span class="pre">undr.path.File</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#undr.json_index_tasks.Selector" title="undr.json_index_tasks.Selector"><span class="pre">Selector</span></a></span></span><a class="headerlink" href="#undr.json_index_tasks.Selector.action" title="Link to this definition">#</a></dt>
+<dd><p>Returns the action to apply to the given file.</p>
+<p>Called by <a class="reference internal" href="#undr.json_index_tasks.Index" title="undr.json_index_tasks.Index"><code class="xref py py-class docutils literal notranslate"><span class="pre">Index</span></code></a>, <a class="reference internal" href="#undr.json_index_tasks.InstallFilesRecursive" title="undr.json_index_tasks.InstallFilesRecursive"><code class="xref py py-class docutils literal notranslate"><span class="pre">InstallFilesRecursive</span></code></a> and <a class="reference internal" href="#undr.json_index_tasks.ProcessFilesRecursive" title="undr.json_index_tasks.ProcessFilesRecursive"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessFilesRecursive</span></code></a>.
+The default implementation returns <cite>Selector.Action.PROCESS</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.json_index_tasks.Selector.scan_filesystem">
+<span class="sig-name descname"><span class="pre">scan_filesystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../path_directory/index.html#undr.path_directory.Directory" title="undr.path_directory.Directory"><span class="pre">undr.path_directory.Directory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#undr.json_index_tasks.Selector.scan_filesystem" title="Link to this definition">#</a></dt>
+<dd><p>Whether to scan the filesystem.</p>
+<p>Called by <a class="reference internal" href="#undr.json_index_tasks.Index" title="undr.json_index_tasks.Index"><code class="xref py py-class docutils literal notranslate"><span class="pre">Index</span></code></a> to decide whether it needs to scan the file system.
+This function may return False if <a class="reference internal" href="#undr.json_index_tasks.Selector.action" title="undr.json_index_tasks.Selector.action"><code class="xref py py-func docutils literal notranslate"><span class="pre">action()</span></code></a> returns one of the following for every file in the directory:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.IGNORE" title="undr.json_index_tasks.Selector.Action.IGNORE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Selector.Action.IGNORE</span></code></a></p></li>
+<li><p><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.DOI" title="undr.json_index_tasks.Selector.Action.DOI"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Selector.Action.DOI</span></code></a></p></li>
+<li><p><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.SKIP" title="undr.json_index_tasks.Selector.Action.SKIP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Selector.Action.SKIP</span></code></a></p></li>
+<li><p><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.DOWNLOAD_SKIP" title="undr.json_index_tasks.Selector.Action.DOWNLOAD_SKIP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Selector.Action.DOWNLOAD_SKIP</span></code></a></p></li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="undr.json_index_tasks.UncompressedDecodeProgress">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">undr.json_index_tasks.</span></span><span class="sig-name descname"><span class="pre">UncompressedDecodeProgress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PurePosixPath" title="(in Python v3.12)"><span class="pre">pathlib.PurePosixPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#undr.json_index_tasks.UncompressedDecodeProgress" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../task/index.html#undr.task.Task" title="undr.task.Task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undr.task.Task</span></code></a></p>
+<p>Dummy task that repoorts progress on “decompression” for uncompressed resources.</p>
+<p>Resources that are not compressed are directly downloaded in raw format.
+The conversion from “local” to “raw” (decompression) requires no further action for such resources.
+This action dispatches decompression progress as if they were compressed, to simplify the architecture of progress trackers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="undr.json_index_tasks.UncompressedDecodeProgress.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://requests.readthedocs.io/en/latest/api/#requests.Session" title="(in Requests v2.31.0)"><span class="pre">requests.Session</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../task/index.html#undr.task.Manager" title="undr.task.Manager"><span class="pre">undr.task.Manager</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#undr.json_index_tasks.UncompressedDecodeProgress.run" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../path/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.path</span></code></div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../json_index/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.json_index</span></code></div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; Alexandre Marcireau, ICNS
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">undr.json_index_tasks</span></code></a><ul>
+<li><a class="reference internal" href="#overview">Overview</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.DirectoryScanned"><code class="docutils literal notranslate"><span class="pre">DirectoryScanned</span></code></a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.DirectoryScanned.download_bytes"><code class="docutils literal notranslate"><span class="pre">DirectoryScanned.download_bytes</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.DirectoryScanned.final_count"><code class="docutils literal notranslate"><span class="pre">DirectoryScanned.final_count</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.DirectoryScanned.index_bytes"><code class="docutils literal notranslate"><span class="pre">DirectoryScanned.index_bytes</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.DirectoryScanned.initial_download_count"><code class="docutils literal notranslate"><span class="pre">DirectoryScanned.initial_download_count</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.DirectoryScanned.initial_process_count"><code class="docutils literal notranslate"><span class="pre">DirectoryScanned.initial_process_count</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.DirectoryScanned.path_id"><code class="docutils literal notranslate"><span class="pre">DirectoryScanned.path_id</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.DirectoryScanned.process_bytes"><code class="docutils literal notranslate"><span class="pre">DirectoryScanned.process_bytes</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Doi"><code class="docutils literal notranslate"><span class="pre">Doi</span></code></a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.Doi.path_id"><code class="docutils literal notranslate"><span class="pre">Doi.path_id</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Doi.value"><code class="docutils literal notranslate"><span class="pre">Doi.value</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Index"><code class="docutils literal notranslate"><span class="pre">Index</span></code></a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.Index.run"><code class="docutils literal notranslate"><span class="pre">Index.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.json_index_tasks.IndexLoaded"><code class="docutils literal notranslate"><span class="pre">IndexLoaded</span></code></a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.IndexLoaded.children"><code class="docutils literal notranslate"><span class="pre">IndexLoaded.children</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.IndexLoaded.path_id"><code class="docutils literal notranslate"><span class="pre">IndexLoaded.path_id</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.json_index_tasks.IndexProgress"><code class="docutils literal notranslate"><span class="pre">IndexProgress</span></code></a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.IndexProgress.final"><code class="docutils literal notranslate"><span class="pre">IndexProgress.final</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.IndexProgress.initial"><code class="docutils literal notranslate"><span class="pre">IndexProgress.initial</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.json_index_tasks.InstallFilesRecursive"><code class="docutils literal notranslate"><span class="pre">InstallFilesRecursive</span></code></a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.InstallFilesRecursive.run"><code class="docutils literal notranslate"><span class="pre">InstallFilesRecursive.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.json_index_tasks.ProcessFile"><code class="docutils literal notranslate"><span class="pre">ProcessFile</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.ProcessFileType"><code class="docutils literal notranslate"><span class="pre">ProcessFileType</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.ProcessFilesRecursive"><code class="docutils literal notranslate"><span class="pre">ProcessFilesRecursive</span></code></a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.ProcessFilesRecursive.run"><code class="docutils literal notranslate"><span class="pre">ProcessFilesRecursive.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector"><code class="docutils literal notranslate"><span class="pre">Selector</span></code></a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.Action"><code class="docutils literal notranslate"><span class="pre">Selector.Action</span></code></a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.DECOMPRESS"><code class="docutils literal notranslate"><span class="pre">Selector.Action.DECOMPRESS</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.DOI"><code class="docutils literal notranslate"><span class="pre">Selector.Action.DOI</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.DOWNLOAD"><code class="docutils literal notranslate"><span class="pre">Selector.Action.DOWNLOAD</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.DOWNLOAD_SKIP"><code class="docutils literal notranslate"><span class="pre">Selector.Action.DOWNLOAD_SKIP</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.IGNORE"><code class="docutils literal notranslate"><span class="pre">Selector.Action.IGNORE</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.PROCESS"><code class="docutils literal notranslate"><span class="pre">Selector.Action.PROCESS</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.Action.SKIP"><code class="docutils literal notranslate"><span class="pre">Selector.Action.SKIP</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.INSTALL_IGNORE_ACTIONS"><code class="docutils literal notranslate"><span class="pre">Selector.INSTALL_IGNORE_ACTIONS</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.REPORT_DOWNLOAD_ACTIONS"><code class="docutils literal notranslate"><span class="pre">Selector.REPORT_DOWNLOAD_ACTIONS</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.REPORT_PROCESS_ACTIONS"><code class="docutils literal notranslate"><span class="pre">Selector.REPORT_PROCESS_ACTIONS</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.SKIP_ACTIONS"><code class="docutils literal notranslate"><span class="pre">Selector.SKIP_ACTIONS</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.action"><code class="docutils literal notranslate"><span class="pre">Selector.action()</span></code></a></li>
+<li><a class="reference internal" href="#undr.json_index_tasks.Selector.scan_filesystem"><code class="docutils literal notranslate"><span class="pre">Selector.scan_filesystem()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#undr.json_index_tasks.UncompressedDecodeProgress"><code class="docutils literal notranslate"><span class="pre">UncompressedDecodeProgress</span></code></a><ul>
+<li><a class="reference internal" href="#undr.json_index_tasks.UncompressedDecodeProgress.run"><code class="docutils literal notranslate"><span class="pre">UncompressedDecodeProgress.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
+    </body>
+</html>
