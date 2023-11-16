@@ -5,7 +5,7 @@ import requests
 
 import undr
 
-configuration = undr.configuration_from_path("undr.toml")
+dirname = pathlib.Path(__file__).resolve().parent
 
 
 @dataclasses.dataclass
@@ -36,7 +36,7 @@ class CountEvents(undr.ProcessFile):
 
 
 if __name__ == "__main__":
-    configuration = undr.configuration_from_path("undr.toml")
+    configuration = undr.configuration_from_path(dirname / "undr.toml")
     total = 0
     with configuration.display() as display, undr.ProcessManager() as manager:
         indexes_statuses = configuration.indexes_statuses(Selector())

@@ -3,6 +3,8 @@ import pathlib
 
 import undr
 
+dirname = pathlib.Path(__file__).resolve().parent
+
 
 def handle_dvs(file: undr.DvsFile, send_message: undr.SendMessage):
     file_total = 0
@@ -10,7 +12,7 @@ def handle_dvs(file: undr.DvsFile, send_message: undr.SendMessage):
         file_total += len(packet)
     with open(
         undr.utilities.path_with_suffix(
-            pathlib.Path("results") / file.path_id,
+            dirname / "results" / file.path_id,
             ".json",
         ),
         "w",
@@ -19,9 +21,9 @@ def handle_dvs(file: undr.DvsFile, send_message: undr.SendMessage):
 
 
 if __name__ == "__main__":
-    configuration = undr.configuration_from_path("undr.toml")
-    configuration.mktree("results", exist_ok=True)
-    store = undr.Store("progress.db")
+    configuration = undr.configuration_from_path(dirname / "undr.toml")
+    configuration.mktree(dirname / "results", exist_ok=True)
+    store = undr.Store(dirname / "progress.db")
     for message in configuration.map(
         switch=undr.Switch(handle_dvs=handle_dvs),
         store=store,
@@ -34,7 +36,7 @@ if __name__ == "__main__":
         if isinstance(path, undr.DvsFile):
             with open(
                 undr.utilities.path_with_suffix(
-                    pathlib.Path("results") / path.path_id,
+                    dirname / "results" / path.path_id,
                     ".json",
                 ),
             ) as individual_result:

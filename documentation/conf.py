@@ -15,6 +15,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "python": ("https://docs.python.org/3", None),
     "requests": ("https://requests.readthedocs.io/en/latest/", None),
+    "fastjsonschema": ("https://horejsek.github.io/python-fastjsonschema/", None),
 }
 
 html_css_files = ["css/custom.css"]

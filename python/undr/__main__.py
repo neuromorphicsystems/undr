@@ -86,12 +86,12 @@ def main():
         help="Read all the files and check their invariants (timestamps order, spatial coordinates range...)",
     )
     add_common_arguments(doctor_parser)
-    check_conformance_parser = subparsers.add_parser(
-        "check-conformance",
+    check_compliance_parser = subparsers.add_parser(
+        "check-compliance",
         help="Inspect a directory before uploading it to an UNDR server",
     )
-    check_conformance_parser.add_argument("path", help="Path of the local directory")
-    check_conformance_parser.add_argument(
+    check_compliance_parser.add_argument("path", help="Path of the local directory")
+    check_compliance_parser.add_argument(
         "--skip-format-index",
         "-s",
         action="store_true",
@@ -192,8 +192,8 @@ def main():
         else:
             print(display.format_error(f"{error.path_id}: {error.message}"))
 
-    if args.command == "check-conformance":
-        conformance_error: typing.Optional[str] = None
+    if args.command == "check-compliance":
+        compliance_error: typing.Optional[str] = None
         try:
             path = pathlib.Path(args.path)
             check.structure_recursive(path)
@@ -252,13 +252,13 @@ def main():
                     ),
                 )
         except KeyboardInterrupt:
-            conformance_error = "Interrupted"
+            compliance_error = "Interrupted"
         except:
-            conformance_error = str(sys.exc_info()[1])
-        if conformance_error is None:
+            compliance_error = str(sys.exc_info()[1])
+        if compliance_error is None:
             print(display.format_info("No errors detected"))
         else:
-            print(display.format_error(conformance_error))
+            print(display.format_error(compliance_error))
 
 
 if __name__ == "__main__":

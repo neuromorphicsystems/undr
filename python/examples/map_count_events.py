@@ -1,4 +1,8 @@
+import pathlib
+
 import undr
+
+dirname = pathlib.Path(__file__).resolve().parent
 
 
 def handle_dvs(file: undr.DvsFile, send_message: undr.SendMessage):
@@ -9,7 +13,7 @@ def handle_dvs(file: undr.DvsFile, send_message: undr.SendMessage):
 
 
 if __name__ == "__main__":
-    configuration = undr.configuration_from_path("undr.toml")
+    configuration = undr.configuration_from_path(dirname / "undr.toml")
     total = 0
     for message in configuration.map(switch=undr.Switch(handle_dvs=handle_dvs)):
         total += message

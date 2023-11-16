@@ -1,4 +1,3 @@
-import dataclasses
 import json
 import pathlib
 
@@ -6,7 +5,7 @@ import requests
 
 import undr
 
-configuration = undr.configuration_from_path("undr.toml")
+dirname = pathlib.Path(__file__).resolve().parent
 
 
 class Selector(undr.Selector):
@@ -45,9 +44,9 @@ class CountEvents(undr.ProcessFile):
 
 
 if __name__ == "__main__":
-    configuration = undr.configuration_from_path("undr.toml")
-    configuration.mktree("results", exist_ok=True)
-    store = undr.Store("progress.db")
+    configuration = undr.configuration_from_path(dirname / "undr.toml")
+    configuration.mktree(dirname / "results", exist_ok=True)
+    store = undr.Store(dirname / "progress.db")
     with configuration.display() as display, undr.ProcessManager() as manager:
         indexes_statuses = configuration.indexes_statuses(
             Selector(undr.ReadOnlyStore(store.path))
@@ -105,7 +104,7 @@ if __name__ == "__main__":
         if isinstance(path, undr.DvsFile):
             with open(
                 undr.utilities.path_with_suffix(
-                    pathlib.Path("results") / path.path_id,
+                    dirname / "results" / path.path_id,
                     ".json",
                 ),
             ) as individual_result:

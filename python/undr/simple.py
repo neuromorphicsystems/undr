@@ -15,7 +15,7 @@ import typing
 try:
     import tomllib
 except ModuleNotFoundError:
-    import tomli as tomllib
+    import tomli as tomllib  # type: ignore
 
 from . import configuration, constants, install_mode
 

@@ -9,23 +9,23 @@ import pathlib
 import pkgutil
 import typing
 
-import jsonschema_rs
+import fastjsonschema
 
 from . import constants
 
 
-def load_schema(name: str) -> jsonschema_rs.JSONSchema:
+def load_schema(name: str) -> typing.Callable[[typing.Any], None]:
     """Reads and parses a JSON schema bundled with UNDR.
 
     Args:
         name (str): Name of the schema.
 
     Returns:
-        jsonschema_rs.JSONSchema: JSON schema validator.
+        typing.Callable[[typing.Any], None]: JSON schema validator.
     """
-    data = pkgutil.get_data("undr", name)
+    data = pkgutil.get_data("undr", f"specification/{name}.json")
     assert data is not None
-    return jsonschema_rs.JSONSchema(json.loads(data.decode()))
+    return fastjsonschema.compile(json.loads(data.decode()))  # type: ignore
 
 
 def least_multiple_over_chunk_size(word_size: int) -> int:

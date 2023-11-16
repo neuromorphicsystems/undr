@@ -10,8 +10,8 @@ import typing
 
 from . import constants, utilities
 
-schema = utilities.load_schema("-index_schema.json")
-"""JSON schema for -index files."""
+validate = utilities.load_schema("-index_schema")
+"""JSON schema validator for -index files."""
 
 
 class InstallError(FileNotFoundError):
@@ -41,7 +41,7 @@ def load(path: pathlib.Path) -> dict[str, typing.Any]:
 
     Raises:
         InstallError: if the file does not exist.
-        jsonschema_rs.ValidationError: if validation fails.
+        fastjsonschema.JsonSchemaValueException: if validation fails.
 
     Returns:
         dict[str, typing.Any]: Parsed JSON file contents.
@@ -50,7 +50,7 @@ def load(path: pathlib.Path) -> dict[str, typing.Any]:
     try:
         with open(path) as index_data_file:
             index_data = json.load(index_data_file)
-        schema.validate(index_data)
+        validate(index_data)
         return index_data
     except FileNotFoundError:
         raise InstallError(path)

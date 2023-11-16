@@ -15,7 +15,7 @@ import requests
 try:
     import tomllib
 except ModuleNotFoundError:
-    import tomli as tomllib
+    import tomli as tomllib  # type: ignore
 
 from . import (
     bibtex,
@@ -33,8 +33,8 @@ from . import (
     utilities,
 )
 
-schema = utilities.load_schema("undr_schema.json")
-"""JSON schema for TOML settings files."""
+validate = utilities.load_schema("undr_schema")
+"""JSON schema validator for TOML settings files."""
 
 
 class InstallSelector(json_index_tasks.Selector):
@@ -742,7 +742,7 @@ def configuration_from_path(path: typing.Union[str, os.PathLike]) -> Configurati
     path = pathlib.Path(path).resolve()
     with open(path, "rb") as configuration_file:
         configuration = tomllib.load(configuration_file)
-    schema.validate(configuration)
+    validate(configuration)
     names = set()
     for dataset in configuration["datasets"]:
         if dataset["name"] in names:

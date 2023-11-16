@@ -291,7 +291,7 @@ def format_index_recursive(
     with open(index_path, "rb") as index_file:
         index_content = index_file.read()
     index_data = json.loads(index_content)
-    json_index.schema.validate(index_data)
+    json_index.validate(index_data)
     new_index_content = f"{json.dumps(index_data, sort_keys=True, indent=4)}\n".encode()
     if index_content != new_index_content:
         handle_path(index_path)

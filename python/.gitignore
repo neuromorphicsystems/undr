@@ -3,10 +3,8 @@ __pycache__
 *.pyc
 build
 dist
+sdist
 examples/datasets
 examples/logs
 examples/progress.db
 examples/results
-long_description.md
-sdist
-undr

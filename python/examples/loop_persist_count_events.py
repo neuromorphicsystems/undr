@@ -3,10 +3,11 @@ import pathlib
 
 import undr
 
-configuration = undr.configuration_from_path("undr.toml")
+dirname = pathlib.Path(__file__).resolve().parent
 
-configuration.mktree("results", exist_ok=True)
-store = undr.Store("progress.db")
+configuration = undr.configuration_from_path(dirname / "undr.toml")
+configuration.mktree(dirname / "results", exist_ok=True)
+store = undr.Store(dirname / "progress.db")
 for path in configuration.iter(recursive=True):
     if isinstance(path, undr.DvsFile):
         if str(path.path_id) in store:
@@ -18,7 +19,7 @@ for path in configuration.iter(recursive=True):
                 file_total += len(packet)
             with open(
                 undr.utilities.path_with_suffix(
-                    pathlib.Path("results") / path.path_id,
+                    dirname / "results" / path.path_id,
                     ".json",
                 ),
                 "w",
@@ -32,7 +33,7 @@ for path in configuration.iter(recursive=True):
     if isinstance(path, undr.DvsFile):
         with open(
             undr.utilities.path_with_suffix(
-                pathlib.Path("results") / path.path_id,
+                dirname / "results" / path.path_id,
                 ".json",
             ),
         ) as individual_result:

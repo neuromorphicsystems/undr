@@ -1,6 +1,10 @@
+import pathlib
+
 import undr
 
-configuration = undr.configuration_from_path("undr.toml")
+dirname = pathlib.Path(__file__).resolve().parent
+
+configuration = undr.configuration_from_path(dirname / "undr.toml")
 
 total = 0
 for path in configuration.iter(recursive=True):
