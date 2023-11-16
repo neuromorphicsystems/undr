@@ -25,6 +25,9 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[tool.setuptools.package-data]
+"undr.specification" = ["*.json"]
+
 [tool.setuptools.dynamic]
 version = {attr = "undr.version.__version__"}
 
